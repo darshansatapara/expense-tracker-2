@@ -1,12 +1,14 @@
-import { useState } from "react";
-import "./App.css";
+import SignupPage from "./pages/SignupPage.jsx";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
-      <h1 className="text-red-500"> this is page </h1>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<SignupPage />} />
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }
