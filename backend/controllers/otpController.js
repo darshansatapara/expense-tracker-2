@@ -11,8 +11,7 @@ export const otpController = async (req, res) => {
       const expiresAt = new Date(Date.now() + 2 * 60 * 1000); // OTP valid for 10 minutes
 
       // Save OTP and expiration in the temporary store
-      otpStore.set(email, { otp: otp, expiresAt });
-      console.log(otpStore);
+      otpStore.set(email, { otp: otp.toString(), expiresAt });
 
       // Create Nodemailer transporter
       const transporter = nodemailer.createTransport({

@@ -4,12 +4,12 @@ import toast from "react-hot-toast";
 
 export const useOtpStore = create((set) => ({
   isSendingOtp: false, // Loading state
-  email: "",
-  password: "",
   otpSent: false, // Indicates if OTP was sent successfully
+  isVerifyingOtp: false, // Loading state for verifying OTP
+  otpVerified: false, // Indicates if OTP was verified successfully
 
   // Action to send OTP
-  sendOtp: async (email, password) => {
+  sendOtp: async (email) => {
     set({ isSendingOtp: true });
 
     try {
@@ -24,6 +24,28 @@ export const useOtpStore = create((set) => ({
       );
     } finally {
       set({ isSendingOtp: false });
+    }
+  },
+
+  verifyOtp: async (email, otp) => {
+    set({ isVerifyingOtp: true });
+
+    try {
+      const response = await axiosInstance.post("/otp/verify-otp", {
+        email,
+        otp,
+      });
+   
+
+      set({ otpVerified: true }); // Mark OTP as verified
+      toast.success(response.data.message || "OTP verified successfully!");
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error.response?.data?.message || "Failed to verify OTP. Try again."
+      );
+    } finally {
+      set({ isVerifyingOtp: false });
     }
   },
 }));

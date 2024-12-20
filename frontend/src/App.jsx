@@ -1,15 +1,14 @@
-import SignupPage from "./pages/SignupPage.jsx";
+import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import SignupPage from "../src/pages/SignupPage";
 
 function App() {
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<SignupPage />} />
-        </Routes>
-      </BrowserRouter>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<SignupPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
