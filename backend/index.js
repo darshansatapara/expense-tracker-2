@@ -6,6 +6,7 @@ import userRoute from "./routes/userRoutes.js";
 import categoryRoute from "./routes/categoryRoutes.js";
 import expenseRoute from "./routes/expenseRoutes.js";
 import incomeRoute from "./routes/incomeRoutes.js";
+import otpRoute from "./routes/otpRoutes.js";
 
 dotenv.config(); // Load environment variables
 
@@ -23,6 +24,7 @@ app.use("/api/auth", userRoute);
 app.use("/api/categories", categoryRoute);
 app.use("/api/expenses", expenseRoute);
 app.use("/api/income", incomeRoute);
+app.use("/api/otp", otpRoute);
 
 // Start the server
 const PORT = process.env.PORT || 5000;
