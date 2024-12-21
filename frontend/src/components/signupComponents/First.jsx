@@ -3,6 +3,7 @@ import { Input, Button, notification } from "antd";
 import { Mail, Key } from "lucide-react";
 import Signup from "./leftContent/Signup_Left";
 import { useOtpStore } from "../../store/otpStore.js";
+import OAuth from "./GoogleAuth.jsx";
 
 export default function First() {
   const {
@@ -162,6 +163,7 @@ export default function First() {
                 </Button>
               </form>
             )}
+            <OAuth />
             {otpVerified && (
               <div className="text-center mt-7">
                 <p className="text-green-600 font-semibold">
