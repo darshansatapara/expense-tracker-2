@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignupPage from "../src/pages/SignupPage";
 import ProfileSignup from "./components/signupComponents/ProfileSignup";
@@ -8,7 +7,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/signup/profilesignup" element={<ProfileSignup />} />
+        <Route path="/profilesignup" element={<ProfileSignup />} />
       </Routes>
     </BrowserRouter>
   );

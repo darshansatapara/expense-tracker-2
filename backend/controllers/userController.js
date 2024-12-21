@@ -5,6 +5,7 @@ import { generateToken } from "../config/utils.js";
 // Sign-up controller
 export const signUp = async (req, res, next) => {
   const {
+    profilePic,
     username,
     email,
     password,
@@ -18,7 +19,6 @@ export const signUp = async (req, res, next) => {
     !username ||
     !email ||
     !password ||
-    !name ||
     !mobile_no ||
     !date_of_birth ||
     !category
@@ -35,6 +35,7 @@ export const signUp = async (req, res, next) => {
 
     // Create a new user
     const newUser = new User({
+      profilePic: profilePic,
       username,
       email,
       password: hashedPassword,
@@ -51,13 +52,13 @@ export const signUp = async (req, res, next) => {
 
       // save the new user in the database
       await newUser.save();
+
       res.status(201).json({
         success: true,
         message: "User registered successfully",
         user: {
-          username: newUsernewUser.username,
+          username: newUser.username,
           email: newUser.email,
-          name: newUser.name,
           mobile_no: newUser.mobile_no,
           date_of_birth: newUser.date_of_birth,
           category: newUser.category,

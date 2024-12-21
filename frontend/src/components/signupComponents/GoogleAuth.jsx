@@ -19,11 +19,10 @@ export default function OAuth() {
       const user = {
         name: resultfromgoogle.user.displayName,
         email: resultfromgoogle.user.email,
-        photoURL: resultfromgoogle.user.photoURL,
       };
 
       // Navigate to /signup/profilesignup and pass user data as state
-      navigate("/signup/profilesignup", { state: { user: user } });
+      navigate("/profilesignup", { state: { user: user } });
     } catch (error) {
       console.log(error);
     }

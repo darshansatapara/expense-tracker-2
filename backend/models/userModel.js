@@ -22,10 +22,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  name: {
-    type: String,
-    required: true,
-  },
   mobile_no: {
     type: String,
     required: true,
@@ -34,7 +30,7 @@ const userSchema = new mongoose.Schema({
   date_of_birth: {
     type: Date,
     required: true,
-  },
+  }, //profession
   category: {
     type: String,
     required: true,
