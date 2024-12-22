@@ -23,6 +23,7 @@ export default function OAuth() {
 
       // Navigate to /signup/profilesignup and pass user data as state
       navigate("/profilesignup", { state: { user: user } });
+
     } catch (error) {
       console.log(error);
     }

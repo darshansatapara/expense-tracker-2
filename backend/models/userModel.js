@@ -29,8 +29,8 @@ const userSchema = new mongoose.Schema({
   date_of_birth: {
     type: Date,
     required: true,
-  }, //profession
-  category: {
+  },
+  profession: {
     type: String,
     required: true,
   },
