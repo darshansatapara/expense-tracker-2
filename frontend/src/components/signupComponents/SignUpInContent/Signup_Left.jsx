@@ -1,6 +1,6 @@
 import React from "react";
 import SlidingContent from "./Slidingcontent"; // Adjust path if necessary
-import signup from "/images/Signupimg.jpeg"; // Image import
+import signupImg from "/images/Signupimg.jpeg"; // Image import
 
 const Signup = () => {
   return (
@@ -10,7 +10,7 @@ const Signup = () => {
         {/* Upper part: Image */}
         <div className="flex-1 flex items-center justify-center mb-4 ">
           <img
-            src={signup}
+            src={signupImg}
             alt="Signup Image"
             className="w-full max-w-2xl h-[300px] rounded-lg shadow-lg "
           />

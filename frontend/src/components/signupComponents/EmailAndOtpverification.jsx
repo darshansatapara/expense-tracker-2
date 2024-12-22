@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Input, Button, notification } from "antd";
-import { Mail, Key } from "lucide-react";
-import Signup from "./leftContent/Signup_Left";
+import OTPInput from "react-otp-input"; // Import the correct OTPInput component
+import { Button, Input, notification } from "antd";
+import { Mail } from "lucide-react";
+import SignupLeft from "./SignUpInContent/Signup_Left.jsx";
 import { useOtpStore } from "../../store/otpStore.js";
 import OAuth from "./GoogleAuth.jsx";
 
@@ -97,7 +98,7 @@ export default function First() {
       <div className="flex flex-col lg:flex-row justify-around h-screen bg-[#D9EAFD]">
         {/* Left section */}
         <div className="hidden lg:block px-20 justify-center items-center">
-          <Signup />
+          <SignupLeft />
         </div>
 
         {/* Right section */}
@@ -132,16 +133,21 @@ export default function First() {
                 )}
                 {otpSent && (
                   <div className="mb-7">
-                    <Input
+                    <OTPInput
                       value={otp}
-                      onChange={
-                        (e) => setOtp(e.target.value.slice(0, 6)) // Restrict input to 6 characters
-                      }
-                      prefix={<Key className="text-yellow-500" />}
-                      placeholder="OTP"
-                      size="large"
-                      className="rounded-md"
-                      disabled={isVerifyingOtp} // Disable input while verifying OTP
+                      onChange={(otp) => setOtp(otp)} // Update state with OTP input
+                      numInputs={6} // 6 OTP input boxes
+                      separator={<span>-</span>}
+                      renderInput={(props) => <input {...props} />} // Separator between OTP digits
+                      inputStyle={{
+                        width: "3rem",
+                        height: "3rem",
+                        margin: "0.5rem",
+                        fontSize: "1.5rem",
+                        textAlign: "center",
+                        borderRadius: "8px",
+                        border: "1px solid #ccc",
+                      }}
                     />
                   </div>
                 )}
