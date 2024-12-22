@@ -25,7 +25,7 @@ export default function OAuth2() {
       await googlesignin({ email });
 
       // Redirect to the /category page on success
-      navigate("/category");
+      navigate("/");
 
       // Show success message
       message.success("Signed in successfully!");
