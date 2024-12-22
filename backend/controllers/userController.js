@@ -1,6 +1,7 @@
 import User from "../models/userModel.js";
 import UserCredential from "../models/UserCredential.js";
 import bcrypt from "bcryptjs";
+import cloudinary from "../config/cloudinary.js";
 import { generateToken } from "../config/utils.js";
 
 // Sign-up controller
@@ -31,13 +32,25 @@ export const signUp = async (req, res, next) => {
   }
 
   try {
+    let profilePhoto =
+      null ||
+      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
+
+    // Upload profilePic to Cloudinary if available
+    if (profilePic) {
+      const uploadProfilePic = await cloudinary.uploader.upload(profilePic, {
+        folder: "user_profiles", // Optional: Organize images in a folder on Cloudinary
+      });
+      profilePhoto = uploadProfilePic.secure_url;
+      console.log("Uploaded Profile Photo URL:", profilePhoto);
+    }
     // Hash the password before saving
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create a new user
     const newUser = new User({
-      profilePic,
+      profilePic: profilePhoto,
       username,
       email,
       name,
