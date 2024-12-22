@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import { Button, Input, notification } from "antd";
+import SignupLeft from "./SignUpInContent/Signup_Left";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function PasswordSection() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const userMail = location.state?.user?.email || location.state?.email || "";
+
+  // console.log("userMail", userMail); // For debugging, check what email is passed
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
@@ -16,10 +24,19 @@ export default function PasswordSection() {
       return;
     }
 
+    // Assuming you have the user's email and password
+    const userCredentials = {
+      email: userMail, // Use the email passed through state
+      password: password, // Use the password from the form
+    };
+
     notification.success({
       message: "Password Updated",
       description: "Your password has been successfully updated.",
     });
+
+    // Navigate to /signup/profilesignup and pass user credentials as state
+    navigate("/signup/profileSection", { state: { userCredentials } });
   };
 
   return (
@@ -27,7 +44,7 @@ export default function PasswordSection() {
       <div className="flex flex-col lg:flex-row justify-around h-screen bg-[#D9EAFD]">
         {/* Left section */}
         <div className="hidden lg:block px-20 justify-center items-center">
-          {/* You can add your left side content here if needed */}
+          <SignupLeft />
         </div>
 
         {/* Right section */}
@@ -71,14 +88,14 @@ export default function PasswordSection() {
                 Set Password
               </Button>
             </form>
-            <div className="text-center mt-7">
+            {/* <div className="text-center mt-7">
               <p className="text-gray-600">
                 Already have an account?{" "}
                 <a href="/signin" className="text-blue-500 hover:underline">
                   Sign in
                 </a>
               </p>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

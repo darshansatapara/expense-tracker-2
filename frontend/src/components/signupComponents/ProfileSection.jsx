@@ -18,7 +18,8 @@ export default function ProfileSection() {
   const navigate = useNavigate();
   const signup = userStore((state) => state.signup);
 
-  const userData = location.state?.user || {};
+  const userData = location.state?.userCredentials || {};
+  console.log(userData);
   const [form] = Form.useForm();
   const [profilePic, setProfilePic] = useState("");
   const [loading, setLoading] = useState(false);
@@ -51,6 +52,7 @@ export default function ProfileSection() {
 
     const payload = {
       ...values,
+      password: userData.password,
       profilePic,
     };
 
@@ -78,7 +80,8 @@ export default function ProfileSection() {
           layout="vertical"
           initialValues={{
             profilePic: userData.profilePic || "",
-            username: userData.name || "",
+            username:
+              userData.name || `User${Math.floor(1000 + Math.random() * 9000)}`,
             email: userData.email || "",
             mobile_no: userData.mobile_no || "",
             date_of_birth: userData.date_of_birth || null,
@@ -159,27 +162,34 @@ export default function ProfileSection() {
             <DatePicker
               className="w-full rounded"
               prefix={<CalendarFold className="text-purple-400" />}
+              format="DD-MM-YYYY"
+              placeholder="DD-MM-YYYY"
             />
           </Form.Item>
 
-          {/* Category */}
+          {/* profession */}
           <Form.Item
             name="profession"
             label="Profession"
             rules={[{ required: true, message: "Please select a category!" }]}
           >
             <Select
-              placeholder="Select a Profession"
               className="rounded-md"
+              defaultValue="" // Default to the placeholder option
               prefix={<ClipboardPen className="text-pink-700" />}
             >
+              <Option value="" disabled hidden>
+                Select an option
+              </Option>
               <Option value="student">Student</Option>
-              <Option value="professional">Professional</Option>
+              <Option value="employee">Employee</Option>
+              <Option value="householder">House Holder</Option>
+              <Option value="elder">Elder</Option>
               <Option value="other">Other</Option>
             </Select>
           </Form.Item>
 
-          {/* Password */}
+          {/* Password
           <Form.Item
             name="password"
             label="Password"
@@ -203,7 +213,7 @@ export default function ProfileSection() {
               className="rounded"
               visibilityToggle
             />
-          </Form.Item>
+          </Form.Item> */}
 
           {/* Submit Button */}
           <Form.Item>

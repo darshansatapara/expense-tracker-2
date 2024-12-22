@@ -2,7 +2,7 @@ import React from "react";
 import SlidingContent from "./Slidingcontent"; // Adjust path if necessary
 import signupImg from "/images/Signupimg.jpeg"; // Image import
 
-const Signup = () => {
+const SignupLeft = () => {
   return (
     <div className=" w-full flex h-screen justify-center items-center">
       {/* Left Section - Now occupies the full screen */}
@@ -25,4 +25,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default SignupLeft;
