@@ -100,7 +100,7 @@ export default function ProfileSection() {
                     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
                   }
                   alt="Profile"
-                  className="w-24 h-24 rounded-full mx-auto border-2 rounded-full border-[#79D7BE]"
+                  className="w-24 h-24 rounded-full mx-auto border-2  border-[#79D7BE]"
                 />
               </Upload>
             </div>
