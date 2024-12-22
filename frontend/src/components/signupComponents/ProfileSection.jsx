@@ -46,7 +46,7 @@ export default function ProfileSection() {
             email: userData.email || "",
             mobile_no: userData.mobile_no || "",
             date_of_birth: userData.date_of_birth || null,
-            profession: userData.category || "",
+            profession: userData.profession || "",
           }}
           onFinish={handleFinish}
         >
