@@ -30,10 +30,11 @@ export const userStore = create((set) => ({
    * Signin method to authenticate a user.
    * @param {Object} credentials - User credentials for sign-in.
    */
-  signin: async (credentials) => {
+  signin: async (data) => {
     set({ isSigningIn: true });
     try {
-      const res = await axiosInstance.post("/auth/signin", credentials);
+      const res = await axiosInstance.post("/auth/signin", data);
+      console.log(res);
       set({ currentUser: res.data });
       toast.success("Signed in successfully!");
     } catch (error) {
@@ -44,6 +45,20 @@ export const userStore = create((set) => ({
     }
   },
 
+  googlesignin: async (data) => {
+    set({ isSigningIn: true });
+    try {
+      const res = await axiosInstance.post("/auth/googlesignin", data);
+      console.log(res);
+      set({ currentUser: res.data });
+      toast.success("Signed in successfully!");
+    } catch (error) {
+      console.error("Signin error:", error);
+      toast.error(error.response?.data?.message || "Sign-in failed!");
+    } finally {
+      set({ isSigningIn: false });
+    }
+  },
   /**
    * Signout method to log out the current user.
    */
