@@ -1,13 +1,15 @@
-import { Button } from "antd";
+import { Button, message } from "antd";
 import { AiFillGoogleCircle } from "react-icons/ai";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import React, { useState } from "react";
+import React from "react";
 import { app } from "../../utils/firebase.js";
 import { useNavigate } from "react-router-dom";
+import { userStore } from "../../store/userStore";
 
-export default function OAuth() {
+export default function OAuth2() {
   const auth = getAuth(app);
   const navigate = useNavigate();
+  const { googlesignin } = userStore();
 
   const handleGoogleClick = async () => {
     const provider = new GoogleAuthProvider();
@@ -16,16 +18,20 @@ export default function OAuth() {
     try {
       const resultfromgoogle = await signInWithPopup(auth, provider);
 
-      const user = {
-        name: resultfromgoogle.user.displayName,
-        email: resultfromgoogle.user.email,
-      };
+      // Extract user email from Google sign-in response
+      const email = resultfromgoogle.user.email;
 
-      // Navigate to /signup/profilesignup and pass user data as state
-      navigate("/profilesignup", { state: { user: user } });
+      // Call the store's googlesignin function with email
+      await googlesignin({ email });
 
+      // Redirect to the /category page on success
+      navigate("/");
+
+      // Show success message
+      message.success("Signed in successfully!");
     } catch (error) {
-      console.log(error);
+      console.error("Google Sign-In Error:", error);
+      toast.error("Google Sign-In failed. Please try again.");
     }
   };
 

@@ -181,7 +181,7 @@ export default function First() {
               <div className="text-center mt-7">
                 <p className="text-gray-600">
                   Already have an account?{" "}
-                  <a href="/signup" className="text-blue-500 hover:underline">
+                  <a href="/signin" className="text-blue-500 hover:underline">
                     Sign in
                   </a>
                 </p>

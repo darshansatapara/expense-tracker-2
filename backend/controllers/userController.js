@@ -5,6 +5,7 @@ import { generateToken } from "../config/utils.js";
 // Sign-up controller
 export const signUp = async (req, res, next) => {
   const {
+    profilePic,
     username,
     email,
     password,
@@ -18,7 +19,6 @@ export const signUp = async (req, res, next) => {
     !username ||
     !email ||
     !password ||
-    !name ||
     !mobile_no ||
     !date_of_birth ||
     !profession
@@ -31,10 +31,12 @@ export const signUp = async (req, res, next) => {
 
   try {
     // Hash the password before saving
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create a new user
     const newUser = new User({
+      profilePic: profilePic,
       username,
       email,
       password: hashedPassword,
@@ -51,13 +53,13 @@ export const signUp = async (req, res, next) => {
 
       // save the new user in the database
       await newUser.save();
+
       res.status(201).json({
         success: true,
         message: "User registered successfully",
         user: {
-          username: newUsernewUser.username,
+          username: newUser.username,
           email: newUser.email,
-          name: newUser.name,
           mobile_no: newUser.mobile_no,
           date_of_birth: newUser.date_of_birth,
           profession: newUser.profession,
@@ -72,50 +74,69 @@ export const signUp = async (req, res, next) => {
 // Sign-in controller
 export const signIn = async (req, res, next) => {
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({
-      success: false,
-      message: "Please provide email and password",
-    });
-  }
-
+  console.log(email, password);
   try {
-    // Find the user by email
     const user = await User.findOne({ email });
-
+    // const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid email or password",
-      });
-    }
-
-    // Compare the provided password with the hashed password in the database
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid email or password",
-      });
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
     generateToken(user._id, res);
     res.status(200).json({
-      success: true,
-      message: "User logged in successfully",
-      user: {
-        _id: user._id,
-        email: user.email,
-        name: user.name,
-      },
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      profilepic: user.profilePic,
     });
-  } catch (err) {
-    next(err); // Pass errors to the error-handling middleware
+  } catch (error) {
+    res.status(500).json({ error: "Server Error" });
   }
 };
 
+// google singin
+export const googlesignin = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({
+      success: false,
+      message: "Email is required",
+    });
+  }
+
+  try {
+    // Check if the user exists
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+      // If user does not exist, send error response
+      return res.status(404).json({
+        success: false,
+        message: "User does not exist. Please sign up.",
+      });
+    }
+
+    // Generate a token for the user
+    generateToken(user._id, res);
+
+    res.status(200).json({
+      success: true,
+      message: "Google Sign-In successful",
+      user: {
+        _id: user._id,
+        email: user.email,
+        username: user.username,
+      },
+    });
+  } catch (err) {
+    console.error("Error during Google Sign-In:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
 // Get user by ID controller
 export const getUserById = async (req, res, next) => {
   const { userId } = req.params;

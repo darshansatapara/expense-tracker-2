@@ -16,7 +16,10 @@ connectDatabase();
 const app = express();
 
 // Middleware
-app.use(express.json());
+// Increase payload size limit
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
+
 app.use(cors());
 
 // routes
