@@ -1,16 +1,21 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import SignupPage from './components/Signup/Signup'; // Adjust the path if necessary
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import SignupPage from "../src/pages/SignupPage";
+import ProfileSection from "./components/signupComponents/ProfileSection";
+import SignIn from "./components/signinComponent/Signin";
 
-const App = () => {
+
+function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
-        <Route path="/signup" element={<SignupPage />} />
-        {/* Add more routes as needed */}
+        <Route path="/signup/*" element={<SignupPage />} />
+        {/* <Route path="/signup/profilesignup" element={<ProfileSection />} /> */}
+
+        <Route path="/signin" element={<SignIn />} />
+
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
-};
+}
 
 export default App;

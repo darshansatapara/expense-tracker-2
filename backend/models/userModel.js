@@ -11,7 +11,6 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true,
   },
   email: {
     type: String,
@@ -19,10 +18,6 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
   password: {
-    type: String,
-    required: true,
-  },
-  name: {
     type: String,
     required: true,
   },
@@ -35,7 +30,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  category: {
+  profession: {
     type: String,
     required: true,
   },
