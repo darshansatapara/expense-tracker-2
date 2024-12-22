@@ -11,7 +11,7 @@ export const signUp = async (req, res, next) => {
     name,
     mobile_no,
     date_of_birth,
-    category,
+    profession,
   } = req.body;
 
   if (
@@ -21,7 +21,7 @@ export const signUp = async (req, res, next) => {
     !name ||
     !mobile_no ||
     !date_of_birth ||
-    !category
+    !profession
   ) {
     return res.status(400).json({
       success: false,
@@ -41,7 +41,7 @@ export const signUp = async (req, res, next) => {
       name,
       mobile_no,
       date_of_birth,
-      category,
+      profession,
     });
 
     // console.log(newUser);
@@ -60,7 +60,7 @@ export const signUp = async (req, res, next) => {
           name: newUser.name,
           mobile_no: newUser.mobile_no,
           date_of_birth: newUser.date_of_birth,
-          category: newUser.category,
+          profession: newUser.profession,
         },
       });
     }
@@ -140,7 +140,7 @@ export const getUserById = async (req, res, next) => {
         name: user.name,
         mobile_no: user.mobile_no,
         date_of_birth: user.date_of_birth,
-        category: user.category,
+        profession: user.profession,
       },
     });
   } catch (error) {

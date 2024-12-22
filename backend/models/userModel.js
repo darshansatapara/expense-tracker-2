@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  category: {
+  profession: {
     type: String,
     required: true,
   },

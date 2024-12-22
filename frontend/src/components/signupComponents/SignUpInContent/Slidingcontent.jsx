@@ -7,7 +7,7 @@ const SlidingContent = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentQuoteIndex((prevIndex) => (prevIndex + 1) % quotes.length);
-    }, 3000); // Change quote every 3 seconds
+    }, 4000); // Change quote every 3 seconds
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
 

@@ -6,7 +6,7 @@ import { AiOutlinePhone, AiOutlineUpload } from "react-icons/ai";
 
 const { Option } = Select;
 
-export default function ProfileSignup() {
+export default function ProfileSection() {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -31,7 +31,7 @@ export default function ProfileSignup() {
 
   return (
     <div className="min-h-screen bg-custom-bg flex items-center justify-center py-10 px-5 bg-[#D9EAFD] font-nunito">
-      <div className="p-8 max-w-lg w-full">
+      <div className="p-8 pt-0 max-w-lg w-full">
         <h1 className="text-center text-2xl font-semibold text-gray-700 mb-6">
           Complete Your Profile
         </h1>
@@ -46,17 +46,17 @@ export default function ProfileSignup() {
             email: userData.email || "",
             mobile_no: userData.mobile_no || "",
             date_of_birth: userData.date_of_birth || null,
-            category: userData.category || "",
+            profession: userData.category || "",
           }}
           onFinish={handleFinish}
         >
           {/* Profile Picture */}
-          <Form.Item label="Profile Picture" className="text-center">
+          <Form.Item className="text-center">
             <div className="mt-3 text-center">
               <Upload beforeUpload={handleFileUpload} showUploadList={false}>
-                <Button className="bg-blue-500 hover:bg-blue-600 hidden border-8 rounded-full">
+                {/* <Button className="bg-blue-500 hover:bg-blue-600 hidden border-8 rounded-full">
                   Upload Profile Picture
-                </Button>
+                </Button> */}
 
                 <img
                   src={
@@ -64,7 +64,7 @@ export default function ProfileSignup() {
                     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
                   }
                   alt="Profile"
-                  className="w-24 h-24 rounded-full mx-auto border-2 rounded-full border-[#79D7BE]"
+                  className="w-24 h-24 mx-auto border-2 rounded-full border-[#79D7BE]"
                 />
               </Upload>
             </div>
@@ -73,7 +73,7 @@ export default function ProfileSignup() {
           {/* Username */}
           <Form.Item
             name="username"
-            label="username "
+            label="Username "
             rules={[{ required: true, message: "Please enter your username!" }]}
             style={{ height: " 40px" }}
           >
@@ -84,7 +84,6 @@ export default function ProfileSignup() {
               className="rounded"
             />
           </Form.Item>
-
           {/* Email */}
           <Form.Item
             name="email"
@@ -133,8 +132,8 @@ export default function ProfileSignup() {
 
           {/* Category */}
           <Form.Item
-            name="category"
-            label="Category"
+            name="profession"
+            label="Profession"
             rules={[{ required: true, message: "Please select a category!" }]}
             style={{ height: " 40px", marginTop: "40px" }}
           >
@@ -144,7 +143,8 @@ export default function ProfileSignup() {
               className="rounded-md border-none font-nunito font-semibold"
             >
               <Option value="student">Student</Option>
-              <Option value="professional">Professional</Option>
+              <Option value="student">Employee</Option>
+              <Option value="professional">Elder</Option>
               <Option value="other">Other</Option>
             </Select>
           </Form.Item>

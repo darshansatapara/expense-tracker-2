@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Input, Button, notification } from "antd";
 import { Mail, Key } from "lucide-react";
-import Signup from "./leftContent/Signup_Left";
+import SignupLeft from "./SignUpInContent/Signup_Left.jsx";
 import { useOtpStore } from "../../store/otpStore.js";
 import OAuth from "./GoogleAuth.jsx";
 
@@ -97,7 +97,7 @@ export default function First() {
       <div className="flex flex-col lg:flex-row justify-around h-screen bg-[#D9EAFD]">
         {/* Left section */}
         <div className="hidden lg:block px-20 justify-center items-center">
-          <Signup />
+          <SignupLeft />
         </div>
 
         {/* Right section */}
