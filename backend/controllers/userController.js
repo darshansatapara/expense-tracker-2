@@ -2,7 +2,7 @@ import User from "../models/userModel.js";
 import UserCredential from "../models/UserCredential.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../config/cloudinary.js";
-import { generateToken } from "../config/utils.js";
+import { generateToken } from "../config/tokenGenerate.js";
 
 // Sign-up controller
 export const signUp = async (req, res, next) => {
@@ -77,6 +77,7 @@ export const signUp = async (req, res, next) => {
       success: true,
       message: "User registered successfully",
       user: {
+        _id: savedUser._id,
         username: savedUser.username,
         email: savedUser.email,
         mobile_no: savedUser.mobile_no,

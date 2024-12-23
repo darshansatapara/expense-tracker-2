@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignupPage from "../src/pages/SignupPage";
-
-import SigninPage from "./pages/SigninPage";
+import SignInPage from "./pages/SigninPage";
+import CategoryPage from "./pages/CategoryPage";
 import HomePage from "./pages/HomePage";
 
 function App() {
@@ -9,9 +9,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/signup/*" element={<SignupPage />} />
-        {/* <Route path="/signup/profilesignup" element={<ProfileSection />} /> */}
+        <Route path="/signin" element={<SignInPage />} />
+        <Route path="/category/*" element={<CategoryPage />} />
 
-        <Route path="/signin" element={<SigninPage />} />
         <Route path="/" element={<HomePage />} />
       </Routes>
     </BrowserRouter>
