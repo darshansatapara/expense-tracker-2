@@ -1,27 +1,29 @@
 import User from "../models/userModel.js";
+import UserCredential from "../models/UserCredential.js";
 import bcrypt from "bcryptjs";
+import cloudinary from "../config/cloudinary.js";
 import { generateToken } from "../config/utils.js";
 
 // Sign-up controller
 export const signUp = async (req, res, next) => {
   const {
+    profilePic,
     username,
     email,
     password,
     name,
     mobile_no,
     date_of_birth,
-    category,
+    profession,
   } = req.body;
 
   if (
     !username ||
     !email ||
     !password ||
-    !name ||
     !mobile_no ||
     !date_of_birth ||
-    !category
+    !profession
   ) {
     return res.status(400).json({
       success: false,
@@ -30,41 +32,67 @@ export const signUp = async (req, res, next) => {
   }
 
   try {
+    let profilePhoto =
+      null ||
+      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
+
+    // Upload profilePic to Cloudinary if available
+    if (profilePic) {
+      const uploadProfilePic = await cloudinary.uploader.upload(profilePic, {
+        folder: "user_profiles", // Optional: Organize images in a folder on Cloudinary
+      });
+      profilePhoto = uploadProfilePic.secure_url;
+      console.log("Uploaded Profile Photo URL:", profilePhoto);
+    }
     // Hash the password before saving
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create a new user
     const newUser = new User({
+      profilePic: profilePhoto,
       username,
       email,
-      password: hashedPassword,
       name,
       mobile_no,
       date_of_birth,
-      category,
+      profession,
     });
 
-    // console.log(newUser);
-    if (newUser) {
-      // generate jwt token here
-      generateToken(newUser._id, res);
+    // Save the new user in the database
+    const savedUser = await newUser.save();
 
-      // save the new user in the database
-      await newUser.save();
-      res.status(201).json({
-        success: true,
-        message: "User registered successfully",
-        user: {
-          username: newUsernewUser.username,
-          email: newUser.email,
-          name: newUser.name,
-          mobile_no: newUser.mobile_no,
-          date_of_birth: newUser.date_of_birth,
-          category: newUser.category,
-        },
+    // If user is saved successfully, save credentials
+    const userCredential = new UserCredential({
+      email: savedUser.email, // Ensure it matches the User model
+      password: hashedPassword, // Use the hashed password
+    });
+
+    await userCredential.save();
+
+    // Generate a JWT token for the user
+    generateToken(savedUser._id, res);
+
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      user: {
+        username: savedUser.username,
+        email: savedUser.email,
+        mobile_no: savedUser.mobile_no,
+        date_of_birth: savedUser.date_of_birth,
+        profession: savedUser.profession,
+      },
+    });
+  } catch (err) {
+    // Check for duplicate email error in either User or UserCredential
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already exists. Please use a different email.",
       });
     }
-  } catch (err) {
+
     next(err); // Pass errors to the error-handling middleware
   }
 };
@@ -73,49 +101,123 @@ export const signUp = async (req, res, next) => {
 export const signIn = async (req, res, next) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  try {
+    // Find the user credentials and populate the associated user details
+    const userCredential = await UserCredential.findOne({ email }).populate({
+      path: "email", // Path to the referenced User model
+      model: "User", // Specify the model explicitly (User)
+    });
+
+    if (!userCredential) {
+      return res
+        .status(401)
+        .json({ success: false, error: "Invalid credentials" });
+    }
+
+    // Compare the provided password with the hashed password
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      userCredential.password
+    );
+    if (!isPasswordCorrect) {
+      return res
+        .status(401)
+        .json({ success: false, error: "Invalid credentials" });
+    }
+
+    // `userCredential.email` contains the populated user details
+    const user = userCredential.email;
+
+    // Generate a JWT token for the user
+    generateToken(user._id, res);
+
+    // Return user details
+    res.status(200).json({
+      success: true,
+      message: "Sign-in successful",
+      user: {
+        _id: user._id,
+        profilePic: user.profilePic,
+        username: user.username,
+        email: user.email,
+        mobile_no: user.mobile_no,
+        date_of_birth: user.date_of_birth,
+        profession: user.profession,
+      },
+    });
+  } catch (error) {
+    next(error); // Pass the error to the error-handling middleware
+  }
+};
+
+// google singin
+export const googlesignin = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
     return res.status(400).json({
       success: false,
-      message: "Please provide email and password",
+      message: "Email is required",
     });
   }
 
   try {
-    // Find the user by email
-    const user = await User.findOne({ email });
+    // Check if the user exists in UserCredential and populate the related User document
+    const userCredential = await UserCredential.findOne({ email }).populate({
+      path: "email", // Populate the User document
+      model: "User",
+    });
 
-    if (!user) {
-      return res.status(401).json({
+    if (!userCredential) {
+      // If user does not exist, send error response
+      return res.status(404).json({
         success: false,
-        message: "Invalid email or password",
+        message: "User does not exist. Please sign up.",
       });
     }
 
-    // Compare the provided password with the hashed password in the database
-    const isMatch = await bcrypt.compare(password, user.password);
+    // `userCredential.email` now contains the User document
+    const user = userCredential.email;
 
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid email or password",
-      });
-    }
-
+    // Generate a token for the user using the User model's `_id`
     generateToken(user._id, res);
+
     res.status(200).json({
       success: true,
-      message: "User logged in successfully",
+      message: "Google Sign-In successful",
       user: {
         _id: user._id,
         email: user.email,
-        name: user.name,
+        username: user.username,
+        profilePic: user.profilePic,
+        mobile_no: user.mobile_no,
+        date_of_birth: user.date_of_birth,
+        profession: user.profession,
       },
     });
   } catch (err) {
-    next(err); // Pass errors to the error-handling middleware
+    console.error("Error during Google Sign-In:", err.message);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 
+<<<<<<< HEAD
+// sign out
+export const signOut = (req, res) => {
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    console.log("user logged out");
+    res.status(200).json({ message: "user logged out successfully!!" });
+  } catch (error) {
+    res.status(500).json({ error: "Server Error" });
+  }
+};
+
+=======
+>>>>>>> be8dc402662d68c2a7c3abc347bd6c7731f2125f
 // Get user by ID controller
 export const getUserById = async (req, res, next) => {
   const { userId } = req.params;
@@ -140,7 +242,7 @@ export const getUserById = async (req, res, next) => {
         name: user.name,
         mobile_no: user.mobile_no,
         date_of_birth: user.date_of_birth,
-        category: user.category,
+        profession: user.profession,
       },
     });
   } catch (error) {
