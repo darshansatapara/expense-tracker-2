@@ -3,6 +3,7 @@ import EmailAndOtpverification from "../components/signupComponents/EmailAndOtpv
 import { useLocation } from "react-router-dom";
 import ProfileSection from "../components/signupComponents/ProfileSection.jsx";
 import PasswordSection from "../components/signupComponents/PasswordSection.jsx";
+import CategorySection from "../components/signupComponents/CategorySection.jsx";
 
 export default function SignupPage() {
   const location = useLocation();
@@ -10,8 +11,8 @@ export default function SignupPage() {
   return (
     <>
       {!subpath && <EmailAndOtpverification />}
-      {subpath === "profileSection" && <ProfileSection />}
       {subpath === "passwordSection" && <PasswordSection />}
+      {subpath === "profileSection" && <ProfileSection />}
     </>
   );
 }
