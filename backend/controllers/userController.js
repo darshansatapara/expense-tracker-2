@@ -1,4 +1,5 @@
 import User from "../models/userModel.js";
+import UserCredential from "../models/UserCredential.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../config/cloudinary.js";
 import { generateToken } from "../config/utils.js";
@@ -52,34 +53,46 @@ export const signUp = async (req, res, next) => {
       profilePic: profilePhoto,
       username,
       email,
-      password: hashedPassword,
       name,
       mobile_no,
       date_of_birth,
       profession,
     });
 
-    // console.log(newUser);
-    if (newUser) {
-      // generate jwt token here
-      generateToken(newUser._id, res);
+    // Save the new user in the database
+    const savedUser = await newUser.save();
 
-      // save the new user in the database
-      await newUser.save();
+    // If user is saved successfully, save credentials
+    const userCredential = new UserCredential({
+      email: savedUser.email, // Ensure it matches the User model
+      password: hashedPassword, // Use the hashed password
+    });
 
-      res.status(201).json({
-        success: true,
-        message: "User registered successfully",
-        user: {
-          username: newUser.username,
-          email: newUser.email,
-          mobile_no: newUser.mobile_no,
-          date_of_birth: newUser.date_of_birth,
-          profession: newUser.profession,
-        },
+    await userCredential.save();
+
+    // Generate a JWT token for the user
+    generateToken(savedUser._id, res);
+
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully",
+      user: {
+        username: savedUser.username,
+        email: savedUser.email,
+        mobile_no: savedUser.mobile_no,
+        date_of_birth: savedUser.date_of_birth,
+        profession: savedUser.profession,
+      },
+    });
+  } catch (err) {
+    // Check for duplicate email error in either User or UserCredential
+    if (err.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already exists. Please use a different email.",
       });
     }
-  } catch (err) {
+
     next(err); // Pass errors to the error-handling middleware
   }
 };
@@ -87,23 +100,53 @@ export const signUp = async (req, res, next) => {
 // Sign-in controller
 export const signIn = async (req, res, next) => {
   const { email, password } = req.body;
-  console.log(email, password);
+
   try {
-    const user = await User.findOne({ email });
-    // const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
+    // Find the user credentials and populate the associated user details
+    const userCredential = await UserCredential.findOne({ email }).populate({
+      path: "email", // Path to the referenced User model
+      model: "User", // Specify the model explicitly (User)
+    });
+
+    if (!userCredential) {
+      return res
+        .status(401)
+        .json({ success: false, error: "Invalid credentials" });
     }
 
+    // Compare the provided password with the hashed password
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      userCredential.password
+    );
+    if (!isPasswordCorrect) {
+      return res
+        .status(401)
+        .json({ success: false, error: "Invalid credentials" });
+    }
+
+    // `userCredential.email` contains the populated user details
+    const user = userCredential.email;
+
+    // Generate a JWT token for the user
     generateToken(user._id, res);
+
+    // Return user details
     res.status(200).json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      profilepic: user.profilePic,
+      success: true,
+      message: "Sign-in successful",
+      user: {
+        _id: user._id,
+        profilePic: user.profilePic,
+        username: user.username,
+        email: user.email,
+        mobile_no: user.mobile_no,
+        date_of_birth: user.date_of_birth,
+        profession: user.profession,
+      },
     });
   } catch (error) {
-    res.status(500).json({ error: "Server Error" });
+    next(error); // Pass the error to the error-handling middleware
   }
 };
 
@@ -119,10 +162,13 @@ export const googlesignin = async (req, res) => {
   }
 
   try {
-    // Check if the user exists
-    const user = await User.findOne({ email: email });
+    // Check if the user exists in UserCredential and populate the related User document
+    const userCredential = await UserCredential.findOne({ email }).populate({
+      path: "email", // Populate the User document
+      model: "User",
+    });
 
-    if (!user) {
+    if (!userCredential) {
       // If user does not exist, send error response
       return res.status(404).json({
         success: false,
@@ -130,7 +176,10 @@ export const googlesignin = async (req, res) => {
       });
     }
 
-    // Generate a token for the user
+    // `userCredential.email` now contains the User document
+    const user = userCredential.email;
+
+    // Generate a token for the user using the User model's `_id`
     generateToken(user._id, res);
 
     res.status(200).json({
@@ -140,6 +189,10 @@ export const googlesignin = async (req, res) => {
         _id: user._id,
         email: user.email,
         username: user.username,
+        profilePic: user.profilePic,
+        mobile_no: user.mobile_no,
+        date_of_birth: user.date_of_birth,
+        profession: user.profession,
       },
     });
   } catch (err) {
@@ -151,6 +204,7 @@ export const googlesignin = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 // sign out
 export const signOut = (req, res) => {
   try {
@@ -162,6 +216,8 @@ export const signOut = (req, res) => {
   }
 };
 
+=======
+>>>>>>> be8dc402662d68c2a7c3abc347bd6c7731f2125f
 // Get user by ID controller
 export const getUserById = async (req, res, next) => {
   const { userId } = req.params;

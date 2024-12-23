@@ -5,8 +5,9 @@ import { Mail } from "lucide-react";
 import SignupLeft from "./SignUpInContent/Signup_Left.jsx";
 import { useOtpStore } from "../../store/otpStore.js";
 import OAuth from "./GoogleAuth.jsx";
+import { useNavigate } from "react-router-dom";
 
-export default function First() {
+export default function EmailAndOtpverification() {
   const {
     sendOtp,
     isSendingOtp,
@@ -18,6 +19,7 @@ export default function First() {
 
   const [email, setEmail] = useState(""); // Local state for email input
   const [otp, setOtp] = useState(""); // Local state for OTP input
+  const navigate = useNavigate();
 
   const openNotification = (type, message, description) => {
     notification[type]({
@@ -84,6 +86,8 @@ export default function First() {
         "Verification Successful",
         "Your OTP has been verified successfully!"
       );
+      // console.log("Verification Successful", email);
+      navigate("/signup/passwordSection", { state: { email } });
     } catch (error) {
       openNotification(
         "error",
