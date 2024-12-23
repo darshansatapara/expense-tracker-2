@@ -150,6 +150,18 @@ export const googlesignin = async (req, res) => {
     });
   }
 };
+
+// sign out
+export const signOut = (req, res) => {
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    console.log("user logged out");
+    res.status(200).json({ message: "user logged out successfully!!" });
+  } catch (error) {
+    res.status(500).json({ error: "Server Error" });
+  }
+};
+
 // Get user by ID controller
 export const getUserById = async (req, res, next) => {
   const { userId } = req.params;
