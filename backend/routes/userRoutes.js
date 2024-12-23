@@ -6,6 +6,7 @@ import {
   signIn,
   getUserById,
   googlesignin,
+  signOut,
 } from "../controllers/userController.js";
 // Create a router instance
 const router = express.Router();
@@ -14,6 +15,7 @@ const router = express.Router();
 router.post("/signup", signUp);
 router.post("/signin", signIn);
 router.post("/googlesignin", googlesignin);
+router.post("/signout", signOut);
 router.get("/user/:userId", getUserById);
 
 export default router;
