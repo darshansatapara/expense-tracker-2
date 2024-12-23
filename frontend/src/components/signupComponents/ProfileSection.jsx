@@ -13,12 +13,13 @@ import { userStore } from "../../store/userStore.js";
 
 const { Option } = Select;
 
-export default function ProfileSignup() {
+export default function ProfileSection() {
   const location = useLocation();
   const navigate = useNavigate();
   const signup = userStore((state) => state.signup);
 
-  const userData = location.state?.user || {};
+  const userData = location.state?.userCredentials || {};
+  console.log(userData);
   const [form] = Form.useForm();
   const [profilePic, setProfilePic] = useState("");
   const [loading, setLoading] = useState(false);
@@ -51,6 +52,7 @@ export default function ProfileSignup() {
 
     const payload = {
       ...values,
+      password: userData.password,
       profilePic,
     };
 
@@ -67,7 +69,7 @@ export default function ProfileSignup() {
 
   return (
     <div className="min-h-screen bg-custom-bg flex items-center justify-center py-10 px-5 bg-[#D9EAFD] font-nunito">
-      <div className="bg-[#78B3CE] p-5 rounded-lg max-w-lg w-full">
+      <div className="p-8 max-w-lg w-full">
         <h1 className="text-center text-2xl font-semibold text-gray-700 mb-6">
           Complete Your Profile
         </h1>
@@ -78,30 +80,30 @@ export default function ProfileSignup() {
           layout="vertical"
           initialValues={{
             profilePic: userData.profilePic || "",
-            username: userData.name || "",
+            username:
+              userData.name || `User${Math.floor(1000 + Math.random() * 9000)}`,
             email: userData.email || "",
             mobile_no: userData.mobile_no || "",
             date_of_birth: userData.date_of_birth || null,
-            category: userData.category || "",
+            profession: userData.profession || "",
           }}
           onFinish={handleFinish}
         >
           {/* Profile Picture */}
-          <Form.Item>
-            <div className="text-center">
-              <Upload
-                beforeUpload={handleFileUpload}
-                showUploadList={false}
-                accept="image/*"
-              >
-                <Button className="hidden" />
+          <Form.Item label="Profile Picture" className="text-center">
+            <div className="mt-3 text-center">
+              <Upload beforeUpload={handleFileUpload} showUploadList={false}>
+                <Button className="bg-blue-500 hover:bg-blue-600 hidden border-8 rounded-full">
+                  Upload Profile Picture
+                </Button>
+
                 <img
                   src={
                     profilePic ||
                     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
                   }
                   alt="Profile"
-                  className="w-24 h-24 rounded-full mx-auto border-4 border-[#79D7BE] object-contain"
+                  className="w-24 h-24 rounded-full mx-auto border-2  border-[#79D7BE]"
                 />
               </Upload>
             </div>
@@ -110,7 +112,7 @@ export default function ProfileSignup() {
           {/* Username */}
           <Form.Item
             name="username"
-            label="Username"
+            label="username "
             rules={[{ required: true, message: "Please enter your username!" }]}
           >
             <Input
@@ -120,7 +122,6 @@ export default function ProfileSignup() {
               className="rounded"
             />
           </Form.Item>
-
           {/* Email */}
           <Form.Item
             name="email"
@@ -161,27 +162,34 @@ export default function ProfileSignup() {
             <DatePicker
               className="w-full rounded"
               prefix={<CalendarFold className="text-purple-400" />}
+              format="DD-MM-YYYY"
+              placeholder="DD-MM-YYYY"
             />
           </Form.Item>
 
-          {/* Category */}
+          {/* profession */}
           <Form.Item
-            name="category"
-            label="Category"
+            name="profession"
+            label="Profession"
             rules={[{ required: true, message: "Please select a category!" }]}
           >
             <Select
-              placeholder="Select a Profession"
               className="rounded-md"
+              defaultValue="" // Default to the placeholder option
               prefix={<ClipboardPen className="text-pink-700" />}
             >
+              <Option value="" disabled hidden>
+                Select an option
+              </Option>
               <Option value="student">Student</Option>
               <Option value="employee">Employee</Option>
-              <Option value="householder">Householder</Option>
+              <Option value="householder">House Holder</Option>
+              <Option value="elder">Elder</Option>
+              <Option value="other">Other</Option>
             </Select>
           </Form.Item>
 
-          {/* Password */}
+          {/* Password
           <Form.Item
             name="password"
             label="Password"
@@ -205,7 +213,7 @@ export default function ProfileSignup() {
               className="rounded"
               visibilityToggle
             />
-          </Form.Item>
+          </Form.Item> */}
 
           {/* Submit Button */}
           <Form.Item>
