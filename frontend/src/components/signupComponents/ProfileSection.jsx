@@ -49,7 +49,7 @@ export default function ProfileSection() {
 
   const handleFinish = async (values) => {
     setLoading(true);
-
+    // console.log("Finish");
     const payload = {
       ...values,
       password: userData.password,
@@ -57,9 +57,16 @@ export default function ProfileSection() {
     };
 
     try {
-      await signup(payload);
-      message.success("Profile saved successfully!");
-      navigate("/cetegory");
+      const res = await signup(payload); // Call the signup API from userstore
+      if (res) {
+        message.success("Profile saved successfully!");
+        const { _id, email, profession } = res;
+
+        // Navigate to the CategoryPage with the data
+        navigate("/category", {
+          state: { userId: _id, email, profession },
+        });
+      }
     } catch (error) {
       console.error("Signup failed:", error);
     } finally {
@@ -175,7 +182,6 @@ export default function ProfileSection() {
           >
             <Select
               className="rounded-md"
-              defaultValue="" // Default to the placeholder option
               prefix={<ClipboardPen className="text-pink-700" />}
             >
               <Option value="" disabled hidden>
@@ -183,7 +189,8 @@ export default function ProfileSection() {
               </Option>
               <Option value="student">Student</Option>
               <Option value="employee">Employee</Option>
-              <Option value="householder">House Holder</Option>
+              <Option value="businessmen">Businessmen</Option>
+              <Option value="housewife">House-Wife</Option>
               <Option value="elder">Elder</Option>
               <Option value="other">Other</Option>
             </Select>

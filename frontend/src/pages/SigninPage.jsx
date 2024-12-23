@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Input, Button, message } from "antd";
 import { Mail, Lock } from "lucide-react";
-import { userStore } from "../../store/userStore.js";
-import Signup from "../signupComponents/SignUpInContent/Signup_Left.jsx";
+import { userStore } from "../store/userStore.js";
+import Signup from "../components/signupComponents/SignUpInContent/Signup_Left.jsx";
 import { useNavigate } from "react-router-dom";
-import OAuth2 from "./GoogleSignin.jsx";
+import OAuth2 from "../components/signinComponent/GoogleSignin.jsx";
 
-export default function SignIn() {
+export default function SignInPage() {
   const navigate = useNavigate();
   const { signin, isSigningIn } = userStore(); // Access store
 
