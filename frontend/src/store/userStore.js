@@ -7,6 +7,7 @@ export const userStore = create((set) => ({
   isSigningUp: false,
   isSigningIn: false,
   isSigningOut: false,
+  isUpdatingProfile: false,
 
   /**
    * Signup method to create a new user account.
@@ -75,6 +76,30 @@ export const userStore = create((set) => ({
       toast.error(error.response?.data?.message || "Sign-out failed!");
     } finally {
       set({ isSigningOut: false });
+    }
+  },
+
+  /**
+   * Update user profile.
+   * @param {String} userId - ID of the user to update.
+   * @param {Object} data - Updated user data.
+   */
+  updateProfile: async (userId, data) => {
+    set({ isUpdatingProfile: true });
+    try {
+      const res = await axiosInstance.put(
+        `/auth/updateuserprofile/${userId}`,
+        data
+      );
+      set({ currentUser: res.data.user }); // Update the local store with the updated user data
+      toast.success("Profile updated successfully!");
+      return res.data.user; // Return the updated user data
+    } catch (error) {
+      console.error("Profile update error:", error);
+      toast.error(error.response?.data?.message || "Failed to update profile!");
+      throw error; // Ensure the error propagates
+    } finally {
+      set({ isUpdatingProfile: false });
     }
   },
 }));

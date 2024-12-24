@@ -3,7 +3,7 @@ import { axiosInstance } from "../../utils/axios.js";
 import { toast } from "react-toastify";
 
 export const adminCategoryStore = create((set) => ({
-  adminCategories: {},
+  adminCategories: [],
   isLoadingCategories: false,
   isUpdatingCategory: false,
   isDeletingCategory: false,
@@ -13,10 +13,9 @@ export const adminCategoryStore = create((set) => ({
    */
   fetchAdminCategories: async () => {
     set({ isLoadingCategories: true });
-    console.log("heii")
     try {
       const res = await axiosInstance.get("/admincategories/getallcategories");
-      set({ adminCategories: res.data });
+      set({ adminCategories: Array.isArray(res.data) ? res.data : [] });
     } catch (error) {
       console.error("Error fetching admin categories:", error);
       toast.error("Failed to fetch admin categories!");
