@@ -28,7 +28,7 @@
 
 // // MongoDB connection URI
 // const MONGO_URI =
-//   "mongodb+srv://expenseteam:expense281908@expense-tracker.su97n.mongodb.net/?retryWrites=true&w=majority&appName=expense-tracker";
+//   "process.env.MONGO_URI";
 
 // const seedDatabase = async () => {
 //   try {
@@ -107,8 +107,7 @@ const formatText = (text) => {
 };
 
 // MongoDB connection URI
-const MONGO_URI =
-  "mongodb+srv://expenseteam:expense281908@expense-tracker.su97n.mongodb.net/?retryWrites=true&w=majority&appName=expense-tracker";
+const MONGO_URI = "process.env.MONGO_URI";
 
 const seedDatabase = async () => {
   try {
