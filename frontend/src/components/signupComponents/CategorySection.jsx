@@ -1,30 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { adminCategoryStore } from "../../store/AdminStore/adminCategoryStore.js";
-import { CategorySelectorButton } from "./CategorySelectorButton.jsx"; // Import the CategorySelectorButton
+import { CategorySelectorButton } from "../InputComponents/CategorySelectorButton.jsx"; // Import the CategorySelectorButton
 import SignupLeft from "./SignUpInContent/Signup_Left.jsx";
 
 export default function CategorySection() {
   const navigate = useNavigate();
   const location = useLocation();
-  const userData =
-    (location.state?.userId &&
-      location.state?.email &&
-      location.state?.location.state?.userId) ||
-    {};
-  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  const { userId, email, profession } = location.state || {};
+  const userData = { userId, email, profession };
+
+  const [selectedCategories, setSelectedCategories] = useState({}); // State to store selected categories and their subcategories
   const [fetchError, setFetchError] = useState(false);
   const { adminCategories, isLoadingCategories, fetchAdminCategories } =
     adminCategoryStore();
 
   // Fetch categories on component mount
-  // Fetch categories on component mount
   useEffect(() => {
-    console.log("Fetching categories", userData);
     const fetchData = async () => {
       try {
         await fetchAdminCategories();
-        console.log("Success", adminCategories);
         setFetchError(false); // Reset error on successful fetch
       } catch (error) {
         console.error("Failed to fetch categories:", error);
@@ -35,12 +31,36 @@ export default function CategorySection() {
     fetchData();
   }, []);
 
+  // Handle category selection and store subcategories
+  const handleCategoryChange = (category, isSelected) => {
+    setSelectedCategories((prev) => {
+      const updatedCategories = { ...prev };
+
+      const categoryData = adminCategories?.find(
+        (cat) => cat.name === category
+      );
+
+      // Add or remove the category and its subcategories
+      if (isSelected) {
+        updatedCategories[category] = categoryData?.categories[category] || [];
+      } else {
+        delete updatedCategories[category];
+      }
+
+      return updatedCategories;
+    });
+  };
+
   // Handle next button click
   const handleNext = () => {
-    if (selectedCategories.length > 2) {
-      navigate("/category/subcategories", {
+    if (Object.keys(selectedCategories).length >= 3) {
+      // Ensure at least 3 categories are selected
+      console.log("selected categories", selectedCategories);
+      navigate("/category/subCategorySection", {
         state: { selectedCategories, userData },
       });
+    } else {
+      alert("Please select at least 3 categories.");
     }
   };
 
@@ -55,7 +75,7 @@ export default function CategorySection() {
       <div className="flex flex-1 items-center justify-center font-nunito px-4 lg:px-8">
         <div className="p-6 lg:p-8 w-full max-w-lg bg-white shadow-md rounded-lg">
           <div className="text-2xl mb-6 font-bold text-gray-800 text-center lg:text-left">
-            What Is Your Daily Life Expense Categories? Choose As you Like...
+            What Is Your Daily Life Expense Categories? Choose As You Like...
           </div>
 
           {/* Category Selector */}
@@ -67,8 +87,9 @@ export default function CategorySection() {
                     (category) => category?.name === "Expense Categories"
                   )?.categories || []
                 }
-                selectedCategories={selectedCategories}
+                selectedCategories={Object.keys(selectedCategories)} // Pass only the selected category names
                 setSelectedCategories={setSelectedCategories}
+                onCategoryChange={handleCategoryChange} // Make sure this is correctly passed
               />
             )}
 
@@ -95,9 +116,9 @@ export default function CategorySection() {
           {/* Next button */}
           <button
             onClick={handleNext}
-            disabled={selectedCategories.length <= 2}
+            disabled={Object.keys(selectedCategories).length < 3}
             className={`w-full mt-6 py-2 rounded-md font-semibold transition-colors ${
-              selectedCategories.length > 2
+              Object.keys(selectedCategories).length >= 3
                 ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
