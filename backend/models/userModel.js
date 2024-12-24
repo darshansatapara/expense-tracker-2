@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  profile_complated:{
+    type:Boolean,
+    default: false,
+  }
 });
 
 const User = mongoose.model("User", userSchema);
