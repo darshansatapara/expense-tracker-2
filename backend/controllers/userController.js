@@ -205,7 +205,6 @@ export const googlesignin = async (req, res) => {
   }
 };
 
-<<<<<<< HEAD
 // sign out
 export const signOut = (req, res) => {
   try {
@@ -217,8 +216,6 @@ export const signOut = (req, res) => {
   }
 };
 
-=======
->>>>>>> be8dc402662d68c2a7c3abc347bd6c7731f2125f
 // Get user by ID controller
 export const getUserById = async (req, res, next) => {
   const { userId } = req.params;
