@@ -7,6 +7,7 @@ import {
   getUserById,
   googlesignin,
   signOut,
+  updateUserProfile,
 } from "../controllers/userController.js";
 // Create a router instance
 const router = express.Router();
@@ -17,5 +18,7 @@ router.post("/signin", signIn);
 router.post("/googlesignin", googlesignin);
 router.post("/signout", signOut);
 router.get("/user/:userId", getUserById);
+// Update user profile route
+router.put("/updateuserprofile/:id", updateUserProfile);
 
 export default router;
