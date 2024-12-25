@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const ContactUs = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#D9EAFD] items-center justify-center px-6">
+    <div className="min-h-screen flex flex-col bg-[#D9EAFD] items-center justify-center px-6 font-nunito">
       {/* Header Section */}
       <div className="text-center mb-12 w-full max-w-3xl">
         <h1 className="text-4xl md:text-5xl font-bold text-[#ff6f61] drop-shadow-lg">
@@ -44,14 +44,14 @@ const ContactUs = () => {
           transition={{ duration: 0.8 }}
           className="w-full md:w-1/2 lg:w-2/5 bg-[#E8DFF7] p-6 rounded-lg shadow-lg"
         >
-          <h3 className="text-2xl font-semibold text-[#ff6f61] mb-4 text-center">
+          <h3 className="text-2xl font-semibold text-[#ff6f61] mb-4 text-center font-nunito">
             Contact Information
           </h3>
           <p className="text-gray-700 mb-6 text-center">
             Have any questions? We'd love to hear from you!
           </p>
           <div className="text-center">
-            <p className="font-bold text-black mb-4">
+            <p className="font-bold text-black mb-4 font-nunito">
               ✉️ Email: expensetracker1908@gmail.com
             </p>
             <motion.a

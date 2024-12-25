@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/protectRoute/ProtectedRoute";
 import SignupPage from "../src/pages/SignupPage";
 import SignInPage from "./pages/SigninPage";
 import CategoryPage from "./pages/CategoryPage";
@@ -11,9 +12,12 @@ function App() {
       <Routes>
         <Route path="/signup/*" element={<SignupPage />} />
         <Route path="/signin" element={<SignInPage />} />
-        <Route path="/category/*" element={<CategoryPage />} />
-        <Route path="/" element={<HomePage />} />
-        <Route path="/contactus" element={<ContactusPage />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/category/*" element={<CategoryPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/contactus" element={<ContactusPage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
