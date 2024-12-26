@@ -8,7 +8,14 @@ export const userStore = create((set) => ({
   isSigningIn: false,
   isSigningOut: false,
   isUpdatingProfile: false,
-
+  /**
+   * Check if the user is authenticated.
+   * @returns {boolean} True if authenticated, false otherwise.
+   */
+  checkAuth: () => {
+    const state = userStore.getState();
+    return state.currentUser !== null;
+  },
   /**
    * Signup method to create a new user account.
    * @param {Object} data - User data for signup.

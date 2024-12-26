@@ -25,8 +25,8 @@ app.use(cors());
 
 // routes
 app.use("/api/auth", userRoute);
-app.use("/api/usercategories", userCategoryRoute);
-app.use("/api/admincategories", adminCategoryRoutes);
+// app.use("/api/usercategories", userCategoryRoute);
+// app.use("/api/admincategories", adminCategoryRoutes);
 app.use("/api/expenses", expenseRoute);
 app.use("/api/income", incomeRoute);
 app.use("/api/otp", otpRoute);
