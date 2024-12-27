@@ -6,6 +6,7 @@ import CategoryPage from "./pages/CategoryPage";
 import HomePage from "./pages/HomePage";
 import ContactusPage from "./pages/ContactPage";
 
+
 function App() {
   return (
     <BrowserRouter>
