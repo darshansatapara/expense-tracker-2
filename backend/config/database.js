@@ -1,13 +1,32 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 
-const connectDatabase = async () => {
+dotenv.config();
+
+// Connect to the user database
+export const connectUserDatabase = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("MongoDB Connected");
+    const userDbConnection = mongoose.createConnection(
+      process.env.USER_MONGO_URI
+    );
+    console.log("Connected to user database");
+    return userDbConnection; // Return the connection instance
   } catch (error) {
-    console.error("MongoDB Connection Failed", error);
+    console.error("Error connecting to user database:", error);
     process.exit(1);
   }
 };
 
-export default connectDatabase;
+// Connect to the admin database
+export const connectAdminDatabase = async () => {
+  try {
+    const adminDbConnection = mongoose.createConnection(
+      process.env.ADMIN_MONGO_URI
+    );
+    console.log("Connected to admin database");
+    return adminDbConnection; // Return the connection instance
+  } catch (error) {
+    console.error("Error connecting to admin database:", error);
+    process.exit(1);
+  }
+};

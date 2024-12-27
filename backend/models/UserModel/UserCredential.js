@@ -8,7 +8,7 @@ const UserCredentialSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      ref: "User", // Reference to the User model
+      ref: "UserProfile", // Reference to the User model
     },
     password: {
       type: String,

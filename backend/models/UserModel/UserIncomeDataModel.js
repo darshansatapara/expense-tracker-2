@@ -11,7 +11,11 @@ const incomeSchema = new mongoose.Schema({
 
 // Define the user income schema to group incomes by userId
 const userIncomeSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "UserProfile",
+    required: true,
+  },
   incomes: [
     {
       date: { type: String, required: true },

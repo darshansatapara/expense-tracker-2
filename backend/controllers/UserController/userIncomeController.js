@@ -1,4 +1,4 @@
-import UserIncome from "../models/incomeModel.js";
+import UserIncome from "../../models/UserModel/UserIncomeDataModel.js";
 
 // Controller for adding income
 export const addIncome = async (req, res) => {
