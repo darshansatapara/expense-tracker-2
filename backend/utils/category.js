@@ -1,15 +1,15 @@
-// categories.js
-
 const categories = {
   Travel: [
     "Flights",
     "Trains",
     "Buses",
     "Cabs/Ride-Sharing",
-    "Car Rentals",
-    "Accommodation (Hotels, Hostels)",
+    "Vehicle Rentals",
     "Fuel",
     "Taxis",
+    "Visas",
+    "Tour Packages",
+    "Other",
   ],
   Food: [
     "Breakfast",
@@ -20,6 +20,10 @@ const categories = {
     "Beverages",
     "Takeout/Delivery",
     "Groceries",
+    "Meal Prep Ingredients",
+    "Dietary Supplements",
+    "Meal Kits",
+    "Other",
   ],
   Shopping: [
     "Clothes",
@@ -30,16 +34,21 @@ const categories = {
     "Books",
     "Personal Care Products",
     "Groceries",
+    "Online Shopping",
+    "Sales/Discounts",
+    "Other",
   ],
   Medical: [
     "Doctor's Visits",
-    "Prescription Medications",
-    "Over-the-Counter Medications",
+    "Medications",
     "Health Check-ups",
     "Vaccinations",
     "Medical Equipment",
     "Lab Tests",
     "Emergency Services",
+    "Counseling",
+    "Physical Therapy",
+    "Other",
   ],
   Housing: [
     "Rent/Mortgage",
@@ -49,6 +58,10 @@ const categories = {
     "Utilities",
     "Security Deposits",
     "Home Improvements",
+    "Home Repairs",
+    "Home Appliances",
+    "Real Estate Agent Fees",
+    "Other",
   ],
   PGs_Leasing: [
     "Rent",
@@ -58,6 +71,7 @@ const categories = {
     "Furnishing",
     "Lease Agreement Fees",
     "PG Facility Fees",
+    "Other",
   ],
   Bills: [
     "Electricity",
@@ -67,6 +81,10 @@ const categories = {
     "Phone Bill",
     "Cable/Satellite TV",
     "Trash Collection",
+    "Subscription Services",
+    "Property Taxes",
+    "Internet Service Provider Fees",
+    "Other",
   ],
   Study_Stationeries: [
     "Notebooks",
@@ -77,6 +95,7 @@ const categories = {
     "Erasers",
     "Markers",
     "Calculator",
+    "Other",
   ],
   Entertainment: [
     "Movies/TV Shows",
@@ -86,6 +105,7 @@ const categories = {
     "Video Games",
     "Sports Events",
     "Museums/Exhibitions",
+    "Other",
   ],
   Utilities: [
     "Electricity",
@@ -95,15 +115,16 @@ const categories = {
     "Internet",
     "Trash Removal",
     "Sewer Charges",
+    "Other",
   ],
   Transportation: [
     "Fuel",
-    "Public Transit (Bus, Train, Metro)",
-    "Taxis/Ride-Sharing",
+    "Public Transit",
     "Car Maintenance",
     "Parking Fees",
     "Vehicle Insurance",
     "Tolls",
+    "Other",
   ],
   Fitness: [
     "Gym Membership",
@@ -113,6 +134,9 @@ const categories = {
     "Home Workout Equipment",
     "Yoga/Meditation Classes",
     "Athletic Wear",
+    "Sports Club Memberships",
+    "Fitness Equipment",
+    "Other",
   ],
   Personal_Care: [
     "Haircuts/Styling",
@@ -122,6 +146,10 @@ const categories = {
     "Nail Care",
     "Dental Care",
     "Grooming Supplies",
+    "Hair Treatment Products",
+    "Cosmetics",
+    "Spa Treatments",
+    "Other",
   ],
   Education: [
     "Tuition Fees",
@@ -131,6 +159,9 @@ const categories = {
     "Certifications",
     "Study Materials",
     "Exam Fees",
+    "Language Learning",
+    "Test Preparation",
+    "Other",
   ],
   Subscriptions: [
     "Streaming Services",
@@ -139,6 +170,7 @@ const categories = {
     "News Services",
     "Membership Clubs",
     "Apps/Online Tools",
+    "Other",
   ],
   Gifts: [
     "Birthday Gifts",
@@ -148,6 +180,7 @@ const categories = {
     "Special Occasion Gifts",
     "Personalized Gifts",
     "Gift Cards",
+    "Other",
   ],
   Childcare: [
     "Daycare/Preschool",
@@ -157,6 +190,7 @@ const categories = {
     "Clothing",
     "Health Care",
     "Toys/Games",
+    "Other",
   ],
   Insurance: [
     "Health Insurance",
@@ -166,6 +200,9 @@ const categories = {
     "Travel Insurance",
     "Property Insurance",
     "Business Insurance",
+    "Dental Insurance",
+    "Disability Insurance",
+    "Other",
   ],
   Home_Improvement: [
     "Renovations",
@@ -175,6 +212,10 @@ const categories = {
     "DIY Projects",
     "Appliances",
     "Decorating",
+    "Roofing",
+    "Plumbing",
+    "Electrical Repairs",
+    "Other",
   ],
   Hobbies: [
     "Craft Supplies",
@@ -184,6 +225,7 @@ const categories = {
     "Photography",
     "Collectibles",
     "Sports Equipment",
+    "Other",
   ],
   Pets: [
     "Food",
@@ -193,6 +235,7 @@ const categories = {
     "Training",
     "Pet Insurance",
     "Boarding/Daycare",
+    "Other",
   ],
 };
 
