@@ -10,7 +10,7 @@ const expenseSchema = new mongoose.Schema({
 });
 
 const userExpenseSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "UserProfile", required: true },
   expenses: [
     {
       date: { type: String, required: true },

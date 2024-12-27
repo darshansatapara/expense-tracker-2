@@ -1,169 +1,151 @@
-//************************************************************//
-// category adding script in data base
+// Connect to the admin database
+import currencies from "./currency.js";
+import {
+  // connectUserDatabase,
+  connectAdminDatabase,
+} from "../config/database.js";
+import {
+  AdminCurrencyCategory,
+  AdminExpenseCategory,
+  AdminIncomeCategory,
+} from "../models/AdminModel/AdminCategoryModels.js";
+import incomeSources from "./income.js";
+import mongoose from "mongoose";
+import categories from "./category.js";
 
-// import mongoose from "mongoose";
-// import AdminCategoryDataModel from "../models/AdminModel/AdminCategoryDataModel.js";
-// import categories from "./categories.js";
-// import incomeSources from "./incomeSources.js"; // Assuming the JSON is saved as categories.js
-
-// // Helper function to format text
-// const formatText = (text) => {
-//   return text
-//     .toLowerCase()
-//     .split(" ")
-//     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-//     .join(" ");
-// };
-
-// // Format all categories and subcategories
-// const formatCategories = (categories) => {
-//   const formattedCategories = {};
-//   for (const [key, value] of Object.entries(categories)) {
-//     const formattedKey = formatText(key);
-//     const formattedValues = value.map(formatText);
-//     formattedCategories[formattedKey] = formattedValues;
-//   }
-//   return formattedCategories;
-// };
-
-// // MongoDB connection URI
-// const MONGO_URI =
-//   "process.env.MONGO_URI";
-
-// const seedDatabase = async () => {
+// Function to add currencies to the database
+// const addCurrencies = async () => {
 //   try {
-//     // Connect to MongoDB
-//     await mongoose.connect(MONGO_URI, {
-//       useNewUrlParser: true,
-//       useUnifiedTopology: true,
-//     });
-//     console.log("Connected to MongoDB");
+//     const adminDbConnection = await connectAdminDatabase();
+//     const CurrencyModel = AdminCurrencyCategory(adminDbConnection);
 
-//     // Format the categories
-//     const formattedCategories = formatCategories(categories);
-
-//     // Check if the "Expense Categories" document already exists
-//     let expenseCategory = await AdminCategoryDataModel.findOne({
-//       name: "Expense Categories",
-//     });
-
-//     if (expenseCategory) {
-//       console.log(
-//         "Expense Categories document already exists. Updating categories..."
-//       );
-
-//       // Merge the new categories with the existing ones
-//       for (const [key, value] of Object.entries(formattedCategories)) {
-//         if (expenseCategory.categories.has(key)) {
-//           const existingSubcategories = expenseCategory.categories.get(key);
-//           const newSubcategories = value.filter(
-//             (sub) => !existingSubcategories.includes(sub)
-//           );
-//           expenseCategory.categories.set(key, [
-//             ...existingSubcategories,
-//             ...newSubcategories,
-//           ]);
-//         } else {
-//           expenseCategory.categories.set(key, value);
-//         }
-//       }
-//     } else {
-//       console.log("Creating new Income Categories document...");
-//       expenseCategory = new AdminCategoryDataModel({
-//         name: "Expense Categories",
-//         categories: formattedCategories,
-//       });
+//     for (const currency of currencies) {
+//       const newCurrency = new CurrencyModel(currency);
+//       await newCurrency.save();
+//       console.log(`Added currency: ${currency.currency}`);
 //     }
 
-//     // Save the updated/created document
-//     await expenseCategory.save();
-//     console.log("Categories successfully added/updated!");
-
-//     // Close the connection
-//     mongoose.connection.close();
+//     console.log("All currencies have been added successfully.");
+//     adminDbConnection.close(); // Close the connection after all data is added
 //   } catch (error) {
-//     console.error("Error seeding the database:", error.message);
-//     mongoose.connection.close();
+//     console.error("Error adding currencies:", error);
+//   }
+// };
+
+// Run the script
+// addCurrencies();
+
+// Function to save a income category with its subcategories
+// const saveCategoryWithSubcategories = async (
+//   categoryName,
+//   subcategories,
+//   AdminIncomeCategoryModel
+// ) => {
+//   const subcategoryObjects = subcategories.map((subcategoryName) => {
+//     return {
+//       _id: new mongoose.Types.ObjectId(), // Generate a new ObjectId for each subcategory
+//       name: subcategoryName,
+//     };
+//   });
+
+//   // Create a new category document
+//   const category = new AdminIncomeCategoryModel({
+//     name: categoryName,
+//     subcategories: subcategoryObjects,
+//   });
+
+//   // Save the category to the database
+//   await category.save();
+//   console.log(
+//     `Category "${categoryName}" with ${subcategories.length} subcategories added successfully.`
+//   );
+// };
+
+// // Add income sources to the database
+// const addIncomeSources = async () => {
+//   const adminDbConnection = await connectAdminDatabase();
+
+//   try {
+//     const AdminIncomeCategoryModel = AdminIncomeCategory(adminDbConnection);
+
+//     // Iterate over each category in incomeSources
+//     for (const categoryName in incomeSources) {
+//       const subcategories = incomeSources[categoryName];
+
+//       // Save the category and subcategories one by one
+//       await saveCategoryWithSubcategories(
+//         categoryName,
+//         subcategories,
+//         AdminIncomeCategoryModel
+//       );
+//     }
+
+//     console.log("All income sources added successfully.");
+//     process.exit(0);
+//   } catch (error) {
+//     console.error("Error adding income sources:", error);
+//     process.exit(1);
 //   }
 // };
 
 // // Run the script
-// seedDatabase();
+// addIncomeSources();
 
-// *************************************************//
+// save expense category
 
-// currency adding script in the database
-import mongoose from "mongoose";
-import AdminCategoryDataModel from "../models/AdminModel/AdminCategoryDataModel.js";
-import currencies from "./currency.js";
+// Function to save a category and its subcategories
+const saveCategoryWithSubcategories = async (
+  categoryName,
+  subcategories,
+  AdminExpenseCategoryModel
+) => {
+  // Map the subcategory names to subcategory objects with _id and name
+  const subcategoryObjects = subcategories.map((subcategoryName) => {
+    return {
+      _id: new mongoose.Types.ObjectId(), // Generate a new ObjectId for each subcategory
+      name: subcategoryName,
+    };
+  });
 
-// Helper function to format text
-const formatText = (text) => {
-  return text
-    .toLowerCase()
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  // Create a new category document
+  const category = new AdminExpenseCategoryModel({
+    name: categoryName,
+    subcategories: subcategoryObjects,
+  });
+
+  // Save the category to the database
+  await category.save();
+  console.log(
+    `Category "${categoryName}" with ${subcategories.length} subcategories added successfully.`
+  );
 };
 
-// MongoDB connection URI
-const MONGO_URI = "process.env.MONGO_URI";
+// Function to add all categories and their subcategories to the database
+const addCategories = async () => {
+  const adminDbConnection = await connectAdminDatabase(); // Ensure you define this function to connect to your DB
 
-const seedDatabase = async () => {
   try {
-    // Connect to MongoDB
-    await mongoose.connect(MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("Connected to MongoDB");
+    const AdminExpenseCategoryModel = AdminExpenseCategory(adminDbConnection);
 
-    // Format the currencies to match the required structure
-    const formattedCurrencies = {};
-    currencies.forEach((currency) => {
-      formattedCurrencies[currency.name] = {
-        symbol: currency.symbol,
-        currency: currency.currency,
-      };
-    });
+    // Iterate over each category in categories object
+    for (const categoryName in categories) {
+      const subcategories = categories[categoryName];
 
-    // Check if the "Currency Data" document already exists
-    let currencyCategory = await AdminCategoryDataModel.findOne({
-      name: "Currency Categories",
-    });
-
-    if (currencyCategory) {
-      console.log(
-        "Currency Data document already exists. Updating currency data..."
+      // Save the category and its subcategories
+      await saveCategoryWithSubcategories(
+        categoryName,
+        subcategories,
+        AdminExpenseCategoryModel
       );
-
-      // Merge the new currency data with the existing one
-      for (const [currencyName, currencyData] of Object.entries(
-        formattedCurrencies
-      )) {
-        if (!currencyCategory.categories[currencyName]) {
-          currencyCategory.categories[currencyName] = currencyData;
-        }
-      }
-    } else {
-      console.log("Creating new Currency Data document...");
-      currencyCategory = new AdminCategoryDataModel({
-        name: "Currency Categories",
-        categories: formattedCurrencies, // Add the formatted currency data
-      });
     }
 
-    // Save the updated/created document
-    await currencyCategory.save();
-    console.log("Currency data successfully added/updated!");
-
-    // Close the connection
-    mongoose.connection.close();
+    console.log("All categories and subcategories added successfully.");
+    process.exit(0); // Exit the process after all categories are added
   } catch (error) {
-    console.error("Error seeding the database:", error.message);
-    mongoose.connection.close();
+    console.error("Error adding categories:", error);
+    process.exit(1); // Exit with error status if something goes wrong
   }
 };
 
-// Run the script
-seedDatabase();
+// Run the function to add categories
+addCategories();
