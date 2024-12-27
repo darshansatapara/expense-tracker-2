@@ -1,11 +1,11 @@
-import User from "../models/userModel.js";
-import UserCredential from "../models/UserCredential.js";
+import User from "../../models/UserModel/UserProfileModel.js";
+import UserCredential from "../../models/UserModel/UserCredential.js";
 import bcrypt from "bcryptjs";
-import cloudinary from "../config/cloudinary.js";
-import { generateToken } from "../config/tokenGenerate.js";
+import cloudinary from "../../config/cloudinary.js";
+import { generateToken } from "../../config/tokenGenerate.js";
 
 // Sign-up controller
-export const signUp = async (req, res, next) => {
+export const signUp = (userDbConnection) => async (req, res, next) => {
   const {
     profilePic,
     username,
@@ -39,11 +39,11 @@ export const signUp = async (req, res, next) => {
     // Upload profilePic to Cloudinary if available
     if (profilePic) {
       const uploadProfilePic = await cloudinary.uploader.upload(profilePic, {
-        folder: "user_profiles", // Optional: Organize images in a folder on Cloudinary
+        folder: "user_profiles",
       });
       profilePhoto = uploadProfilePic.secure_url;
-      console.log("Uploaded Profile Photo URL:", profilePhoto);
     }
+
     // Hash the password before saving
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -60,15 +60,19 @@ export const signUp = async (req, res, next) => {
     });
 
     // Save the new user in the database
-    const savedUser = await newUser.save();
+    const savedUser = await newUser.save({
+      session: userDbConnection.startSession(),
+    });
 
     // If user is saved successfully, save credentials
     const userCredential = new UserCredential({
-      email: savedUser.email, // Ensure it matches the User model
-      password: hashedPassword, // Use the hashed password
+      email: savedUser.email,
+      password: hashedPassword,
     });
 
-    await userCredential.save();
+    await userCredential.save({
+      session: userDbConnection.startSession(),
+    });
 
     // Generate a JWT token for the user
     generateToken(savedUser._id, res);
@@ -99,14 +103,21 @@ export const signUp = async (req, res, next) => {
 };
 
 // Sign-in controller
-export const signIn = async (req, res, next) => {
+export const signIn = (userDbConnection) => async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
-    // Find the user credentials and populate the associated user details
-    const userCredential = await UserCredential.findOne({ email }).populate({
-      path: "email", // Path to the referenced User model
-      model: "User", // Specify the model explicitly (User)
+    const UserCredentialModel = userDbConnection.model(
+      "UserCredential",
+      UserCredential.schema
+    );
+    const UserModel = userDbConnection.model("User", User.schema);
+
+    const userCredential = await UserCredentialModel.findOne({
+      email,
+    }).populate({
+      path: "email",
+      model: UserModel,
     });
 
     if (!userCredential) {
@@ -115,7 +126,6 @@ export const signIn = async (req, res, next) => {
         .json({ success: false, error: "Invalid credentials" });
     }
 
-    // Compare the provided password with the hashed password
     const isPasswordCorrect = await bcrypt.compare(
       password,
       userCredential.password
@@ -126,13 +136,10 @@ export const signIn = async (req, res, next) => {
         .json({ success: false, error: "Invalid credentials" });
     }
 
-    // `userCredential.email` contains the populated user details
     const user = userCredential.email;
 
-    // Generate a JWT token for the user
     generateToken(user._id, res);
 
-    // Return user details
     res.status(200).json({
       success: true,
       message: "Sign-in successful",
@@ -147,12 +154,12 @@ export const signIn = async (req, res, next) => {
       },
     });
   } catch (error) {
-    next(error); // Pass the error to the error-handling middleware
+    next(error);
   }
 };
 
-// google singin
-export const googlesignin = async (req, res) => {
+// Google sign-in controller
+export const googlesignin = (userDbConnection) => async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
@@ -163,87 +170,66 @@ export const googlesignin = async (req, res) => {
   }
 
   try {
-    // Check if the user exists in UserCredential and populate the related User document
-    const userCredential = await UserCredential.findOne({ email }).populate({
-      path: "email", // Populate the User document
-      model: "User",
+    const UserCredentialModel = userDbConnection.model(
+      "UserCredential",
+      UserCredential.schema
+    );
+    const UserModel = userDbConnection.model("User", User.schema);
+
+    const userCredential = await UserCredentialModel.findOne({ email }).populate({
+      path: "email",
+      model: UserModel,
     });
 
     if (!userCredential) {
-      // If user does not exist, send error response
       return res.status(404).json({
         success: false,
         message: "User does not exist. Please sign up.",
       });
     }
 
-    // `userCredential.email` now contains the User document
     const user = userCredential.email;
 
-    // Generate a token for the user using the User model's `_id`
     generateToken(user._id, res);
 
     res.status(200).json({
       success: true,
-      message: "Google Sign-In successful",
+      message: "Google Sign-in successful",
       user: {
         _id: user._id,
-        email: user.email,
-        username: user.username,
         profilePic: user.profilePic,
+        username: user.username,
+        email: user.email,
         mobile_no: user.mobile_no,
         date_of_birth: user.date_of_birth,
         profession: user.profession,
       },
     });
-  } catch (err) {
-    console.error("Error during Google Sign-In:", err.message);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// sign out
-export const signOut = (req, res) => {
-  try {
-    res.cookie("jwt", "", { maxAge: 0 });
-    console.log("user logged out");
-    res.status(200).json({ message: "user logged out successfully!!" });
-  } catch (error) {
-    res.status(500).json({ error: "Server Error" });
-  }
+// Sign-out controller
+export const signOut = () => (req, res) => {
+  res.clearCookie("token");
+  res.status(200).json({ success: true, message: "Successfully signed out" });
 };
 
 // Get user by ID controller
-export const getUserById = async (req, res, next) => {
+export const getUserById = (userDbConnection) => async (req, res) => {
   const { userId } = req.params;
 
   try {
-    // Find user by _id
-    const user = await User.findById(userId);
-
+    const user = await userDbConnection.model("User", User.schema).findById(
+      userId
+    );
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Send the user details without the password
-    res.status(200).json({
-      success: true,
-      user: {
-        username: user.username,
-        email: user.email,
-        name: user.name,
-        mobile_no: user.mobile_no,
-        date_of_birth: user.date_of_birth,
-        profession: user.profession,
-      },
-    });
-  } catch (error) {
-    next(error); // Pass errors to the error-handling middleware
+    res.status(200).json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
