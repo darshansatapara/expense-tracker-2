@@ -111,7 +111,7 @@ export const signIn = (userDbConnection) => async (req, res, next) => {
       "UserCredential",
       UserCredential.schema
     );
-    const UserModel = userDbConnection.model("User", User.schema);
+    const UserModel = userDbConnection.model("UserProfile", User.schema);
 
     const userCredential = await UserCredentialModel.findOne({
       email,
@@ -174,7 +174,7 @@ export const googlesignin = (userDbConnection) => async (req, res) => {
       "UserCredential",
       UserCredential.schema
     );
-    const UserModel = userDbConnection.model("User", User.schema);
+    const UserModel = userDbConnection.model("UserProfile", User.schema);
 
     const userCredential = await UserCredentialModel.findOne({ email }).populate({
       path: "email",
@@ -221,7 +221,7 @@ export const getUserById = (userDbConnection) => async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const user = await userDbConnection.model("User", User.schema).findById(
+    const user = await userDbConnection.model("UserProfile", User.schema).findById(
       userId
     );
     if (!user) {
