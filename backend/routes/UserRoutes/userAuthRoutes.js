@@ -15,15 +15,11 @@ const userAuthRoute = (userDbConnection) => {
   const router = express.Router();
 
   // Pass the controller functions as references, not invoked immediately
-  router.post("/signup", (req, res) => signUp(req, res, userDbConnection));
-  router.post("/signin", (req, res) => signIn(req, res, userDbConnection));
-  router.post("/googlesignin", (req, res) =>
-    googlesignin(req, res, userDbConnection)
-  );
+  router.post("/signup", signUp(userDbConnection));
+  router.post("/signin", signIn(userDbConnection));
+  router.post("/googlesignin", googlesignin(userDbConnection));
   router.post("/signout", signOut); // Assuming signOut doesn't require the database connection
-  router.get("/user/:userId", (req, res) =>
-    getUserById(req, res, userDbConnection)
-  );
+  router.get("/user/:userId", getUserById(userDbConnection));
 
   return router;
 };

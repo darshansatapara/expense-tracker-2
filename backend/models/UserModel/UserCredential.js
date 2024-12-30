@@ -37,6 +37,8 @@ UserCredentialSchema.methods.comparePassword = async function (
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-const UserCredential = mongoose.model("UserCredential", UserCredentialSchema);
+const UserCredential = (userDbConnection) => {
+  return userDbConnection.model("UserCredential", UserCredentialSchema);
+};
 
 export default UserCredential;

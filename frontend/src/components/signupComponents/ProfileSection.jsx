@@ -48,14 +48,14 @@ export default function ProfileSection() {
   };
 
   const handleFinish = async (values) => {
+    console.log("i am clicked ");
     setLoading(true);
-    // console.log("Finish");
     const payload = {
       ...values,
       password: userData.password,
       profilePic,
     };
-
+    console.log("payload", payload);
     try {
       const res = await signup(payload); // Call the signup API from userstore
       if (res) {
@@ -187,40 +187,15 @@ export default function ProfileSection() {
               <Option value="" disabled hidden>
                 Select an option
               </Option>
-              <Option value="student">Student</Option>
-              <Option value="employee">Employee</Option>
-              <Option value="businessmen">Businessmen</Option>
-              <Option value="housewife">House-Wife</Option>
-              <Option value="elder">Elder</Option>
-              <Option value="other">Other</Option>
+              <Option value="Student">Student</Option>
+              <Option value="Employee">Employee</Option>
+              <Option value="Worker">Worker</Option>
+              <Option value="Businessmen">Businessmen</Option>
+              <Option value="Housewife">House-Wife</Option>
+              <Option value="Door-to-Door Seller">Door-to-Door Seller</Option>
+              <Option value="Elder">Elder</Option>
             </Select>
           </Form.Item>
-
-          {/* Password
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[
-              { required: true, message: "Please enter your password!" },
-              {
-                min: 6,
-                message: "Password must be at least 6 characters long!",
-              },
-              {
-                pattern:
-                  /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-                message:
-                  "Password must contain letters, numbers, and a special character!",
-              },
-            ]}
-          >
-            <Input.Password
-              prefix={<Lock className="text-blue-500" />}
-              placeholder="Enter your password"
-              className="rounded"
-              visibilityToggle
-            />
-          </Form.Item> */}
 
           {/* Submit Button */}
           <Form.Item>

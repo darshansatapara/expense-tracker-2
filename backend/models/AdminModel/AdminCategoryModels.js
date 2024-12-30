@@ -1,21 +1,5 @@
 import mongoose from "mongoose";
 
-// Admin Currency Category Schema
-const AdminCurrencyCategorySchema = new mongoose.Schema({
-  currency: {
-    type: String,
-    required: true, // e.g., "USD"
-  },
-  name: {
-    type: String,
-    required: true, // e.g., "United States Dollar"
-  },
-  symbol: {
-    type: String,
-    required: true, // e.g., "$"
-  },
-});
-
 // Admin Expense Category Schema
 const AdminExpenseCategorySchema = new mongoose.Schema({
   name: {
@@ -58,8 +42,31 @@ const AdminIncomeCategorySchema = new mongoose.Schema({
   ],
 });
 
+// Admin Currency Category Schema
+const AdminCurrencyCategorySchema = new mongoose.Schema({
+  currency: {
+    type: String,
+    required: true, // e.g., "USD"
+  },
+  name: {
+    type: String,
+    required: true, // e.g., "United States Dollar"
+  },
+  symbol: {
+    type: String,
+    required: true, // e.g., "$"
+  },
+});
+
+// Export models, passing the correct database connection
 // Export models, passing the correct database connection
 export const AdminCurrencyCategory = (adminDbConnection) => {
+  // Check if the model is already registered to prevent errors
+  if (adminDbConnection.models.AdminCurrencyCategory) {
+    return adminDbConnection.models.AdminCurrencyCategory;
+  }
+
+  // If not, create and register the model with the provided database connection
   return adminDbConnection.model(
     "AdminCurrencyCategory",
     AdminCurrencyCategorySchema
