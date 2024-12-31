@@ -15,7 +15,11 @@ export default function Sidebar({ onSelectItem, username = "User Name" }) {
     <Sider
       width={300} // Increase width of the sidebar
       className="h-full p-4 shadow-md"
-      style={{ height: "100vh", backgroundColor: "transparent", border: "none" }} // Remove box effect, transparent background
+      style={{
+        height: "100vh",
+        backgroundColor: "transparent",
+        border: "none",
+      }} // Remove box effect, transparent background
     >
       {/* Sidebar Content */}
       <div className="flex flex-col h-full">
@@ -48,22 +52,38 @@ export default function Sidebar({ onSelectItem, username = "User Name" }) {
           </Menu.Item>
 
           {/* Analysis */}
-          <Menu.Item key="Analysis" icon={<BarChartOutlined />} className="font-nunito">
+          <Menu.Item
+            key="Analysis"
+            icon={<BarChartOutlined />}
+            className="font-nunito"
+          >
             Analysis
           </Menu.Item>
 
           {/* History */}
-          <Menu.Item key="History" icon={<HistoryOutlined />} className="font-nunito">
+          <Menu.Item
+            key="History"
+            icon={<HistoryOutlined />}
+            className="font-nunito"
+          >
             History
           </Menu.Item>
 
           {/* Settings */}
-          <Menu.Item key="Settings" icon={<SettingOutlined />} className="font-nunito">
+          <Menu.Item
+            key="Settings"
+            icon={<SettingOutlined />}
+            className="font-nunito"
+          >
             Settings
           </Menu.Item>
 
           {/* Reports */}
-          <Menu.Item key="Reports" icon={<FileTextOutlined />} className="font-nunito">
+          <Menu.Item
+            key="Reports"
+            icon={<FileTextOutlined />}
+            className="font-nunito"
+          >
             Reports
           </Menu.Item>
         </Menu>
@@ -81,9 +101,8 @@ export default function Sidebar({ onSelectItem, username = "User Name" }) {
 
         {/* Footer Text */}
         <div className="text-center text-sm text-gray-600 font-nunito mb-7">
-  <p>© 2025 Expense Tracker. All rights reserved.</p>
-</div>
-
+          <p>© 2025 Expense Tracker. All rights reserved.</p>
+        </div>
       </div>
     </Sider>
   );

@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Layout, Typography, Button, Image } from "antd"; // Import Image for logo
 import { AlignJustify } from "lucide-react";
-import { HomeOutlined, BarChartOutlined, HistoryOutlined, SettingOutlined, FileTextOutlined } from "@ant-design/icons";
+import {
+  HomeOutlined,
+  BarChartOutlined,
+  HistoryOutlined,
+  SettingOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons";
 
 const { Header } = Layout;
 const { Text } = Typography;
@@ -37,35 +43,46 @@ export default function Navbar({ selectedItem }) {
       <Header className="bg-[#D9EAFD] flex items-center justify-between h-12 md:h-14 px-4 rounded-md">
         {/* App Logo for small screen */}
         <div className="block md:hidden mt-7">
-  <Image
-    src="/images/applogo.jpg" // Update the path to your logo image
-    alt="App Logo"
-    width={40}
-    height={40}
-    className="rounded-full" // This class makes the image circular
-  />
-</div>
-
+          <Image
+            src="/images/applogo.jpg" // Update the path to your logo image
+            alt="App Logo"
+            width={40}
+            height={40}
+            className="rounded-full" // This class makes the image circular
+          />
+        </div>
 
         {/* Selected Item with Icon on the Left */}
-        <div className="flex items-center space-x-1 hidden md:flex">
-          {selectedItem === "Home" && <HomeOutlined className="text-2xl md:text-xl" />}
-          {selectedItem === "Analysis" && <BarChartOutlined className="text-2xl md:text-xl" />}
-          {selectedItem === "History" && <HistoryOutlined className="text-2xl md:text-xl" />}
-          {selectedItem === "Settings" && <SettingOutlined className="text-2xl md:text-xl" />}
-          {selectedItem === "Reports" && <FileTextOutlined className="text-2xl md:text-xl" />}
-          <Text className="text-gray-700 text-sm md:text-2xl font-semibold">{selectedItem}</Text>
+        <div className=" items-center space-x-1 hidden md:flex">
+          {selectedItem === "Home" && (
+            <HomeOutlined className="text-2xl md:text-xl" />
+          )}
+          {selectedItem === "Analysis" && (
+            <BarChartOutlined className="text-2xl md:text-xl" />
+          )}
+          {selectedItem === "History" && (
+            <HistoryOutlined className="text-2xl md:text-xl" />
+          )}
+          {selectedItem === "Settings" && (
+            <SettingOutlined className="text-2xl md:text-xl" />
+          )}
+          {selectedItem === "Reports" && (
+            <FileTextOutlined className="text-2xl md:text-xl" />
+          )}
+          <Text className="text-gray-700 text-sm md:text-2xl font-semibold">
+            {selectedItem}
+          </Text>
         </div>
 
         {/* Dynamic Content in a Box in the Center (only visible on medium and larger screens) */}
-        <div className="flex-7 flex justify-center items-center hidden md:block">
-  <div className="bg-white p-4 rounded-md shadow-md max-w-3xl w-full">
-    <Text className="text-gray-700 text-xs md:text-sm font-semibold text-center">
-      {content[currentContent]} {/* Displaying dynamic content every 2 seconds */}
-    </Text>
-  </div>
-</div>
-
+        <div className="flex-7  justify-center items-center hidden md:block">
+          <div className="bg-white p-4 rounded-md shadow-md max-w-3xl w-full">
+            <Text className="text-gray-700 text-xs md:text-sm font-semibold text-center">
+              {content[currentContent]}{" "}
+              {/* Displaying dynamic content every 2 seconds */}
+            </Text>
+          </div>
+        </div>
 
         {/* Sign Out Button */}
         <div className="hidden md:block">

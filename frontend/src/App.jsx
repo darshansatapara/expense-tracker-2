@@ -6,19 +6,18 @@ import CategoryPage from "./pages/CategoryPage";
 import HomePage from "./pages/HomePage";
 import ContactusPage from "./pages/ContactPage";
 
-
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/signup/*" element={<SignupPage />} />
         <Route path="/signin" element={<SignInPage />} />
-
-        <Route element={<ProtectedRoute />}>
-          <Route path="/category/*" element={<CategoryPage />} />
-          <Route path="/" element={<HomePage />} />
-          <Route path="/contactus" element={<ContactusPage />} />
-        </Route>
+        {/* 
+        <Route element={<ProtectedRoute />}> */}
+        <Route path="/category/*" element={<CategoryPage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/contactus" element={<ContactusPage />} />
+        {/* </Route> */}
       </Routes>
     </BrowserRouter>
   );
