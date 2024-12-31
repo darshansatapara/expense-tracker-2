@@ -8,6 +8,9 @@ import {
   getUserCurrencyAndBudget,
   updateUserCurrencyAndBudget,
   updateUserExpenseCategories,
+  deleteUserExpenseSubcategories,
+  deleteUserExpenseCategories,
+  deleteUserCurrencyCategory,
   // updateUserIncomeCategory,
 } from "../../controllers/UserController/userCategoryController.js";
 
@@ -18,7 +21,7 @@ const userCategoryRoute = (userDbConnection, adminDbConnection) => {
 
   const router = express.Router();
 
-  // ******************************post routes******************************
+  // ******************************post routes******************************//
 
   //add expense category
   router.post("/addExpenseCategory", addUserExpenseCategory(userDbConnection));
@@ -30,7 +33,7 @@ const userCategoryRoute = (userDbConnection, adminDbConnection) => {
     addUserCurrencyAndBudget(userDbConnection)
   );
 
-  // *******************************get routes********************************
+  // *******************************get routes********************************//
 
   // Expense Categories Route
   router.get(
@@ -68,7 +71,27 @@ const userCategoryRoute = (userDbConnection, adminDbConnection) => {
     updateUserCurrencyAndBudget(userDbConnection, adminDbConnection)
   );
 
+  //***********************************Delete Route*****************************************/
+
+  // delete user expense category forn userdatabase(if category deleted then all sub-category will be auto delete from user database)
+  router.delete(
+    "/expenseCategory/deleteExpenseCategory/:userId",
+    deleteUserExpenseCategories(userDbConnection)
+  );
+
+  // delete user expense sub-categories from userdatabase
+  router.delete(
+    "/expenseCategory/deleteExpenseSubCategory/:userId",
+    deleteUserExpenseSubcategories(userDbConnection)
+  );
+
+  //delete currency category
+  router.delete(
+    "/currencyCategory/deleteCureencyCategory/:userId",
+    deleteUserCurrencyCategory(userDbConnection)
+  );
+
   return router;
 };
 
-export default userCategoryRoute;
+export default userCategoryRoute; 

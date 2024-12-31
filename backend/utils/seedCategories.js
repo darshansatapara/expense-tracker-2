@@ -8,12 +8,13 @@ import {
   AdminCurrencyCategory,
   AdminExpenseCategory,
   AdminIncomeCategory,
+  CopyAdminExpenseCategory,
 } from "../models/AdminModel/AdminCategoryModels.js";
 import incomeSources from "./income.js";
 import mongoose from "mongoose";
 import categories from "./category.js";
 
-// Function to add currencies to the database
+// **********************************Function to add currencies to the database
 // const addCurrencies = async () => {
 //   try {
 //     const adminDbConnection = await connectAdminDatabase();
@@ -61,7 +62,7 @@ import categories from "./category.js";
 //   );
 // };
 
-// // Add income sources to the database
+// // Add income sources to the database******************************
 // const addIncomeSources = async () => {
 //   const adminDbConnection = await connectAdminDatabase();
 
@@ -93,59 +94,108 @@ import categories from "./category.js";
 
 // save expense category
 
-// Function to save a category and its subcategories
-const saveCategoryWithSubcategories = async (
-  categoryName,
-  subcategories,
-  AdminExpenseCategoryModel
-) => {
-  // Map the subcategory names to subcategory objects with _id and name
-  const subcategoryObjects = subcategories.map((subcategoryName) => {
-    return {
-      _id: new mongoose.Types.ObjectId(), // Generate a new ObjectId for each subcategory
-      name: subcategoryName,
-    };
-  });
+// Function to save a category and its subcategories***********************************
+// const saveCategoryWithSubcategories = async (
+//   categoryName,
+//   subcategories,
+//   CopyAdminExpenseCategoryModel
+// ) => {
+//   // Map the subcategory names to subcategory objects with _id and name
+//   const subcategoryObjects = subcategories.map((subcategoryName) => {
+//     return {
+//       _id: new mongoose.Types.ObjectId(), // Generate a new ObjectId for each subcategory
+//       name: subcategoryName,
+//     };
+//   });
 
-  // Create a new category document
-  const category = new AdminExpenseCategoryModel({
-    name: categoryName,
-    subcategories: subcategoryObjects,
-  });
+//   // Create a new category document
+//   const category = new CopyAdminExpenseCategoryModel({
+//     name: categoryName,
+//     subcategories: subcategoryObjects,
+//   });
 
-  // Save the category to the database
-  await category.save();
-  console.log(
-    `Category "${categoryName}" with ${subcategories.length} subcategories added successfully.`
-  );
-};
+//   // Save the category to the database
+//   await category.save();
+//   console.log(
+//     `Category "${categoryName}" with ${subcategories.length} subcategories added successfully.`
+//   );
+// };
 
-// Function to add all categories and their subcategories to the database
-const addCategories = async () => {
-  const adminDbConnection = await connectAdminDatabase(); // Ensure you define this function to connect to your DB
+// // Function to add all categories and their subcategories to the database
+// const addCategories = async () => {
+//   const adminDbConnection = await connectAdminDatabase(); // Ensure you define this function to connect to your DB
 
+//   try {
+//     const AdminExpenseCategoryModel =
+//       CopyAdminExpenseCategory(adminDbConnection);
+
+//     // Iterate over each category in categories object
+//     for (const categoryName in categories) {
+//       const subcategories = categories[categoryName];
+
+//       // Save the category and its subcategories
+//       await saveCategoryWithSubcategories(
+//         categoryName,
+//         subcategories,
+//         AdminExpenseCategoryModel
+//       );
+//     }
+
+//     console.log("All categories and subcategories added successfully.");
+//     process.exit(0); // Exit the process after all categories are added
+//   } catch (error) {
+//     console.error("Error adding categories:", error);
+//     process.exit(1); // Exit with error status if something goes wrong
+//   }
+// };
+
+// // Run the function to add categories
+// addCategories();
+
+// *************************************************Copy data function
+
+// make a copy of the data of admin expense categories
+async function copyAdminExpenseCategories() {
   try {
-    const AdminExpenseCategoryModel = AdminExpenseCategory(adminDbConnection);
+    const adminDbConnection = await connectAdminDatabase();
+    console.log("Connected to MongoDB");
 
-    // Iterate over each category in categories object
-    for (const categoryName in categories) {
-      const subcategories = categories[categoryName];
+    // Initialize the models
+    const AdminCategory = AdminExpenseCategory(adminDbConnection);
+    const CopyCategory = CopyAdminExpenseCategory(adminDbConnection);
 
-      // Save the category and its subcategories
-      await saveCategoryWithSubcategories(
-        categoryName,
-        subcategories,
-        AdminExpenseCategoryModel
-      );
-    }
+    // Fetch all documents from the AdminExpenseCategory collection
+    const categories = await AdminCategory.find({});
 
-    console.log("All categories and subcategories added successfully.");
-    process.exit(0); // Exit the process after all categories are added
+    console.log(
+      `Found ${categories.length} categories in AdminExpenseCategory`
+    );
+
+    // Prepare data for the CopyAdminExpenseCategory collection
+    const copyData = categories.map((category) => {
+      return {
+        name: category.name,
+        categoryId: category._id, // Store the original _id
+        subcategories: category.subcategories,
+        status: "active", // Mark all categories as active by default
+      };
+    });
+
+    // Insert the data into the CopyAdminExpenseCategory collection
+    const result = await CopyCategory.insertMany(copyData);
+
+    console.log(
+      `Copied ${result.length} categories to CopyAdminExpenseCategory`
+    );
+
+    // Close the database connection
+    await mongoose.connection.close();
+    console.log("Database connection closed");
   } catch (error) {
-    console.error("Error adding categories:", error);
-    process.exit(1); // Exit with error status if something goes wrong
+    console.error("Error copying categories:", error);
+    process.exit(1); // Exit with failure
   }
-};
+}
 
-// Run the function to add categories
-addCategories();
+// Execute the function
+copyAdminExpenseCategories();

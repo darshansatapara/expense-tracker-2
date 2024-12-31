@@ -258,6 +258,138 @@ export const updateUserExpenseCategories =
     }
   };
 
+//delete user expense categories (if user can remove category, then accordingly their subcategories will be removed)
+export const deleteUserExpenseCategories =
+  (userDbConnection) => async (req, res) => {
+    const { userId } = req.params;
+    const { deleteCategoryIds } = req.body;
+
+    if (
+      !userId ||
+      !Array.isArray(deleteCategoryIds) ||
+      deleteCategoryIds.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a valid userId and a deleteCategoryIds array.",
+      });
+    }
+
+    try {
+      const UserExpenseCategory = UserExpenseCategoryModel(userDbConnection);
+
+      // Fetch the user's data
+      const userExpenseData = await UserExpenseCategory.findOne({ userId });
+
+      if (!userExpenseData) {
+        return res.status(404).json({
+          success: false,
+          message: "User expense data not found.",
+        });
+      }
+
+      // Filter out the categories to be deleted
+      const updatedExpenseCategories = userExpenseData.expenseCategories.filter(
+        (category) =>
+          !deleteCategoryIds.includes(category.categoryId.toString())
+      );
+
+      // Update the user's expense categories
+      userExpenseData.expenseCategories = updatedExpenseCategories;
+
+      // Save the updated document
+      const updatedUserData = await userExpenseData.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Categories and their subcategories deleted successfully.",
+        data: updatedUserData,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to delete categories.",
+        error: error.message,
+      });
+    }
+  };
+
+// delete only user sub-category in this route (..category have > 2 sub-categories)
+export const deleteUserExpenseSubcategories =
+  (userDbConnection) => async (req, res) => {
+    const { userId } = req.params;
+    const { CategoryDeleteData } = req.body;
+
+    if (
+      !userId ||
+      !Array.isArray(CategoryDeleteData) ||
+      CategoryDeleteData.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide userId and a valid CategoryDeleteData array.",
+      });
+    }
+
+    try {
+      const UserExpenseCategory = UserExpenseCategoryModel(userDbConnection);
+      // const AdminExpenseCategoryModel = AdminExpenseCategory(adminDbConnection);
+
+      // Fetch user's expense data
+      const userExpenseData = await UserExpenseCategory.findOne({ userId });
+
+      if (!userExpenseData) {
+        return res.status(404).json({
+          success: false,
+          message: "No expense data found for the given user.",
+        });
+      }
+
+      // Prepare updated expense categories
+      const updatedExpenseCategories = userExpenseData.expenseCategories.map(
+        (userCategory) => {
+          const categoryToDelete = CategoryDeleteData.find(
+            (delCat) => delCat.categoryId === userCategory.categoryId.toString()
+          );
+
+          // Skip categories not in delete data
+          if (!categoryToDelete) return userCategory;
+
+          // Remove subcategories only if the category has more than 2 subcategories
+          if (userCategory.subcategoryIds.length > 2) {
+            userCategory.subcategoryIds = userCategory.subcategoryIds.filter(
+              (subId) =>
+                !categoryToDelete.subcategoryIds.includes(subId.toString())
+            );
+          }
+
+          return userCategory;
+        }
+      );
+
+      // Remove any categories that no longer have subcategories
+      const filteredCategories = updatedExpenseCategories.filter(
+        (category) => category.subcategoryIds.length > 0
+      );
+
+      // Update user data
+      userExpenseData.expenseCategories = filteredCategories;
+      const updatedUserExpenseData = await userExpenseData.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Subcategories removed successfully.",
+        data: updatedUserExpenseData,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to delete subcategories.",
+        error: error.message,
+      });
+    }
+  };
+
 // ****************************************INCOME Controllers***********************************
 // Add User Income Categories
 // export const addUserIncomeCategory = (userDbConnection) => async (req, res) => {
@@ -691,6 +823,69 @@ export const updateUserCurrencyAndBudget =
         success: false,
         message: "Server error",
         error: err.message,
+      });
+    }
+  };
+
+//delete currency category form user database
+export const deleteUserCurrencyCategory =
+  (userDbConnection) => async (req, res) => {
+    const { userId } = req.params;
+    const { deleteCurrencyCategoryIds } = req.body;
+
+    // Validate input
+    if (
+      !userId ||
+      !Array.isArray(deleteCurrencyCategoryIds) ||
+      deleteCurrencyCategoryIds.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Please provide a valid userId and deleteCurrencyCategoryIds array.",
+      });
+    }
+
+    try {
+      // Initialize the user model
+      const UserCurrencyAndBudget =
+        UserCurrencyAndBudgetModel(userDbConnection);
+
+      // Fetch user data
+      const userCurrencyAndBudgetData = await UserCurrencyAndBudget.findOne({
+        userId,
+      });
+
+      if (!userCurrencyAndBudgetData) {
+        return res.status(404).json({
+          success: false,
+          message: "User currency and budget data not found.",
+        });
+      }
+
+      // Filter out the currency categories to be deleted
+      const updatedCurrencyCategories =
+        userCurrencyAndBudgetData.currencyCategory.filter(
+          (currencyId) =>
+            !deleteCurrencyCategoryIds.includes(currencyId.toString())
+        );
+
+      // Update the user's currency categories
+      userCurrencyAndBudgetData.currencyCategory = updatedCurrencyCategories;
+
+      // Save the changes
+      const updatedUserData = await userCurrencyAndBudgetData.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Currency categories deleted successfully.",
+        data: updatedUserData,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to delete currency categories.",
+        error: error.message,
       });
     }
   };
