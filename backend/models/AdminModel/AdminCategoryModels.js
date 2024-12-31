@@ -11,6 +11,11 @@ const CopyAdminExpenseCategorySchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
+  categoryStatus: {
+    type: String,
+    required: true,
+    default: "active",
+  },
   subcategories: [
     {
       _id: {
@@ -20,6 +25,11 @@ const CopyAdminExpenseCategorySchema = new mongoose.Schema({
       name: {
         type: String,
         required: true,
+      },
+      subCategorystatus: {
+        type: String,
+        required: true,
+        default: "active",
       },
     },
   ],
