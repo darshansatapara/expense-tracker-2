@@ -1,6 +1,30 @@
 import mongoose from "mongoose";
 
 // Admin Expense Category Schema
+const CopyAdminExpenseCategorySchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true, // Ensure each category name is unique
+  },
+  categoryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+  },
+  subcategories: [
+    {
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+      },
+      name: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
+});
+// Admin Expense Category Schema
 const AdminExpenseCategorySchema = new mongoose.Schema({
   name: {
     type: String,
@@ -59,7 +83,6 @@ const AdminCurrencyCategorySchema = new mongoose.Schema({
 });
 
 // Export models, passing the correct database connection
-// Export models, passing the correct database connection
 export const AdminCurrencyCategory = (adminDbConnection) => {
   // Check if the model is already registered to prevent errors
   if (adminDbConnection.models.AdminCurrencyCategory) {
@@ -77,6 +100,12 @@ export const AdminExpenseCategory = (adminDbConnection) => {
   return adminDbConnection.model(
     "AdminExpenseCategory",
     AdminExpenseCategorySchema
+  );
+};
+export const CopyAdminExpenseCategory = (adminDbConnection) => {
+  return adminDbConnection.model(
+    "CopyAdminExpenseCategory",
+    CopyAdminExpenseCategorySchema
   );
 };
 
