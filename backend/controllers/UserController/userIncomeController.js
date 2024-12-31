@@ -1,7 +1,7 @@
 import UserIncome from "../../models/UserModel/UserIncomeDataModel.js";
 
 // Controller for adding income
-export const addIncome = async (req, res) => {
+export const addIncome = (userDbConnection) => async (req, res) => {
   const { userId, date, mode, amount, category, description } = req.body;
 
   if (!userId || !date || !mode || !amount || !category) {
@@ -70,7 +70,7 @@ export const addIncome = async (req, res) => {
 };
 
 // Controller for updating income
-export const updateIncome = async (req, res) => {
+export const updateIncome = (userDbConnection) => async (req, res) => {
   const { userId, date } = req.params;
   const { amount, category, description, incomeId, mode } = req.body;
 
@@ -154,7 +154,7 @@ export const updateIncome = async (req, res) => {
 };
 
 // Controller for fetching incomes by date range
-export const getIncomes = async (req, res) => {
+export const getIncomes = (userDbConnection) => async (req, res) => {
   const { userId, startDate, endDate } = req.params;
 
   try {

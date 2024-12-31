@@ -26,6 +26,6 @@ const userIncomeSchema = new mongoose.Schema({
 });
 
 // Create the UserIncome model
-const UserIncome = mongoose.model("UserIncome", userIncomeSchema);
+const UserIncome = mongoose.model("UserIncomeData", userIncomeSchema);
 
 export default UserIncome;

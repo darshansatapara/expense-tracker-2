@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
+const userProfileSchema = new mongoose.Schema({
   profilePic: {
     type: String,
     required: false,
@@ -39,5 +39,9 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-const User = mongoose.model("UserProfile", userSchema);
-export default User;
+// Export model for the specific connection
+const UserProfile = (userDbConnection) => {
+  return userDbConnection.model("UserProfile", userProfileSchema);
+};
+
+export default UserProfile;

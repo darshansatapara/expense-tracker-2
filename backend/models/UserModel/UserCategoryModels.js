@@ -64,13 +64,12 @@ const UserCurrencyAndBudgetSchema = new mongoose.Schema({
   ],
   budget: [
     {
-      offlineBudget: { type: String, required: true },
-      onlineBudget: { type: String, required: true },
+      offlineBudget: { type: String, required: true, default: "0" },
+      onlineBudget: { type: String, required: true, default: "0" },
     },
   ],
 });
 
-// const UserExpenseCategoryModel = userDbConnection.model(   "UserExpenseCategory",   UserExpenseCategorySchema);
 export const UserExpenseCategoryModel = (userDbConnection) => {
   return userDbConnection.model(
     "UserExpenseCategoryData",
@@ -88,4 +87,10 @@ export const UserCurrencyAndBudgetModel = (userDbConnection) => {
     "UserCurrencyAndBudgetData",
     UserCurrencyAndBudgetSchema
   );
+};
+
+export default {
+  UserExpenseCategoryModel,
+  UserIncomeCategoryModel,
+  UserCurrencyAndBudgetModel,
 };
