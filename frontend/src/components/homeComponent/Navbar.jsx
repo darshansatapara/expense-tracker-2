@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Typography, Button, Image } from "antd"; // Import Image for logo
+import { Layout, Typography, Button, Image } from "antd";
 import { AlignJustify } from "lucide-react";
 import {
   HomeOutlined,
@@ -8,15 +8,18 @@ import {
   SettingOutlined,
   FileTextOutlined,
 } from "@ant-design/icons";
+<<<<<<< HEAD
+=======
+import MobileSidebar from "../homeComponent/Mobilescreen/MobileSidebar"; // Importing the Mobile Sidebar component
+>>>>>>> 17a3548ff7a1d3be8fe0678d49185e8061153503
 
 const { Header } = Layout;
 const { Text } = Typography;
 
-export default function Navbar({ selectedItem }) {
+export default function Navbar({ selectedItem, setIsDesktopSidebarOpen }) {
   const [currentContent, setCurrentContent] = useState(0);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State for sidebar visibility
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Array of dynamic content to be displayed in the navbar
   const content = [
     "Track your daily expenses effortlessly!",
     "Save more with smarter budgeting.",
@@ -26,19 +29,20 @@ export default function Navbar({ selectedItem }) {
   ];
 
   useEffect(() => {
-    // Interval for changing content every 2 seconds
     const interval = setInterval(() => {
       setCurrentContent((prev) => (prev + 1) % content.length);
     }, 2000);
 
-    return () => clearInterval(interval); // Clear interval when component unmounts
+    return () => clearInterval(interval);
   }, [content.length]);
 
   const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen); // Toggle the sidebar state
+    setIsSidebarOpen(!isSidebarOpen);
+    setIsDesktopSidebarOpen(false); // Close the desktop sidebar when the mobile sidebar is opened
   };
 
   return (
+<<<<<<< HEAD
     <Layout className="bg-[#D9EAFD] shadow-lg px-4 py-1 font-nunito">
       <Header className="bg-[#D9EAFD] flex items-center justify-between h-12 md:h-14 px-4 rounded-md">
         {/* App Logo for small screen */}
@@ -80,6 +84,46 @@ export default function Navbar({ selectedItem }) {
             <Text className="text-gray-700 text-xs md:text-sm font-semibold text-center">
               {content[currentContent]}{" "}
               {/* Displaying dynamic content every 2 seconds */}
+=======
+    <Layout className="bg-[#D9EAFD] shadow-lg px-2 py-2 font-nunito">
+      <Header className="bg-[#D9EAFD] flex items-center justify-between h-10 md:h-12 px-3 rounded-md">
+        {/* App Logo */}
+        <div className="block md:hidden mt-3 w-12 h-17">
+          <Image
+            src="/images/applogo.jpg"
+            alt="App Logo"
+            className="w-2 h-1" // Smaller width and height for the logo
+          />
+        </div>
+
+        {/* Selected Item */}
+        <div className="flex items-center space-x-1 hidden md:flex">
+          {selectedItem === "Home" && (
+            <HomeOutlined className="text-xl md:text-lg" />
+          )}
+          {selectedItem === "Analysis" && (
+            <BarChartOutlined className="text-xl md:text-lg" />
+          )}
+          {selectedItem === "History" && (
+            <HistoryOutlined className="text-xl md:text-lg" />
+          )}
+          {selectedItem === "Settings" && (
+            <SettingOutlined className="text-xl md:text-lg" />
+          )}
+          {selectedItem === "Reports" && (
+            <FileTextOutlined className="text-xl md:text-lg" />
+          )}
+          <Text className="text-gray-700 text-xs md:text-sm font-semibold">
+            {selectedItem}
+          </Text>
+        </div>
+
+        {/* Dynamic Content */}
+        <div className="flex-7 flex justify-center items-center hidden md:block">
+          <div className="bg-white bg-gray-100  shadow-md max-w-4xl w-full">
+            <Text className="text-gray-700 p-3 text-xs md:text-sm font-semibold text-center">
+              {content[currentContent]}
+>>>>>>> 17a3548ff7a1d3be8fe0678d49185e8061153503
             </Text>
           </div>
         </div>
@@ -87,10 +131,7 @@ export default function Navbar({ selectedItem }) {
         {/* Sign Out Button */}
         <div className="hidden md:block">
           <Button
-            onClick={() => {
-              // Add sign out functionality here
-              console.log("Signed Out");
-            }}
+            onClick={() => console.log("Signed Out")}
             type="primary"
             className="bg-red-500 text-white hover:bg-red-600 text-xs md:text-sm"
           >
@@ -98,27 +139,19 @@ export default function Navbar({ selectedItem }) {
           </Button>
         </div>
 
-        {/* Hamburger Menu for mobile view */}
-        <Button
-          type="primary"
-          onClick={toggleSidebar} // Toggle sidebar visibility
-          icon={<AlignJustify />}
-          className="block md:hidden bg-[#cfcfcf] text-red-500 hover:bg-red-600 font-nunito text-lg"
-        />
+        {/* Hamburger Menu - Only show when the sidebar is NOT open */}
+        {!isSidebarOpen && (
+          <Button
+            type="primary"
+            onClick={toggleSidebar}
+            icon={<AlignJustify />}
+            className="block md:hidden bg-[#cfcfcf] text-red-500 hover:bg-red-600 font-nunito text-lg"
+          />
+        )}
       </Header>
 
-      {/* Sidebar for mobile view */}
-      {isSidebarOpen && (
-        <div className="fixed top-0 left-0 w-64 h-full bg-white shadow-lg z-50">
-          {/* Add your sidebar menu items here */}
-          <Button onClick={() => {}}>Profile</Button>
-          <Button onClick={() => {}}>Home</Button>
-          <Button onClick={() => {}}>Analysis</Button>
-          <Button onClick={() => {}}>History</Button>
-          <Button onClick={() => {}}>Settings</Button>
-          <Button onClick={() => {}}>Report</Button>
-        </div>
-      )}
+      {/* Mobile Sidebar */}
+      {isSidebarOpen && <MobileSidebar onClose={toggleSidebar} />}
     </Layout>
   );
 }
