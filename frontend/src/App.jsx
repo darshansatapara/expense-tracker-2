@@ -12,13 +12,8 @@ function App() {
       <Routes>
         <Route path="/signup/*" element={<SignupPage />} />
         <Route path="/signin" element={<SignInPage />} />
-<<<<<<< HEAD
-        {/* 
-        <Route element={<ProtectedRoute />}> */}
-=======
 
         {/* <Route element={<ProtectedRoute />}> */}
->>>>>>> 886fd224e6f5dcce9326ad0375da19c80099244e
         <Route path="/category/*" element={<CategoryPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/contactus" element={<ContactusPage />} />
