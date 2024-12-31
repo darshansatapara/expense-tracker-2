@@ -12,18 +12,11 @@ function App() {
       <Routes>
         <Route path="/signup/*" element={<SignupPage />} />
         <Route path="/signin" element={<SignInPage />} />
-<<<<<<< HEAD
 
         {/* <Route element={<ProtectedRoute />}> */}
         <Route path="/category/*" element={<CategoryPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/contactus" element={<ContactusPage />} />
-=======
-        {/* <Route element={<ProtectedRoute />}> */}
-          <Route path="/category/*" element={<CategoryPage />} />
-          <Route path="/" element={<HomePage />} />
-          <Route path="/contactus" element={<ContactusPage />} />
->>>>>>> 17a3548ff7a1d3be8fe0678d49185e8061153503
         {/* </Route> */}
       </Routes>
     </BrowserRouter>

@@ -116,16 +116,11 @@ export const signIn = (userDbConnection) => async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
-<<<<<<< HEAD
-    const UserCredentialModel = UserCredential(userDbConnection);
-    const UserProfileModel = UserProfile(userDbConnection);
-=======
     const UserCredentialModel = userDbConnection.model(
       "UserCredential",
       UserCredential.schema
     );
     const UserModel = userDbConnection.model("UserProfile", User.schema);
->>>>>>> 17a3548ff7a1d3be8fe0678d49185e8061153503
 
     const userCredential = await UserCredentialModel.findOne({ email });
 
@@ -181,16 +176,11 @@ export const googlesignin = (userDbConnection) => async (req, res) => {
   }
 
   try {
-<<<<<<< HEAD
-    const UserCredentialModel = UserCredential(userDbConnection);
-    const UserProfileModel = UserProfile(userDbConnection);
-=======
     const UserCredentialModel = userDbConnection.model(
       "UserCredential",
       UserCredential.schema
     );
     const UserModel = userDbConnection.model("UserProfile", User.schema);
->>>>>>> 17a3548ff7a1d3be8fe0678d49185e8061153503
 
     const userCredential = await UserCredentialModel.findOne({ email });
 
@@ -237,17 +227,9 @@ export const getUserById = (userDbConnection) => async (req, res) => {
   const { userId } = req.params;
 
   try {
-<<<<<<< HEAD
-    const UserProfileModel = UserProfile(userDbConnection);
-    // Try to find the user by their _id field
-    const user = await UserProfileModel.findById(userId);
-
-    // If no user found, return a 404 error
-=======
     const user = await userDbConnection.model("UserProfile", User.schema).findById(
       userId
     );
->>>>>>> 17a3548ff7a1d3be8fe0678d49185e8061153503
     if (!user) {
       return res
         .status(404)

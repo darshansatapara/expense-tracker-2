@@ -14,16 +14,7 @@ export default function Sidebar({ onSelectItem, username = "User Name" }) {
   return (
     <Sider
       width={300} // Increase width of the sidebar
-<<<<<<< HEAD
-      className="h-full p-4 shadow-md"
-      style={{
-        height: "100vh",
-        backgroundColor: "transparent",
-        border: "none",
-      }} // Remove box effect, transparent background
-=======
       className="fixed top-16 left-0 h-full p-4 shadow-md bg-[#D9EAFD] hidden md:block z-10" // Fixed sidebar, placed below the navbar
->>>>>>> 17a3548ff7a1d3be8fe0678d49185e8061153503
     >
       {/* Sidebar Content */}
       <div className="flex flex-col h-full">
@@ -97,13 +88,8 @@ export default function Sidebar({ onSelectItem, username = "User Name" }) {
         </div>
 
         {/* Footer Text */}
-<<<<<<< HEAD
-        <div className="text-center text-sm text-gray-600 font-nunito mb-7">
-          <p>© 2025 Expense Tracker. All rights reserved.</p>
-=======
         <div className="flex justify-center items-center text-sm text-gray-600 font-nunito mb-14">
           <span>© 2025 Expense Tracker. All rights reserved.</span>
->>>>>>> 17a3548ff7a1d3be8fe0678d49185e8061153503
         </div>
       </div>
     </Sider>
