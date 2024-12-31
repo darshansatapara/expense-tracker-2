@@ -166,27 +166,25 @@ async function copyAdminExpenseCategories() {
 
     // Fetch all documents from the AdminExpenseCategory collection
     const categories = await AdminCategory.find({});
-
-    console.log(
-      `Found ${categories.length} categories in AdminExpenseCategory`
-    );
+    console.log(`Found ${categories.length} categories in AdminExpenseCategory`);
 
     // Prepare data for the CopyAdminExpenseCategory collection
     const copyData = categories.map((category) => {
       return {
         name: category.name,
         categoryId: category._id, // Store the original _id
-        subcategories: category.subcategories,
-        status: "active", // Mark all categories as active by default
+        categoryStatus: "active", // Default status for category
+        subcategories: category.subcategories.map((subcategory) => ({
+          _id: subcategory._id,
+          name: subcategory.name,
+          subCategoryStatus: "active", // Default status for subcategory
+        })),
       };
     });
 
     // Insert the data into the CopyAdminExpenseCategory collection
     const result = await CopyCategory.insertMany(copyData);
-
-    console.log(
-      `Copied ${result.length} categories to CopyAdminExpenseCategory`
-    );
+    console.log(`Copied ${result.length} categories to CopyAdminExpenseCategory`);
 
     // Close the database connection
     await mongoose.connection.close();
@@ -199,3 +197,4 @@ async function copyAdminExpenseCategories() {
 
 // Execute the function
 copyAdminExpenseCategories();
+

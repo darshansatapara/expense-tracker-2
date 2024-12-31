@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 const incomeSchema = new mongoose.Schema({
   date: { type: String, required: true },
   mode: { type: String, enum: ["Online", "Offline"], required: true },
-  amount: { type: string, required: true },
+  amount: { type: String, required: true },
   currency: { type: mongoose.Schema.Types.ObjectId, required: true },
   category: { type: mongoose.Schema.Types.ObjectId, required: true },
   note: { type: String, required: false },
