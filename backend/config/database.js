@@ -7,7 +7,8 @@ dotenv.config();
 export const connectUserDatabase = async () => {
   try {
     const userDbConnection = mongoose.createConnection(
-      process.env.USER_MONGO_URI
+      process.env.USER_MONGO_URI,
+      { serverSelectionTimeoutMS: 30000 }
     );
     console.log("Connected to user database");
     return userDbConnection; // Return the connection instance
@@ -21,7 +22,8 @@ export const connectUserDatabase = async () => {
 export const connectAdminDatabase = async () => {
   try {
     const adminDbConnection = mongoose.createConnection(
-      process.env.ADMIN_MONGO_URI
+      process.env.ADMIN_MONGO_URI,
+      { serverSelectionTimeoutMS: 30000 }
     );
     console.log("Connected to admin database");
     return adminDbConnection; // Return the connection instance

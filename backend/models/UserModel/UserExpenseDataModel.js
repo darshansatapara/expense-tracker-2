@@ -10,7 +10,11 @@ const expenseSchema = new mongoose.Schema({
 });
 
 const userExpenseSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "UserProfile", required: true },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "UserProfile",
+    required: true,
+  },
   expenses: [
     {
       date: { type: String, required: true },
@@ -20,6 +24,6 @@ const userExpenseSchema = new mongoose.Schema({
   ],
 });
 
-const UserExpense = mongoose.model("UserExpense", userExpenseSchema);
+const UserExpense = mongoose.model("UserExpenseData", userExpenseSchema);
 
 export default UserExpense;

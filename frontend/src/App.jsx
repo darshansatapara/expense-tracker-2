@@ -14,11 +14,11 @@ function App() {
         <Route path="/signup/*" element={<SignupPage />} />
         <Route path="/signin" element={<SignInPage />} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route path="/category/*" element={<CategoryPage />} />
-          <Route path="/" element={<HomePage />} />
-          <Route path="/contactus" element={<ContactusPage />} />
-        </Route>
+        {/* <Route element={<ProtectedRoute />}> */}
+        <Route path="/category/*" element={<CategoryPage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/contactus" element={<ContactusPage />} />
+        {/* </Route> */}
       </Routes>
     </BrowserRouter>
   );
