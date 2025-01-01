@@ -119,6 +119,7 @@ export const signIn = (userDbConnection) => async (req, res, next) => {
     const UserCredentialModel = UserCredential(userDbConnection);
     const UserProfileModel = UserProfile(userDbConnection);
 
+
     const userCredential = await UserCredentialModel.findOne({ email });
 
     if (!userCredential) {
@@ -173,6 +174,7 @@ export const googlesignin = (userDbConnection) => async (req, res) => {
   }
 
   try {
+
     const UserCredentialModel = UserCredential(userDbConnection);
     const UserProfileModel = UserProfile(userDbConnection);
 
