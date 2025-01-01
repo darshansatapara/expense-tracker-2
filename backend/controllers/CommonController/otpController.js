@@ -34,7 +34,6 @@ export const otpController = async (req, res) => {
         <h2>Your OTP Code is : </h2>
          <h1 style="font-size: 36px; font-weight: bold; color: #4CAF50;">${otp}</h1>
         <p>Please use the following OTP to complete your process. This code is valid for 2 minutes.</p>
-       
       </div>
     `,
       };

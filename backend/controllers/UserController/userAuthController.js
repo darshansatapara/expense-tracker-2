@@ -1,22 +1,21 @@
-import User from "../../models/UserModel/UserProfileModel.js";
+import UserProfile from "../../models/UserModel/UserProfileModel.js";
 import UserCredential from "../../models/UserModel/UserCredential.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../../config/cloudinary.js";
 import { generateToken } from "../../config/tokenGenerate.js";
 
-// Sign-up controller
 export const signUp = (userDbConnection) => async (req, res, next) => {
   const {
     profilePic,
     username,
     email,
     password,
-    name,
     mobile_no,
     date_of_birth,
     profession,
   } = req.body;
 
+  // Validate required fields
   if (
     !username ||
     !email ||
@@ -27,59 +26,68 @@ export const signUp = (userDbConnection) => async (req, res, next) => {
   ) {
     return res.status(400).json({
       success: false,
-      message: "Please provide all required fields",
+      message: "Please provide all required fields.",
     });
   }
 
   try {
     let profilePhoto =
-      null ||
+      profilePic ||
       "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png";
 
-    // Upload profilePic to Cloudinary if available
+    // Upload profilePic to Cloudinary if provided
     if (profilePic) {
-      const uploadProfilePic = await cloudinary.uploader.upload(profilePic, {
-        folder: "user_profiles",
-      });
-      profilePhoto = uploadProfilePic.secure_url;
+      try {
+        const uploadProfilePic = await cloudinary.uploader.upload(profilePic, {
+          folder: "user_profiles",
+        });
+        profilePhoto = uploadProfilePic.secure_url;
+      } catch (uploadError) {
+        return res.status(500).json({
+          success: false,
+          message: "Failed to upload profile picture.",
+        });
+      }
     }
 
-    // Hash the password before saving
+    // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create a new user
-    const newUser = new User({
+    // Create a new user in the user database using the model
+    const UserProfileModel = UserProfile(userDbConnection); // Get model for this connection
+
+    const newUser = new UserProfileModel({
       profilePic: profilePhoto,
       username,
       email,
-      name,
       mobile_no,
       date_of_birth,
       profession,
     });
 
-    // Save the new user in the database
-    const savedUser = await newUser.save({
-      session: userDbConnection.startSession(),
-    });
+    // Save the user details to the user database
+    const savedUser = await newUser.save();
+    console.log("user saved");
 
-    // If user is saved successfully, save credentials
-    const userCredential = new UserCredential({
+    // Save user credentials to the user database
+    const UserCredentialModel = UserCredential(userDbConnection); // Get model for this connection
+
+    const userCredential = new UserCredentialModel({
       email: savedUser.email,
       password: hashedPassword,
     });
 
-    await userCredential.save({
-      session: userDbConnection.startSession(),
-    });
+    await userCredential.save();
+    console.log("user credential saved");
 
-    // Generate a JWT token for the user
+    // Generate JWT Token
     generateToken(savedUser._id, res);
 
+    // Send response
     res.status(201).json({
       success: true,
-      message: "User registered successfully",
+      message: "User registered successfully.",
       user: {
         _id: savedUser._id,
         username: savedUser.username,
@@ -90,15 +98,16 @@ export const signUp = (userDbConnection) => async (req, res, next) => {
       },
     });
   } catch (err) {
-    // Check for duplicate email error in either User or UserCredential
+    // Handle duplicate errors more precisely
     if (err.code === 11000) {
+      const duplicateKey = Object.keys(err.keyValue)[0];
       return res.status(400).json({
         success: false,
-        message: "Email already exists. Please use a different email.",
+        message: `${duplicateKey} already exists. Please use a different ${duplicateKey}.`,
       });
     }
 
-    next(err); // Pass errors to the error-handling middleware
+    next(err); // Pass other errors to error-handling middleware
   }
 };
 
@@ -107,18 +116,11 @@ export const signIn = (userDbConnection) => async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
-    const UserCredentialModel = userDbConnection.model(
-      "UserCredential",
-      UserCredential.schema
-    );
-    const UserModel = userDbConnection.model("UserProfile", User.schema);
+    const UserCredentialModel = UserCredential(userDbConnection);
+    const UserProfileModel = UserProfile(userDbConnection);
 
-    const userCredential = await UserCredentialModel.findOne({
-      email,
-    }).populate({
-      path: "email",
-      model: UserModel,
-    });
+
+    const userCredential = await UserCredentialModel.findOne({ email });
 
     if (!userCredential) {
       return res
@@ -136,7 +138,10 @@ export const signIn = (userDbConnection) => async (req, res, next) => {
         .json({ success: false, error: "Invalid credentials" });
     }
 
-    const user = userCredential.email;
+    // Fetch user profile using the UserProfile model
+    const user = await UserProfileModel.findOne({
+      email: userCredential.email,
+    });
 
     generateToken(user._id, res);
 
@@ -163,23 +168,17 @@ export const googlesignin = (userDbConnection) => async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
-    return res.status(400).json({
-      success: false,
-      message: "Email is required",
-    });
+    return res
+      .status(400)
+      .json({ success: false, message: "Email is required" });
   }
 
   try {
-    const UserCredentialModel = userDbConnection.model(
-      "UserCredential",
-      UserCredential.schema
-    );
-    const UserModel = userDbConnection.model("UserProfile", User.schema);
 
-    const userCredential = await UserCredentialModel.findOne({ email }).populate({
-      path: "email",
-      model: UserModel,
-    });
+    const UserCredentialModel = UserCredential(userDbConnection);
+    const UserProfileModel = UserProfile(userDbConnection);
+
+    const userCredential = await UserCredentialModel.findOne({ email });
 
     if (!userCredential) {
       return res.status(404).json({
@@ -188,7 +187,10 @@ export const googlesignin = (userDbConnection) => async (req, res) => {
       });
     }
 
-    const user = userCredential.email;
+    // Fetch user profile using the UserProfile model
+    const user = await UserProfileModel.findOne({
+      email: userCredential.email,
+    });
 
     generateToken(user._id, res);
 
@@ -221,15 +223,31 @@ export const getUserById = (userDbConnection) => async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const user = await userDbConnection.model("UserProfile", User.schema).findById(
-      userId
-    );
+    const UserProfileModel = UserProfile(userDbConnection);
+    // Try to find the user by their _id field
+    const user = await UserProfileModel.findById(userId);
+
+    // If no user found, return a 404 error
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
+    // If user is found, return the user data
     res.status(200).json({ success: true, user });
   } catch (err) {
+    // Log the error to see what is going wrong
+    console.error("Error in getUserById:", err);
+
+    // Check if the error is related to the ObjectId format
+    if (err.name === "CastError" && err.kind === "ObjectId") {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid userId format" });
+    }
+
+    // Return generic server error
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
