@@ -9,14 +9,18 @@ const userExpenseRoute = (userDbConnection) => {
   const router = express.Router();
 
   // Pass the controller functions as references, not invoked immediately
-  router.post("/addExpense", (req, res) => addExpense(req, res, userDbConnection));
-  router.get(
-    "/getExpenses/:userId/:startDate/:endDate",
-    (req, res) => getExpenses(req, res, userDbConnection)
+  router.post("/addExpense", (req, res) =>
+    addExpense(req, res, userDbConnection)
   );
-  router.put(
-    "/updateExpense/:userId/:expenseDate",
-    (req, res) => updateExpense(req, res, userDbConnection)
+
+  // get expense of the user
+  router.get("/getExpenses/:userId/:startDate/:endDate", (req, res) =>
+    getExpenses(req, res, userDbConnection)
+  );
+
+  // update expense of the user
+  router.put("/updateExpense/:userId/:expenseDate", (req, res) =>
+    updateExpense(req, res, userDbConnection)
   );
 
   return router;

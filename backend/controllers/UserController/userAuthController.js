@@ -103,7 +103,8 @@ export const signUp = (userDbConnection) => async (req, res, next) => {
       const duplicateKey = Object.keys(err.keyValue)[0];
       return res.status(400).json({
         success: false,
-        message: `${duplicateKey} already exists. Please use a different ${duplicateKey}.`,
+        message:
+          "${duplicateKey} already exists. Please use a different ${duplicateKey}.",
       });
     }
 
@@ -116,11 +117,8 @@ export const signIn = (userDbConnection) => async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
-    const UserCredentialModel = userDbConnection.model(
-      "UserCredential",
-      UserCredential.schema
-    );
-    const UserModel = userDbConnection.model("UserProfile", User.schema);
+    const UserCredentialModel = UserCredential(userDbConnection);
+    const UserProfileModel = UserProfile(userDbConnection);
 
     const userCredential = await UserCredentialModel.findOne({ email });
 
@@ -176,11 +174,8 @@ export const googlesignin = (userDbConnection) => async (req, res) => {
   }
 
   try {
-    const UserCredentialModel = userDbConnection.model(
-      "UserCredential",
-      UserCredential.schema
-    );
-    const UserModel = userDbConnection.model("UserProfile", User.schema);
+    const UserCredentialModel = UserCredential(userDbConnection);
+    const UserProfileModel = UserProfile(userDbConnection);
 
     const userCredential = await UserCredentialModel.findOne({ email });
 
@@ -227,9 +222,11 @@ export const getUserById = (userDbConnection) => async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const user = await userDbConnection.model("UserProfile", User.schema).findById(
-      userId
-    );
+    const UserProfileModel = UserProfile(userDbConnection);
+    // Try to find the user by their _id field
+    const user = await UserProfileModel.findById(userId);
+
+    // If no user found, return a 404 error
     if (!user) {
       return res
         .status(404)
