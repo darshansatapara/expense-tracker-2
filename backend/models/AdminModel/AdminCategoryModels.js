@@ -1,66 +1,16 @@
 import mongoose from "mongoose";
 
 // Admin Expense Category Schema
-const CopyAdminExpenseCategorySchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true, // Ensure each category name is unique
-  },
-  categoryId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-  },
-  categoryStatus: {
-    type: String,
-    required: true,
-    default: "active",
-  },
-  subcategories: [
-    {
-      _id: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-      },
-      name: {
-        type: String,
-        required: true,
-      },
-      subCategorystatus: {
-        type: String,
-        required: true,
-        default: "active",
-      },
-    },
-  ],
-});
-// Admin Expense Category Schema
 const AdminExpenseCategorySchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
     unique: true, // Ensure each category name is unique
   },
-  subcategories: [
-    {
-      _id: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-      },
-      name: {
-        type: String,
-        required: true,
-      },
-    },
-  ],
-});
-
-// Admin Income Category Schema
-const AdminIncomeCategorySchema = new mongoose.Schema({
-  name: {
-    type: String,
+  isCategoryActive: {
+    type: Boolean,
     required: true,
-    unique: true, // Ensure each category name is unique
+    default: true, // true for active, false for deactive
   },
   subcategories: [
     {
@@ -72,9 +22,89 @@ const AdminIncomeCategorySchema = new mongoose.Schema({
         type: String,
         required: true,
       },
+      isSubCategoryActive: {
+        type: Boolean,
+        required: true,
+        default: true,
+      },
     },
   ],
 });
+// Admin Expense Category Schema
+// const AdminExpenseCategorySchema = new mongoose.Schema({
+//   name: {
+//     type: String,
+//     required: true,
+//     unique: true, // Ensure each category name is unique
+//   },
+//   subcategories: [
+//     {
+//       _id: {
+//         type: mongoose.Schema.Types.ObjectId,
+//         required: true,
+//       },
+//       name: {
+//         type: String,
+//         required: true,
+//       },
+//     },
+//   ],
+// });
+
+// copy Admin Income Category Schema
+const AdminIncomeCategorySchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true, // Ensure each category name is unique
+  },
+  // categoryId: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   required: true,
+  // },
+  isCategoryActive: {
+    type: Boolean,
+    required: true,
+    default: true, // true for active, false for deactive
+  },
+  subcategories: [
+    {
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+      },
+      name: {
+        type: String,
+        required: true,
+      },
+      isSubCategoryActive: {
+        type: Boolean,
+        required: true,
+        default: true,
+      },
+    },
+  ],
+});
+// Admin Income Category Schema
+// const AdminIncomeCategorySchema = new mongoose.Schema({
+//   name: {
+//     type: String,
+//     required: true,
+//     unique: true, // Ensure each category name is unique
+//   },
+//   subcategories: [
+//     {
+//       _id: {
+//         type: mongoose.Schema.Types.ObjectId,
+//         required: true,
+//       },
+//       name: {
+//         type: String,
+//         required: true,
+//       },
+//     },
+//   ],
+// });
 
 // Admin Currency Category Schema
 const AdminCurrencyCategorySchema = new mongoose.Schema({
@@ -90,9 +120,40 @@ const AdminCurrencyCategorySchema = new mongoose.Schema({
     type: String,
     required: true, // e.g., "$"
   },
+  isCurrencyActive: {
+    type: Boolean,
+    required: true,
+    default: true, // true for active, false for deactive
+  },
 });
 
 // Export models, passing the correct database connection
+export const AdminExpenseCategory = (adminDbConnection) => {
+  return adminDbConnection.model(
+    "AdminExpenseCategory",
+    AdminExpenseCategorySchema
+  );
+};
+// export const CopyAdminExpenseCategory = (adminDbConnection) => {
+//   return adminDbConnection.model(
+//     "CopyAdminExpenseCategory",
+//     CopyAdminExpenseCategorySchema
+//   );
+// };
+
+export const AdminIncomeCategory = (adminDbConnection) => {
+  return adminDbConnection.model(
+    "AdminIncomeCategory",
+    AdminIncomeCategorySchema
+  );
+};
+// export const CopyAdminIncomeCategory = (adminDbConnection) => {
+//   return adminDbConnection.model(
+//     "CopyAdminIncomeCategory",
+//     CopyAdminIncomeCategorySchema
+//   );
+// };
+
 export const AdminCurrencyCategory = (adminDbConnection) => {
   // Check if the model is already registered to prevent errors
   if (adminDbConnection.models.AdminCurrencyCategory) {
@@ -103,25 +164,5 @@ export const AdminCurrencyCategory = (adminDbConnection) => {
   return adminDbConnection.model(
     "AdminCurrencyCategory",
     AdminCurrencyCategorySchema
-  );
-};
-
-export const AdminExpenseCategory = (adminDbConnection) => {
-  return adminDbConnection.model(
-    "AdminExpenseCategory",
-    AdminExpenseCategorySchema
-  );
-};
-export const CopyAdminExpenseCategory = (adminDbConnection) => {
-  return adminDbConnection.model(
-    "CopyAdminExpenseCategory",
-    CopyAdminExpenseCategorySchema
-  );
-};
-
-export const AdminIncomeCategory = (adminDbConnection) => {
-  return adminDbConnection.model(
-    "AdminIncomeCategory",
-    AdminIncomeCategorySchema
   );
 };

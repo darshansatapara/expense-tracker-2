@@ -5,8 +5,16 @@ const expenseSchema = new mongoose.Schema({
   mode: { type: String, enum: ["Online", "Offline"], required: true },
   amount: { type: String, required: true },
   currency: { type: mongoose.Schema.Types.ObjectId, required: true },
-  category: { type: mongoose.Schema.Types.ObjectId, required: true },
-  subcategory: { type: mongoose.Schema.Types.ObjectId, required: true },
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "CopyAdminExpenseCategory",
+  },
+  subcategory: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "CopyAdminExpenseCategory.subcategories",
+  },
   note: { type: String, required: false },
 });
 
