@@ -179,7 +179,25 @@ export const getUserExpenseCategories =
     }
   };
 
-// update user expense category
+// update route to add new expense category and subcategory in the userdatabase
+/*
+  {
+  "newExpenseCategory": [
+    {
+      "categoryId": "6774dfd2a75ec7e9ef49e89e",
+      "subcategoryIds": [
+        "6774dfd2a75ec7e9ef49e894",
+        "6774dfd2a75ec7e9ef49e896"
+      ]
+    },
+    {
+      "categoryId": "6774dfd4a75ec7e9ef49e8ad",
+      "subcategoryIds": [
+        "6774dfd4a75ec7e9ef49e8a1"
+      ]
+    }
+  ]
+}*/
 export const updateUserExpenseCategories =
   (userDbConnection, adminDbConnection) => async (req, res) => {
     const { userId } = req.params;
@@ -245,20 +263,30 @@ export const updateUserExpenseCategories =
 
         // Add or update category and subcategories
         if (existingCategoriesMap[categoryId]) {
-          // Update subcategories for existing category
+          // Update subcategories and activate the category
           const existingCategory = existingCategoriesMap[categoryId];
+          existingCategory.isCategoryActive = true;
           const updatedSubcategories = [
             ...new Set([
-              ...existingCategory.subcategoryIds.map((id) => id.toString()),
+              ...existingCategory.subcategoryIds.map((sub) =>
+                sub.subcategoryId.toString()
+              ),
               ...validSubcategories.map((sub) => sub._id.toString()),
             ]),
-          ];
+          ].map((id) => ({
+            subcategoryId: id,
+            isSubcategoryActive: true,
+          }));
           existingCategory.subcategoryIds = updatedSubcategories;
         } else {
           // Add new category
           userExpenseData.expenseCategories.push({
             categoryId,
-            subcategoryIds: validSubcategories.map((sub) => sub._id.toString()),
+            isCategoryActive: true,
+            subcategoryIds: validSubcategories.map((sub) => ({
+              subcategoryId: sub._id.toString(),
+              isSubcategoryActive: true,
+            })),
           });
         }
       }
@@ -281,6 +309,16 @@ export const updateUserExpenseCategories =
   };
 
 //delete user expense categories (if user can remove category, then accordingly their subcategories will be removed)
+
+/*
+{
+  "deleteCategoryIds": [
+    "64a3e97e8f5b9b0023ae4d1b",
+    "64a3e97e8f5b9b0023ae4d1c"
+  ]
+}
+
+*/
 export const deleteUserExpenseCategories =
   (userDbConnection) => async (req, res) => {
     const { userId } = req.params;
@@ -310,14 +348,12 @@ export const deleteUserExpenseCategories =
         });
       }
 
-      // Filter out the categories to be deleted
-      const updatedExpenseCategories = userExpenseData.expenseCategories.filter(
-        (category) =>
-          !deleteCategoryIds.includes(category.categoryId.toString())
-      );
-
-      // Update the user's expense categories
-      userExpenseData.expenseCategories = updatedExpenseCategories;
+      // Remove categories and their subcategories
+      userExpenseData.expenseCategories =
+        userExpenseData.expenseCategories.filter(
+          (category) =>
+            !deleteCategoryIds.includes(category.categoryId.toString())
+        );
 
       // Save the updated document
       const updatedUserData = await userExpenseData.save();
@@ -337,6 +373,24 @@ export const deleteUserExpenseCategories =
   };
 
 // delete only user sub-category in this route (..category have > 2 sub-categories)
+/* {
+  "CategoryDeleteData": [
+    {
+      "categoryId": "64a3e97e8f5b9b0023ae4d1b",
+      "subcategoryIds": [
+        "64a3ea6d8f5b9b0023ae4d1d",
+        "64a3ea6d8f5b9b0023ae4d1e"
+      ]
+    },
+    {
+      "categoryId": "64a3e97e8f5b9b0023ae4d1c",
+      "subcategoryIds": [
+        "64a3ea6d8f5b9b0023ae4d1f"
+      ]
+    }
+  ]
+}
+*/
 export const deleteUserExpenseSubcategories =
   (userDbConnection) => async (req, res) => {
     const { userId } = req.params;
@@ -355,7 +409,6 @@ export const deleteUserExpenseSubcategories =
 
     try {
       const UserExpenseCategory = UserExpenseCategoryModel(userDbConnection);
-      // const AdminExpenseCategoryModel = AdminExpenseCategory(adminDbConnection);
 
       // Fetch user's expense data
       const userExpenseData = await UserExpenseCategory.findOne({ userId });
@@ -377,13 +430,13 @@ export const deleteUserExpenseSubcategories =
           // Skip categories not in delete data
           if (!categoryToDelete) return userCategory;
 
-          // Remove subcategories only if the category has more than 2 subcategories
-          if (userCategory.subcategoryIds.length > 2) {
-            userCategory.subcategoryIds = userCategory.subcategoryIds.filter(
-              (subId) =>
-                !categoryToDelete.subcategoryIds.includes(subId.toString())
-            );
-          }
+          // Remove specified subcategories
+          userCategory.subcategoryIds = userCategory.subcategoryIds.filter(
+            (sub) =>
+              !categoryToDelete.subcategoryIds.includes(
+                sub.subcategoryId.toString()
+              )
+          );
 
           return userCategory;
         }
@@ -530,114 +583,114 @@ export const getUserIncomeCategories =
     }
   };
 
-// export const updateUserIncomeCategory =
-//   (userDbConnection, adminDbConnection) => async (req, res) => {
-//     const { userId, newUpdatedCategories } = req.body;
+/*export const updateUserIncomeCategory =
+  (userDbConnection, adminDbConnection) => async (req, res) => {
+    const { userId, newUpdatedCategories } = req.body;
 
-//     if (!userId || !newUpdatedCategories) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Please provide userId and updatedCategories.",
-//       });
-//     }
+    if (!userId || !newUpdatedCategories) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide userId and updatedCategories.",
+      });
+    }
 
-//     try {
-//       const UserIncomeCategory = UserIncomeCategoryModel(userDbConnection);
-//       const AdminIncomeCategoryModel = AdminIncomeCategory(adminDbConnection);
+    try {
+      const UserIncomeCategory = UserIncomeCategoryModel(userDbConnection);
+      const AdminIncomeCategoryModel = AdminIncomeCategory(adminDbConnection);
 
-//       // Fetch the user's existing income categories
-//       const existingRecord = await UserIncomeCategory.findOne({ userId });
+      // Fetch the user's existing income categories
+      const existingRecord = await UserIncomeCategory.findOne({ userId });
 
-//       if (!existingRecord) {
-//         return res.status(404).json({
-//           success: false,
-//           message: "No income categories found for this user.",
-//         });
-//       }
+      if (!existingRecord) {
+        return res.status(404).json({
+          success: false,
+          message: "No income categories found for this user.",
+        });
+      }
 
-//       // Validate categories against the admin database
-//       const adminCategoryIds = newUpdatedCategories.map(
-//         (item) => item.categoryId
-//       );
-//       const adminCategories = await AdminIncomeCategoryModel.find({
-//         _id: { $in: adminCategoryIds },
-//       }).lean();
+      // Validate categories against the admin database
+      const adminCategoryIds = newUpdatedCategories.map(
+        (item) => item.categoryId
+      );
+      const adminCategories = await AdminIncomeCategoryModel.find({
+        _id: { $in: adminCategoryIds },
+      }).lean();
 
-//       if (adminCategories.length !== adminCategoryIds.length) {
-//         return res.status(400).json({
-//           success: false,
-//           message: "Some provided category IDs are invalid.",
-//         });
-//       }
+      if (adminCategories.length !== adminCategoryIds.length) {
+        return res.status(400).json({
+          success: false,
+          message: "Some provided category IDs are invalid.",
+        });
+      }
 
-//       // Map admin categories for validation and quick access
-//       const adminCategoryMap = Object.fromEntries(
-//         adminCategories.map((cat) => [cat._id.toString(), cat])
-//       );
+      // Map admin categories for validation and quick access
+      const adminCategoryMap = Object.fromEntries(
+        adminCategories.map((cat) => [cat._id.toString(), cat])
+      );
 
-//       // Process updated categories
-//       newUpdatedCategories.forEach(({ categoryId, subcategoryIds }) => {
-//         const adminCategory = adminCategoryMap[categoryId];
+      // Process updated categories
+      newUpdatedCategories.forEach(({ categoryId, subcategoryIds }) => {
+        const adminCategory = adminCategoryMap[categoryId];
 
-//         if (!adminCategory) {
-//           throw new Error(`Category with ID ${categoryId} not found.`);
-//         }
+        if (!adminCategory) {
+          throw new Error(`Category with ID ${categoryId} not found.`);
+        }
 
-//         // Filter valid subcategories from the admin category
-//         const validSubcategories = subcategoryIds.filter((subId) =>
-//           adminCategory.subcategories.some(
-//             (sub) => sub._id.toString() === subId
-//           )
-//         );
+        // Filter valid subcategories from the admin category
+        const validSubcategories = subcategoryIds.filter((subId) =>
+          adminCategory.subcategories.some(
+            (sub) => sub._id.toString() === subId
+          )
+        );
 
-//         // Find the existing category in the user's record
-//         const existingCategory = existingRecord.incomeCategories.find(
-//           (cat) => cat.categoryId.toString() === categoryId
-//         );
+        // Find the existing category in the user's record
+        const existingCategory = existingRecord.incomeCategories.find(
+          (cat) => cat.categoryId.toString() === categoryId
+        );
 
-//         if (existingCategory) {
-//           // Append only new subcategories to the existing category
-//           existingCategory.subcategoryIds = [
-//             ...new Set([
-//               ...existingCategory.subcategoryIds,
-//               ...validSubcategories,
-//             ]),
-//           ];
-//         } else {
-//           // Add a new category with valid subcategories
-//           existingRecord.incomeCategories.push({
-//             categoryId,
-//             subcategoryIds: validSubcategories,
-//           });
-//         }
-//       });
+        if (existingCategory) {
+          // Append only new subcategories to the existing category
+          existingCategory.subcategoryIds = [
+            ...new Set([
+              ...existingCategory.subcategoryIds,
+              ...validSubcategories,
+            ]),
+          ];
+        } else {
+          // Add a new category with valid subcategories
+          existingRecord.incomeCategories.push({
+            categoryId,
+            subcategoryIds: validSubcategories,
+          });
+        }
+      });
 
-//       // Save the updated record
-//       await existingRecord.save();
+      // Save the updated record
+      await existingRecord.save();
 
-//       // Populate the updated data for response
-//       const populatedData = await UserIncomeCategory.findOne({
-//         userId,
-//       }).populate({
-//         path: "incomeCategories.categoryId",
-//         model: AdminIncomeCategoryModel,
-//       });
+      // Populate the updated data for response
+      const populatedData = await UserIncomeCategory.findOne({
+        userId,
+      }).populate({
+        path: "incomeCategories.categoryId",
+        model: AdminIncomeCategoryModel,
+      });
 
-//       res.status(200).json({
-//         success: true,
-//         message: "Income categories updated successfully.",
-//         data: populatedData,
-//       });
-//     } catch (error) {
-//       res.status(500).json({
-//         success: false,
-//         message: "Failed to update income categories.",
-//         error: error.message,
-//       });
-//     }
-//   };
+      res.status(200).json({
+        success: true,
+        message: "Income categories updated successfully.",
+        data: populatedData,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to update income categories.",
+        error: error.message,
+      });
+    }
+   };*/
 
-//*********************************Currnecy Controller***********************************/
+/*********************************Currnecy Controller***********************************/
 
 // Add User Currency and Budget
 /* example input
@@ -758,6 +811,21 @@ export const getUserCurrencyAndBudget =
   };
 
 //update user currency and budget data
+/*
+{
+  "newCurrencyCategoryIds": [
+    "64f11b0e2f4d86f12345abc1",
+    "64f11b0e2f4d86f12345abc2"
+  ],
+  "budget": [
+    {
+      "offlineBudget": "7000",
+      "onlineBudget": "4500"
+    }
+  ]
+}
+
+*/
 export const updateUserCurrencyAndBudget =
   (userDbConnection, adminDbConnection) => async (req, res) => {
     const { userId } = req.params;
@@ -782,10 +850,10 @@ export const updateUserCurrencyAndBudget =
       // Check if the user already has a budget entry
       const userData = await UserCurrencyAndBudget.findOne({ userId });
 
-      if (!userData || !userData.budget || userData.budget.length === 0) {
+      if (!userData) {
         return res.status(404).json({
           success: false,
-          message: "No existing budget found for the user.",
+          message: "No existing data found for the user.",
         });
       }
 
@@ -793,23 +861,19 @@ export const updateUserCurrencyAndBudget =
       if (budget) {
         const { offlineBudget, onlineBudget } = budget[0]; // Extract budget details
 
-        // Ensure that budget values are numbers (if they are provided as strings)
-        const offlineBudgetNum = parseFloat(offlineBudget);
-        const onlineBudgetNum = parseFloat(onlineBudget);
-
-        // Prepare the update data for the budget
+        // Ensure that budget values are strings and not undefined
         const updateData = {};
-        if (!isNaN(offlineBudgetNum)) {
-          updateData["budget.$.offlineBudget"] = offlineBudgetNum;
+        if (offlineBudget !== undefined) {
+          updateData["budget.0.offlineBudget"] = offlineBudget.toString();
         }
-        if (!isNaN(onlineBudgetNum)) {
-          updateData["budget.$.onlineBudget"] = onlineBudgetNum;
+        if (onlineBudget !== undefined) {
+          updateData["budget.0.onlineBudget"] = onlineBudget.toString();
         }
 
         // If update data exists, perform the update
         if (Object.keys(updateData).length > 0) {
           await UserCurrencyAndBudget.updateOne(
-            { userId, "budget._id": userData.budget[0]._id }, // Reference the first budget entry's _id
+            { userId },
             { $set: updateData }
           );
         }
@@ -833,23 +897,35 @@ export const updateUserCurrencyAndBudget =
           });
         }
 
-        // Add new currency categories to the user's existing data
-        await UserCurrencyAndBudget.findOneAndUpdate(
-          { userId },
-          {
-            $addToSet: { currencyCategory: { $each: newCurrencyCategoryIds } },
-          },
-          { new: true } // Return the updated document
-        );
+        // Add or update new currency categories
+        for (const currencyId of newCurrencyCategoryIds) {
+          const existingCurrency = userData.currencyCategory.find(
+            (cat) => cat.currencyId.toString() === currencyId
+          );
+
+          if (existingCurrency) {
+            // Ensure the currency is active
+            existingCurrency.isCurrencyActive = true;
+          } else {
+            // Add the new currency category
+            userData.currencyCategory.push({
+              currencyId,
+              isCurrencyActive: true,
+            });
+          }
+        }
+
+        // Save the updated data
+        await userData.save();
       }
 
-      // Return success response after updating
-      const updatedData = await UserCurrencyAndBudget.findOne({
-        userId,
-      }).populate({
-        path: "currencyCategory",
-        model: AdminCurrencyCategoryModel,
-      });
+      // Fetch updated data for response
+      const updatedData = await UserCurrencyAndBudget.findOne({ userId })
+        .populate({
+          path: "currencyCategory.currencyId",
+          model: AdminCurrencyCategoryModel,
+        })
+        .exec();
 
       if (!updatedData) {
         return res.status(404).json({
@@ -873,6 +949,16 @@ export const updateUserCurrencyAndBudget =
   };
 
 //delete currency category form user database
+/*
+{
+  "deleteCurrencyCategoryIds": [
+    "64f11b0e2f4d86f12345abc1",
+    "64f11b0e2f4d86f12345abc2"
+  ]
+}
+
+*/
+
 export const deleteUserCurrencyCategory =
   (userDbConnection) => async (req, res) => {
     const { userId } = req.params;
@@ -908,11 +994,11 @@ export const deleteUserCurrencyCategory =
         });
       }
 
-      // Filter out the currency categories to be deleted
+      // Filter out the categories to be deleted
       const updatedCurrencyCategories =
         userCurrencyAndBudgetData.currencyCategory.filter(
-          (currencyId) =>
-            !deleteCurrencyCategoryIds.includes(currencyId.toString())
+          (currency) =>
+            !deleteCurrencyCategoryIds.includes(currency.currencyId.toString())
         );
 
       // Update the user's currency categories
