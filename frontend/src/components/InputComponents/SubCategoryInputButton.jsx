@@ -1,5 +1,4 @@
-// SubCategoryInputButton.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, X } from "lucide-react";
 
 export const SubCategoryInputButton = ({
@@ -10,36 +9,45 @@ export const SubCategoryInputButton = ({
   setFinalCategory,
 }) => {
   const [selectedSubCategories, setSelectedSubCategories] = useState([]);
-  console.log(subCategories);
+
+  useEffect(() => {
+    // Initialize the selected subcategories from finalCategory if available
+    setSelectedSubCategories(finalCategory[categoryId] || []);
+  }, [categoryId, finalCategory]);
+
   // Handle subcategory selection and toggle its state
   const handleSubCategorySelection = (subcategory) => {
-    setFinalCategory((prev) => {
-      const updatedCategories = { ...prev };
-
-      if (!updatedCategories[categoryId]) {
-        updatedCategories[categoryId] = [];
-      }
-
-      if (updatedCategories[categoryId].includes(subcategory)) {
-        updatedCategories[categoryId] = updatedCategories[categoryId].filter(
-          (item) => item !== subcategory
-        );
-      } else {
-        updatedCategories[categoryId].push(subcategory);
-      }
-
-      if (updatedCategories[categoryId].length === 0) {
-        delete updatedCategories[categoryId];
-      }
-
-      return updatedCategories;
-    });
-
-    setSelectedSubCategories((prev) =>
-      prev.includes(subcategory)
+    setSelectedSubCategories((prev) => {
+      const newSelected = prev.includes(subcategory)
         ? prev.filter((item) => item !== subcategory)
-        : [...prev, subcategory]
-    );
+        : [...prev, subcategory];
+
+      // Update finalCategory after modifying local selected state
+      setFinalCategory((prevFinalCategory) => {
+        const updatedCategories = { ...prevFinalCategory };
+
+        if (!updatedCategories[categoryId]) {
+          updatedCategories[categoryId] = [];
+        }
+
+        if (newSelected.includes(subcategory)) {
+          updatedCategories[categoryId] = [...newSelected];
+        } else {
+          updatedCategories[categoryId] = newSelected.filter(
+            (item) => item !== subcategory
+          );
+        }
+
+        // If there are no selected subcategories for this category, delete it from finalCategory
+        if (updatedCategories[categoryId].length === 0) {
+          delete updatedCategories[categoryId];
+        }
+
+        return updatedCategories;
+      });
+
+      return newSelected;
+    });
   };
 
   return (

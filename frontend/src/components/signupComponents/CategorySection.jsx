@@ -12,7 +12,7 @@ export default function CategorySection() {
   const userData = { userId, email, profession };
   console.log(userData);
 
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState([]); // Store selected category IDs
+  const [selectedCategories, setSelectedCategories] = useState([]); // Store selected categories with empty subcategories
   const [fetchError, setFetchError] = useState(false);
 
   const { expenseCategories, isLoadingCategories, fetchExpenseCategories } =
@@ -47,12 +47,21 @@ export default function CategorySection() {
 
   console.log("Transformed Categories Object:", categoriesObject);
 
-  console.log(selectedCategoryIds);
   // Handle Next button click
   const handleNext = () => {
-    if (selectedCategoryIds.length >= 3) {
+    if (selectedCategories.length >= 3) {
+      // Prepare the data in the required format
+      const payload = {
+        userId,
+        expenseCategories: selectedCategories.map((categoryId) => ({
+          categoryId,
+          subcategoryIds: [], // Subcategories are empty initially
+        })),
+      };
+
+      console.log(payload);
       navigate("/category/subCategorySection", {
-        state: { selectedCategoryIds, userData },
+        state: { userData, payload, categoriesObject },
       });
     } else {
       alert("Please select at least 3 categories.");
@@ -78,7 +87,7 @@ export default function CategorySection() {
             {!isLoadingCategories && !fetchError && (
               <CategorySelectorButton
                 categories={categoriesObject} // Pass all categories
-                setSelectedCategoryIds={setSelectedCategoryIds} // Update selected IDs
+                setSelectedCategoryIds={setSelectedCategories} // Update selected categories
               />
             )}
 
@@ -105,9 +114,9 @@ export default function CategorySection() {
           {/* Next button */}
           <button
             onClick={handleNext}
-            disabled={selectedCategoryIds.length < 3}
+            disabled={selectedCategories.length < 3}
             className={`w-full mt-6 py-2 rounded-md font-semibold transition-colors ${
-              selectedCategoryIds.length >= 3
+              selectedCategories.length >= 3
                 ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}

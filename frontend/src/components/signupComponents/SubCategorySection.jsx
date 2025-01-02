@@ -1,4 +1,3 @@
-// SubCategorySection.jsx
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { SubCategoryInputButton } from "../InputComponents/SubCategoryInputButton";
@@ -9,16 +8,38 @@ export default function SubCategorySection() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { selectedCategoryIds, userData } = location.state || {};
-  const selectedCategories = selectedCategoryIds;
-  console.log(selectedCategories);
+  // Extract data passed from the previous step
+  const { payload, userData, categoriesObject } = location.state || {};
+  console.log("Payload:", payload);
+  console.log("Categories Object:", categoriesObject);
 
+  // Extract expenseCategories from the payload
+  const expenseCategories = payload?.expenseCategories || [];
+
+  // Initialize state
   const [finalCategory, setFinalCategory] = useState({});
   const addExpenseCategory = userCategoryStore(
     (state) => state.addExpenseCategory
   );
 
-  // Log final category state for debugging
+  // Extract selected categories and their subcategories
+  const selectedCategoriesWithSubcategories = expenseCategories.map(
+    (category) => {
+      const categoryData = categoriesObject?.[category.categoryId];
+      return {
+        categoryId: category.categoryId,
+        categoryName: categoryData?.name || "Unknown Category",
+        subcategories: categoryData?.subcategories || [],
+      };
+    }
+  );
+
+  console.log(
+    "Selected Categories with Subcategories:",
+    selectedCategoriesWithSubcategories
+  );
+
+  // Log the final category state for debugging
   useEffect(() => {
     console.log("Final Category State:", finalCategory);
   }, [finalCategory]);
@@ -35,9 +56,24 @@ export default function SubCategorySection() {
       };
     });
 
+  // Validation: Check if at least two subcategories are selected for each category
+  const validateSubCategorySelection = () => {
+    return selectedCategoriesWithSubcategories.every(
+      (category) => finalCategory[category.categoryId]?.length >= 2
+    );
+  };
+
+  console.log(
+    "Validation:",
+    selectedCategoriesWithSubcategories.map((category) => ({
+      categoryId: category.categoryId,
+      selectedSubcategories: finalCategory[category.categoryId],
+    }))
+  );
+
   // Handle the next button click
   const handleNext = async () => {
-    if (Object.keys(finalCategory).length > 0) {
+    if (validateSubCategorySelection()) {
       try {
         const categoryData = transformCategoryData();
         console.log("Posting Data to Backend:", categoryData);
@@ -48,22 +84,16 @@ export default function SubCategorySection() {
         });
 
         navigate("/category/currencyBudgetSelection", {
-          state: { finalCategory, userData },
+          state: { userData },
         });
       } catch (error) {
         console.error("Error Posting Data:", error);
       }
     } else {
-      alert("Please select at least one subcategory.");
+      alert("Please select at least two subcategories for each category.");
     }
   };
 
-  const validSelectedCategories =
-    selectedCategories && typeof selectedCategories === "object"
-      ? selectedCategories
-      : {};
-
-  console.log("Valid Categories:", validSelectedCategories);
   return (
     <div className="flex flex-col lg:flex-row justify-around h-screen bg-[#D9EAFD]">
       {/* Left section */}
@@ -80,19 +110,17 @@ export default function SubCategorySection() {
 
           {/* Category and Subcategory Selector */}
           <div className="relative mb-5 h-80 max-h-80 overflow-y-auto border rounded-lg p-4 bg-gray-50 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
-            {Object.keys(validSelectedCategories).length > 0 ? (
-              Object.entries(validSelectedCategories).map(
-                ([categoryId, { name, subcategories }]) => (
-                  <SubCategoryInputButton
-                    key={`category-${categoryId}`}
-                    categoryId={categoryId}
-                    categoryName={name}
-                    subCategories={subcategories}
-                    finalCategory={finalCategory}
-                    setFinalCategory={setFinalCategory}
-                  />
-                )
-              )
+            {selectedCategoriesWithSubcategories.length > 0 ? (
+              selectedCategoriesWithSubcategories.map((category) => (
+                <SubCategoryInputButton
+                  key={`category-${category.categoryId}`}
+                  categoryId={category.categoryId}
+                  categoryName={category.categoryName}
+                  subCategories={category.subcategories}
+                  finalCategory={finalCategory}
+                  setFinalCategory={setFinalCategory}
+                />
+              ))
             ) : (
               <div className="text-center text-gray-500">
                 No categories available. Please go back and select categories.
@@ -100,13 +128,23 @@ export default function SubCategorySection() {
             )}
           </div>
 
+          <div className="mb-6">
+            {/* Note Section */}
+            <div className="p-1 bg-[#edf2f7] border-l-4 border-[#a0aec0] text-black-800 rounded-md shadow-sm">
+              <p className="font-medium">
+                <span className="font-semibold">Note:</span> You must select at
+                least 2 Subcategories of each Category to proceed.
+              </p>
+            </div>
+          </div>
+
           {/* Next Button */}
           <div className="mt-6">
             <button
               onClick={handleNext}
-              disabled={Object.keys(finalCategory).length === 0}
+              disabled={!validateSubCategorySelection()}
               className={`w-full py-2 rounded-md font-semibold transition-colors ${
-                Object.keys(finalCategory).length > 0
+                validateSubCategorySelection()
                   ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
               }`}
