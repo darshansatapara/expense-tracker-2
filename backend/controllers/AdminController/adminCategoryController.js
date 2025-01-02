@@ -41,6 +41,152 @@ export const getAllAdminExpenseCategoriesIsActive =
     }
   };
 
+// update category & subcategories name , we able to update one or more categories at a time
+export const updateExpenseCategoriesAndSubcategories =
+  (adminDbConnection) => async (req, res) => {
+    const updatedcategories = req.body.updatedcategories; // Expect an array of update objects
+
+    if (!Array.isArray(updatedcategories) || updatedcategories.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No updates provided." });
+    }
+
+    const notFoundItems = [];
+    const successfulUpdates = [];
+
+    try {
+      const AdminExpenseCategoryModel = AdminExpenseCategory(adminDbConnection);
+
+      // Process all updates
+      for (const update of updatedcategories) {
+        const { categoryId, categoryNewName, subcategories } = update;
+
+        if (!categoryId) {
+          notFoundItems.push({ categoryId, message: "Missing category ID" });
+          continue;
+        }
+
+        const category = await AdminExpenseCategoryModel.findById(categoryId);
+        if (!category) {
+          notFoundItems.push({ categoryId, message: "Category not found" });
+          continue;
+        }
+
+        if (categoryId && categoryNewName && !subcategories) {
+          // Case 1: Update only category name
+          category.name = categoryNewName;
+          await category.save();
+          successfulUpdates.push({
+            categoryId,
+            categoryNewName,
+            message: "Category name updated successfully",
+          });
+        } else if (
+          categoryId &&
+          !categoryNewName &&
+          Array.isArray(subcategories)
+        ) {
+          // Case 3: Update only subcategories
+          for (const subcategoryUpdate of subcategories) {
+            const { subcategoryId, subCategorynewName } = subcategoryUpdate;
+
+            if (!subcategoryId || !subCategorynewName) {
+              notFoundItems.push({
+                categoryId,
+                subcategoryId,
+                message: "Missing subcategory ID or new name",
+              });
+              continue;
+            }
+
+            const subcategory = category.subcategories.id(subcategoryId);
+            if (subcategory) {
+              subcategory.name = subCategorynewName;
+              successfulUpdates.push({
+                categoryId,
+                subcategoryId,
+                subCategorynewName,
+                message: "Subcategory updated successfully",
+              });
+            } else {
+              notFoundItems.push({
+                categoryId,
+                subcategoryId,
+                message: "Subcategory not found",
+              });
+            }
+          }
+
+          await category.save();
+        } else if (
+          categoryId &&
+          categoryNewName &&
+          Array.isArray(subcategories)
+        ) {
+          // Case 2: Update both category name and subcategories
+          category.name = categoryNewName;
+
+          for (const subcategoryUpdate of subcategories) {
+            const { subcategoryId, subCategorynewName } = subcategoryUpdate;
+
+            if (!subcategoryId || !subCategorynewName) {
+              notFoundItems.push({
+                categoryId,
+                subcategoryId,
+                message: "Missing subcategory ID or new name",
+              });
+              continue;
+            }
+
+            const subcategory = category.subcategories.id(subcategoryId);
+            if (subcategory) {
+              subcategory.name = subCategorynewName;
+              successfulUpdates.push({
+                categoryId,
+                categoryNewName,
+                subcategoryId,
+                subCategorynewName,
+              });
+            } else {
+              notFoundItems.push({
+                categoryId,
+                subcategoryId,
+                message: "Subcategory not found",
+              });
+            }
+          }
+
+          await category.save();
+          successfulUpdates.push({
+            categoryId,
+            categoryNewName,
+            message: "Category name and subcategories updated successfully",
+          });
+        } else {
+          // Case 4: Invalid or incomplete input
+          notFoundItems.push({
+            categoryId,
+            message:
+              "Invalid update request. Provide valid category or subcategory data.",
+          });
+        }
+      }
+
+      // Respond with the results after processing all updates
+      res.status(200).json({
+        success: true,
+        message: "Updates processed successfully.",
+        successfulUpdates,
+        notFoundItems,
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  };
+
+// using update we can remove expense category from the admincategory(make category)
+
 //********************Income**************************//
 // Get all Admin Income Categories
 export const getAllAdminIncomeCategories =
