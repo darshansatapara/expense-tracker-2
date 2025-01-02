@@ -14,10 +14,22 @@ const UserExpenseCategorySchema = new mongoose.Schema({
         ref: "AdminExpenseCategory",
         required: true,
       },
+      isCategoryActive: {
+        type: Boolean,
+        required: true,
+        default: true,
+      },
       subcategoryIds: [
         {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "AdminExpenseCategory.subcategories",
+          subcategoryId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "AdminExpenseCategory.subcategories",
+          },
+          isSubcategoryActive: {
+            type: Boolean,
+            required: true,
+            default: true,
+          },
         },
       ],
     },
@@ -40,8 +52,15 @@ const UserIncomeCategorySchema = new mongoose.Schema({
       },
       subcategoryIds: [
         {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "AdminIncomeCategory.subcategories",
+          subcategoryId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "AdminExpenseCategory.subcategories",
+          },
+          isSubcategoryActive: {
+            type: Boolean,
+            required: true,
+            default: true,
+          },
         },
       ],
     },
@@ -57,9 +76,16 @@ const UserCurrencyAndBudgetSchema = new mongoose.Schema({
   },
   currencyCategory: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "AdminCurrencyCategory", // Reference to the AdminCurrencyCategory model
-      required: true,
+      currencyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "AdminCurrencyCategory", // Reference to the AdminCurrencyCategory model
+        required: true,
+      },
+      isCurrencyActive: {
+        type: Boolean,
+        required: true,
+        default: true,
+      },
     },
   ],
   budget: [
