@@ -48,11 +48,13 @@ export const userCategoryStore = create((set) => ({
   // Add an expense category
   addExpenseCategory: async (data) => {
     set({ isPostingCategory: true });
+    console.log(data);
     try {
       const res = await axiosInstance.post(
         `/usercategories/addExpenseCategory`,
         data
       );
+
       set((state) => ({
         userCategories: { ...state.userCategories, expense: res.data },
       }));

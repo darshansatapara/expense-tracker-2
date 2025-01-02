@@ -2,61 +2,42 @@ import { Plus, X } from "lucide-react";
 import { useState } from "react";
 
 export const CategorySelectorButton = ({
-  categories, // Categories with their subcategories
-  setSelectedCategories, // Function to update selected categories
+  categories, // Categories object { id: { name, subcategories } }
+  setSelectedCategoryIds, // Function to update selected category IDs
 }) => {
-  const [tempCategories, selectedTempCategories] = useState([]); // Track only main categories
+  const [selectedCategories, setSelectedCategories] = useState([]); // Track selected IDs locally
 
-  // Handle category selection or deselection
-  const toggleCategory = (category) => {
-    console.log("Category clicked:", category); // Log category clicked
+  console.log(categories);
+  // Toggle category selection
+  const toggleCategory = (categoryId) => {
+    const isSelected = selectedCategories.includes(categoryId);
 
-    const isSelected = tempCategories.includes(category); // Check if category is already selected
+    const updatedSelectedCategories = isSelected
+      ? selectedCategories.filter((id) => id !== categoryId) // Remove if already selected
+      : [...selectedCategories, categoryId]; // Add if not selected
 
-    // Update tempCategories state first
-    selectedTempCategories((prevTemp) =>
-      isSelected
-        ? prevTemp.filter((item) => item !== category)
-        : [...prevTemp, category]
-    );
-
-    // Then update selectedCategories using the updated tempCategories
-    setSelectedCategories((prev) => {
-      const updatedCategories = { ...prev };
-
-      if (isSelected) {
-        delete updatedCategories[category]; // Remove the category
-      } else {
-        updatedCategories[category] = categories[category]; // Add subcategories
-      }
-
-      console.log("Updated selectedCategories:", updatedCategories); // Log the updated categories
-      return updatedCategories;
-    });
+    setSelectedCategories(updatedSelectedCategories);
+    setSelectedCategoryIds(updatedSelectedCategories); // Update parent state with IDs
   };
 
-  // Utility function to get the color styles based on category selection
-  const getCategoryColor = (category) => {
-    // If the category is in the selected main categories (tempCategories), apply the selected color style
-    if (tempCategories.includes(category)) {
-      return "bg-gradient-to-r from-purple-500 to-pink-500 text-white"; // Selected category style
-    } else {
-      return "bg-white text-gray-800"; // Default unselected style
-    }
-  };
+  // Utility function to get color styles
+  const getCategoryColor = (categoryId) =>
+    selectedCategories.includes(categoryId)
+      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+      : "bg-white text-gray-800";
 
   return (
     <div className="flex flex-wrap gap-2 mb-5">
-      {Object.keys(categories).map((category) => (
+      {Object.entries(categories).map(([categoryId, categoryData]) => (
         <button
-          key={category}
-          onClick={() => toggleCategory(category)} // Toggle the category
+          key={categoryId}
+          onClick={() => toggleCategory(categoryId)} // Toggle based on ID
           className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-200 ${getCategoryColor(
-            category
+            categoryId
           )} hover:bg-purple-200`}
         >
-          <span>{category}</span>
-          {tempCategories.includes(category) ? (
+          <span>{categoryData.name}</span> {/* Display name */}
+          {selectedCategories.includes(categoryId) ? (
             <X className="w-4 h-4" />
           ) : (
             <Plus className="w-4 h-4" />

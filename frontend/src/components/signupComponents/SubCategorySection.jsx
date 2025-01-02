@@ -1,3 +1,4 @@
+// SubCategorySection.jsx
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { SubCategoryInputButton } from "../InputComponents/SubCategoryInputButton";
@@ -8,49 +9,61 @@ export default function SubCategorySection() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { selectedCategories, userData } = location.state || {};
+  const { selectedCategoryIds, userData } = location.state || {};
+  const selectedCategories = selectedCategoryIds;
+  console.log(selectedCategories);
 
   const [finalCategory, setFinalCategory] = useState({});
   const addExpenseCategory = userCategoryStore(
     (state) => state.addExpenseCategory
   );
 
+  // Log final category state for debugging
   useEffect(() => {
-    console.log("finalCategory", finalCategory);
+    console.log("Final Category State:", finalCategory);
   }, [finalCategory]);
 
-  // Transform the finalCategory object into an array
+  // Transform the finalCategory object into the required format for backend
   const transformCategoryData = () =>
-    Object.entries(finalCategory).map(([category, subCategories]) => ({
-      category,
-      subCategories,
-    }));
+    Object.entries(finalCategory).map(([categoryId, subCategories]) => {
+      const subcategoryIds = subCategories.map(
+        (subCategory) => subCategory._id || subCategory
+      );
+      return {
+        categoryId,
+        subcategoryIds,
+      };
+    });
 
-  // Handle next button click
+  // Handle the next button click
   const handleNext = async () => {
     if (Object.keys(finalCategory).length > 0) {
       try {
         const categoryData = transformCategoryData();
-        console.log("Posting data to backend:", categoryData);
+        console.log("Posting Data to Backend:", categoryData);
 
-        // Post the data to the backend
         await addExpenseCategory({
-          userId: userData?.id, // Ensure `userData.id` exists
-          categories: categoryData,
+          userId: userData?.userId,
+          expenseCategories: categoryData,
         });
 
-        // Navigate to the next page
-        navigate("/budget", {
+        navigate("/category/currencyBudgetSelection", {
           state: { finalCategory, userData },
         });
       } catch (error) {
-        console.error("Error posting data:", error);
+        console.error("Error Posting Data:", error);
       }
     } else {
       alert("Please select at least one subcategory.");
     }
   };
 
+  const validSelectedCategories =
+    selectedCategories && typeof selectedCategories === "object"
+      ? selectedCategories
+      : {};
+
+  console.log("Valid Categories:", validSelectedCategories);
   return (
     <div className="flex flex-col lg:flex-row justify-around h-screen bg-[#D9EAFD]">
       {/* Left section */}
@@ -65,19 +78,28 @@ export default function SubCategorySection() {
             Choose Your Subcategories
           </div>
 
-          {/* Iterate over the selected categories and render SubCategoryInputButton */}
-          {/* Category Selector */}
+          {/* Category and Subcategory Selector */}
           <div className="relative mb-5 h-80 max-h-80 overflow-y-auto border rounded-lg p-4 bg-gray-50 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
-            {Object.keys(selectedCategories).map((category) => (
-              <SubCategoryInputButton
-                key={category}
-                category={category}
-                subCategories={selectedCategories[category]} // Pass subcategories for each category
-                finalCategory={finalCategory}
-                setFinalCategory={setFinalCategory}
-              />
-            ))}
+            {Object.keys(validSelectedCategories).length > 0 ? (
+              Object.entries(validSelectedCategories).map(
+                ([categoryId, { name, subcategories }]) => (
+                  <SubCategoryInputButton
+                    key={`category-${categoryId}`}
+                    categoryId={categoryId}
+                    categoryName={name}
+                    subCategories={subcategories}
+                    finalCategory={finalCategory}
+                    setFinalCategory={setFinalCategory}
+                  />
+                )
+              )
+            ) : (
+              <div className="text-center text-gray-500">
+                No categories available. Please go back and select categories.
+              </div>
+            )}
           </div>
+
           {/* Next Button */}
           <div className="mt-6">
             <button
