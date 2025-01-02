@@ -6,6 +6,7 @@ import {
   getAllAdminExpenseCategoriesIsActive,
   getAllAdminIncomeCategories,
   getAllAdminIncomeCategoriesIsActive,
+  updateExpenseCategoriesAndSubcategories,
 } from "../../controllers/AdminController/adminCategoryController.js"; // Make sure this import path is correct
 
 // Define the adminCategoryRoute
@@ -27,6 +28,11 @@ const adminCategoryRoutes = (adminDbConnection) => {
   router.get(
     "/allexpenseCategoryIsActive",
     getAllAdminExpenseCategoriesIsActive(adminDbConnection)
+  );
+
+  router.put(
+    "/updateExpenseCategoriesAndSubcategories",
+    updateExpenseCategoriesAndSubcategories(adminDbConnection)
   );
 
   //*******************income route **************************/

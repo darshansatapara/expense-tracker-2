@@ -11,7 +11,20 @@ import {
 } from "../../models/AdminModel/AdminCategoryModels.js";
 
 //************************************EXPENSE Controller************************************
-// Add User Expense Categories
+// Add User Expense Categories for this the sending formate is
+/*{
+  "userId": "64b3b2f4d8e11b0012dabc34",
+  "expenseCategories": [
+    {
+      "categoryId": "64b3b2f4d8e11b0012dabc35",
+      "subcategoryIds": [
+        "64b3b2f4d8e11b0012dabc36",
+        "64b3b2f4d8e11b0012dabc37"
+      ]
+    }
+  ]
+}*/
+
 export const addUserExpenseCategory =
   (userDbConnection) => async (req, res) => {
     const { userId, expenseCategories } = req.body;
@@ -27,13 +40,21 @@ export const addUserExpenseCategory =
     try {
       const UserExpenseCategory = UserExpenseCategoryModel(userDbConnection);
 
+      // Transform subcategoryIds from strings to objects if necessary
+      const transformedCategories = expenseCategories.map((category) => ({
+        ...category,
+        subcategoryIds: category.subcategoryIds.map((id) => ({
+          subcategoryId: id,
+        })),
+      }));
+
       const existingRecord = await UserExpenseCategory.findOne({ userId });
 
       if (existingRecord) {
         // Append new categories without duplicates
         const updatedCategories = [
           ...existingRecord.expenseCategories,
-          ...expenseCategories.filter(
+          ...transformedCategories.filter(
             (newCategory) =>
               !existingRecord.expenseCategories.some(
                 (existing) =>
@@ -55,7 +76,7 @@ export const addUserExpenseCategory =
       // Create a new record
       const newExpenseCategory = new UserExpenseCategory({
         userId,
-        expenseCategories,
+        expenseCategories: transformedCategories,
       });
 
       const savedCategory = await newExpenseCategory.save();
@@ -619,6 +640,21 @@ export const getUserIncomeCategories =
 //*********************************Currnecy Controller***********************************/
 
 // Add User Currency and Budget
+/* example input
+{
+  "userId": "64b3b2f4d8e11b0012dabc34",
+  "currencyCategory": [
+    "64b3b2f4d8e11b0012dabc35",
+    "64b3b2f4d8e11b0012dabc36"
+  ],
+  "budget": [
+    {
+      "offlineBudget": "500",
+      "onlineBudget": "1000"
+    }
+  ]
+}
+*/
 export const addUserCurrencyAndBudget =
   (userDbConnection) => async (req, res) => {
     const { userId, currencyCategory, budget } = req.body;
@@ -634,11 +670,19 @@ export const addUserCurrencyAndBudget =
       const UserCurrencyAndBudget =
         UserCurrencyAndBudgetModel(userDbConnection);
 
+      // Transform currencyCategory from an array of IDs to an array of objects
+      const transformedCurrencyCategory = currencyCategory.map(
+        (currencyId) => ({
+          currencyId,
+          isCurrencyActive: true, // Default is true
+        })
+      );
+
       const existingRecord = await UserCurrencyAndBudget.findOne({ userId });
 
       if (existingRecord) {
         // Update currency category and budget
-        existingRecord.currencyCategory = currencyCategory;
+        existingRecord.currencyCategory = transformedCurrencyCategory;
         existingRecord.budget = budget;
 
         await existingRecord.save();
@@ -653,7 +697,7 @@ export const addUserCurrencyAndBudget =
       // Create a new record
       const newCurrencyAndBudget = new UserCurrencyAndBudget({
         userId,
-        currencyCategory,
+        currencyCategory: transformedCurrencyCategory,
         budget,
       });
 
