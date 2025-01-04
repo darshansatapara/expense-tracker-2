@@ -1,57 +1,73 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { adminCategoryStore } from "../../store/AdminStore/adminCategoryStore.js";
+import { CurrencySelectorButton } from "../InputComponents/CurrencySelectorButton.jsx";
+import SignupLeft from "./SignUpInContent/Signup_Left.jsx";
 import { toast } from "react-toastify";
+import { userCategoryStore } from "../../store/userCategoryStore.js";
 
-const CurrencyBudgetSelection = () => {
+export default function CurrencyBudgetSelection() {
   const location = useLocation();
   const navigate = useNavigate();
 
   const { finalCategory, userData } = location.state || {};
+  const addCurrencyAndBudget = userCategoryStore(
+    (state) => state.addCurrencyAndBudget
+  );
   const fetchCurrencyCategories = adminCategoryStore(
     (state) => state.fetchCurrencyCategories
   );
-  const currencyCategories = adminCategoryStore(
+
+  const allcurrencyCategories = adminCategoryStore(
     (state) => state.currencyCategories
   );
+
+  const currencyCategories = allcurrencyCategories.currencies;
+  console.log(currencyCategories);
 
   const [selectedCurrency, setSelectedCurrency] = useState([]);
   const [onlineBudget, setOnlineBudget] = useState("");
   const [offlineBudget, setOfflineBudget] = useState("");
+  const [fetchError, setFetchError] = useState(false);
 
+  // Fetch currency categories on component mount
   useEffect(() => {
-    fetchCurrencyCategories();
+    const fetchData = async () => {
+      try {
+        await fetchCurrencyCategories();
+        setFetchError(false);
+      } catch (error) {
+        console.error("Failed to fetch currency categories:", error);
+        setFetchError(true);
+      }
+    };
+
+    fetchData();
   }, [fetchCurrencyCategories]);
 
-  const handleCurrencySelection = (currencyId) => {
-    setSelectedCurrency((prev) =>
-      prev.includes(currencyId)
-        ? prev.filter((id) => id !== currencyId)
-        : [...prev, currencyId]
-    );
-  };
-
+  // Handle form submission
   const handleSubmit = async () => {
     if (selectedCurrency.length === 0) {
       toast.error("Please select at least one currency.");
       return;
     }
-    if (!onlineBudget || !offlineBudget) {
-      toast.error("Please enter both online and offline budgets.");
+    if (onlineBudget < 500 || offlineBudget < 500) {
+      toast.error("Both online and offline budgets must be at least 500.");
       return;
     }
 
     try {
       const budgetData = {
-        userId: userData?.id,
+        userId: userData.userId,
         currencyCategory: selectedCurrency,
         budget: [{ offlineBudget, onlineBudget }],
       };
 
+      console.log(budgetData.userId);
       console.log("Submitted Budget Data:", budgetData);
 
-      // Navigate to the next step with data
-      navigate("/next-step", { state: { finalCategory, budgetData } });
+      await addCurrencyAndBudget(budgetData);
+      navigate("/", { state: { finalCategory, budgetData } });
     } catch (error) {
       console.error("Error submitting currency and budget:", error);
       toast.error("Failed to submit currency and budget.");
@@ -59,61 +75,87 @@ const CurrencyBudgetSelection = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100 p-6">
-      <div className="w-full max-w-lg bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800">
-          Set Your Currency and Budget
-        </h2>
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Select Currencies</h3>
-          <div className="grid grid-cols-2 gap-4">
-            {currencyCategories.map((currency) => (
-              <button
-                key={currency._id}
-                className={`px-4 py-2 rounded-md border ${
-                  selectedCurrency.includes(currency._id)
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 text-gray-800"
-                }`}
-                onClick={() => handleCurrencySelection(currency._id)}
-              >
-                {currency.name}
-              </button>
-            ))}
+    <div className="flex flex-col lg:flex-row justify-around h-screen bg-[#D9EAFD]">
+      {/* Left Section */}
+      <div className="hidden lg:block px-20 justify-center items-center">
+        <SignupLeft />
+      </div>
+
+      {/* Right Section */}
+      <div className="flex flex-1 items-center justify-center font-nunito px-4 lg:px-8">
+        <div className="p-6 lg:p-8 w-full max-w-lg bg-white shadow-md rounded-lg">
+          <div className="text-2xl mb-6 font-bold text-gray-800 text-center lg:text-left">
+            Select Your Currency and Set a Budget
           </div>
-        </div>
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-2">Set Budget</h3>
-          <div className="flex gap-4">
-            <input
-              type="number"
-              placeholder="Offline Budget"
-              className="w-1/2 p-2 border rounded-md"
-              value={offlineBudget}
-              onChange={(e) => setOfflineBudget(e.target.value)}
-            />
-            <input
-              type="number"
-              placeholder="Online Budget"
-              className="w-1/2 p-2 border rounded-md"
-              value={onlineBudget}
-              onChange={(e) => setOnlineBudget(e.target.value)}
-            />
+
+          {/* Currency Selector */}
+          <div className="relative mb-5 h-80 max-h-80 overflow-y-auto border rounded-lg p-4 bg-gray-50 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+            {!fetchError && (
+              <CurrencySelectorButton
+                currencies={
+                  Array.isArray(currencyCategories) // Ensure it's an array
+                    ? currencyCategories.reduce((acc, currency) => {
+                        acc[currency._id] = {
+                          name: currency.currency,
+                          Symbol: currency.symbol,
+                        };
+                        return acc;
+                      }, {})
+                    : {} // Default to an empty object if currencyCategories is not an array
+                }
+                setSelectedCurrencyIds={setSelectedCurrency}
+              />
+            )}
+
+            {/* Empty Fallback */}
+            {!fetchError && allcurrencyCategories.length === 0 && (
+              <div className="text-center text-gray-500">
+                No currencies available to display.
+              </div>
+            )}
           </div>
+
+          {/* Budget Input */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">Set a Monthly Budget</h3>
+            <div className="flex gap-4">
+              <input
+                inputMode="numeric"
+                placeholder="Offline Budget (min 500)"
+                className="w-1/2 p-2 border rounded-md"
+                value={offlineBudget}
+                onChange={(e) => setOfflineBudget(e.target.value)}
+              />
+              <input
+                inputMode="numeric"
+                placeholder="Online Budget (min 500)"
+                className="w-1/2 p-2 border rounded-md"
+                value={onlineBudget}
+                onChange={(e) => setOnlineBudget(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            onClick={handleSubmit}
+            disabled={
+              !selectedCurrency.length ||
+              onlineBudget < 500 ||
+              offlineBudget < 500
+            }
+            className={`w-full mt-6 py-2 rounded-md font-semibold transition-colors ${
+              selectedCurrency.length &&
+              onlineBudget >= 500 &&
+              offlineBudget >= 500
+                ? "bg-gradient-to-r from-blue-500 to-green-500 text-white hover:from-blue-600 hover:to-green-600"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+          >
+            Submit
+          </button>
         </div>
-        <button
-          onClick={handleSubmit}
-          className={`w-full py-2 rounded-md font-semibold ${
-            selectedCurrency.length > 0 && onlineBudget && offlineBudget
-              ? "bg-blue-500 text-white hover:bg-blue-600"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
-        >
-          Submit
-        </button>
       </div>
     </div>
   );
-};
-
-export default CurrencyBudgetSelection;
+}

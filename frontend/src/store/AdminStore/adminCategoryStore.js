@@ -15,9 +15,10 @@ export const adminCategoryStore = create((set) => ({
     set({ isLoadingCategories: true });
     try {
       const res = await axiosInstance.get(
-        "/admincategories/allcurrencyCategory"
+        "/admincategories/allcurrencyCategoryIsActive"
       );
-      set({ currencyCategories: Array.isArray(res.data) ? res.data : [] });
+      set({ currencyCategories: res.data });
+      console.log(res.data);
     } catch (error) {
       console.error("Error fetching currency categories:", error);
       toast.error("Failed to fetch currency categories!");

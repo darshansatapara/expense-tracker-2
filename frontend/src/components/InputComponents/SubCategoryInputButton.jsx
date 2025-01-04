@@ -11,34 +11,26 @@ export const SubCategoryInputButton = ({
   const [selectedSubCategories, setSelectedSubCategories] = useState([]);
 
   useEffect(() => {
-    // Initialize the selected subcategories from finalCategory if available
-    setSelectedSubCategories(finalCategory[categoryId] || []);
+    // Initialize the selected subcategories from finalCategory without triggering unnecessary updates
+    if (finalCategory[categoryId]) {
+      setSelectedSubCategories(finalCategory[categoryId]);
+    }
   }, [categoryId, finalCategory]);
 
   // Handle subcategory selection and toggle its state
   const handleSubCategorySelection = (subcategory) => {
     setSelectedSubCategories((prev) => {
-      const newSelected = prev.includes(subcategory)
+      const isSelected = prev.includes(subcategory);
+      const updatedSelected = isSelected
         ? prev.filter((item) => item !== subcategory)
         : [...prev, subcategory];
 
-      // Update finalCategory after modifying local selected state
+      // Update finalCategory only after local state change
       setFinalCategory((prevFinalCategory) => {
         const updatedCategories = { ...prevFinalCategory };
+        updatedCategories[categoryId] = updatedSelected;
 
-        if (!updatedCategories[categoryId]) {
-          updatedCategories[categoryId] = [];
-        }
-
-        if (newSelected.includes(subcategory)) {
-          updatedCategories[categoryId] = [...newSelected];
-        } else {
-          updatedCategories[categoryId] = newSelected.filter(
-            (item) => item !== subcategory
-          );
-        }
-
-        // If there are no selected subcategories for this category, delete it from finalCategory
+        // If no subcategories are selected, remove the category from finalCategory
         if (updatedCategories[categoryId].length === 0) {
           delete updatedCategories[categoryId];
         }
@@ -46,7 +38,7 @@ export const SubCategoryInputButton = ({
         return updatedCategories;
       });
 
-      return newSelected;
+      return updatedSelected;
     });
   };
 
