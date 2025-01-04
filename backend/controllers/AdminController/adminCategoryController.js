@@ -3,6 +3,12 @@ import {
   AdminExpenseCategory,
   AdminIncomeCategory,
 } from "../../models/AdminModel/AdminCategoryModels.js";
+import {
+  removeSoftDeleteUserExpenseCategoryByAdminChanged,
+  softDeleteUserCurrencyByAdminChanged,
+  softDeleteUserExpenseCategoryByAdminChanged,
+} from "../../middlewares/userMiddlewares/userCategoryMiddlewares.js";
+import mongoose from "mongoose";
 
 //********************Expense**************************//
 // Get all Admin Expense Categories which is active and inactive both
@@ -185,7 +191,214 @@ export const updateExpenseCategoriesAndSubcategories =
     }
   };
 
-// using update we can remove expense category from the admincategory(make category)
+// soft delete of only expense "categories" in the admin and user expense data
+/*{
+  "categoryIds": ["64e8b25f1234567890abcdef", "64e8b2601234567890abcdef"]
+}
+ */
+export const softDeleteExpenseCategories =
+  (adminDbConnection, userDbConnection) => async (req, res) => {
+    const { categoryIds } = req.body;
+
+    if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Provide at least one categoryId to soft delete.",
+      });
+    }
+
+    try {
+      const AdminExpenseCategoryModel = AdminExpenseCategory(adminDbConnection);
+
+      // Soft delete categories and their subcategories in admin data
+      await AdminExpenseCategoryModel.updateMany(
+        { _id: { $in: categoryIds } },
+        {
+          $set: {
+            isCategoryActive: false,
+            "subcategories.$[].isSubCategoryActive": false, // Deactivate all subcategories
+          },
+        }
+      );
+
+      // Step 2: Update user data using middleware
+      const handleMiddlewareResponse = async () => {
+        return new Promise((resolve, reject) => {
+          softDeleteUserExpenseCategoryByAdminChanged(
+            adminDbConnection,
+            userDbConnection
+          )(
+            req, // Pass the request object to middleware
+            res, // Pass the response object to middleware
+            categoryIds,
+            null, // No subcategory-specific data needed here
+            (error) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve();
+              }
+            }
+          );
+        });
+      };
+
+      await handleMiddlewareResponse();
+
+      // Step 3: Send success response after both updates
+      res.status(200).json({
+        success: true,
+        message:
+          "Categories and their subcategories soft deleted successfully in both admin and user data.",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to soft delete categories.",
+        error: error.message,
+      });
+    }
+  };
+
+// soft delete of only expense "Sub-categories" in the admin and user expense data
+/*
+{
+  "softdeletedata": [
+    {
+      "categoryIds": "64e8b25f1234567890abcdef",
+      "subcategoriesId": ["64e8b25f1234567890abc001", "64e8b25f1234567890abc002"]
+    },
+    {
+      "categoryIds": "64e8b2601234567890abcdef",
+      "subcategoriesId": ["64e8b2601234567890abc003", "64e8b2601234567890abc004"]
+    }
+  ]
+}
+
+*/
+export const softDeleteExpenseSubcategories =
+  (adminDbConnection, userDbConnection) => async (req, res) => {
+    const { softdeletedata } = req.body;
+
+    if (!softdeletedata || !Array.isArray(softdeletedata)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid input. 'softdeletedata' must be a valid array.",
+      });
+    }
+
+    const alreadyDeletedSubcategories = [];
+    const changedSubcategories = [];
+
+    try {
+      const AdminExpenseCategoryModel = AdminExpenseCategory(adminDbConnection);
+
+      // Step 1: Soft delete subcategories in admin data
+      for (const { categoryIds, subcategoriesId } of softdeletedata) {
+        const adminCategory = await AdminExpenseCategoryModel.findOne({
+          _id: categoryIds,
+          "subcategories._id": { $in: subcategoriesId },
+        });
+
+        if (!adminCategory) {
+          continue; // Skip if category doesn't exist
+        }
+
+        for (const subcategoryId of subcategoriesId) {
+          const subcategory = adminCategory.subcategories.find(
+            (sub) => sub._id.toString() === subcategoryId
+          );
+
+          if (!subcategory) {
+            continue; // Skip if subcategory doesn't exist
+          }
+
+          if (subcategory.isSubCategoryActive === false) {
+            // Already soft deleted, add to `alreadyDeletedSubcategories`
+            alreadyDeletedSubcategories.push(subcategoryId);
+          } else {
+            // Soft delete and add to `changedSubcategories`
+            await AdminExpenseCategoryModel.updateOne(
+              { _id: categoryIds },
+              {
+                $set: {
+                  "subcategories.$[subcategory].isSubCategoryActive": false,
+                },
+              },
+              {
+                arrayFilters: [{ "subcategory._id": subcategoryId }],
+              }
+            );
+
+            changedSubcategories.push(subcategoryId);
+          }
+        }
+      }
+
+      // Step 2: Update user data using middleware
+      const handleMiddlewareResponse = async () => {
+        return new Promise((resolve, reject) => {
+          softDeleteUserExpenseCategoryByAdminChanged(
+            adminDbConnection,
+            userDbConnection
+          )(
+            req, // Pass the request object to middleware
+            res, // Pass the response object to middleware
+            softdeletedata,
+            (error) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve();
+              }
+            }
+          );
+        });
+      };
+
+      await handleMiddlewareResponse();
+
+      // Step 3: Send success response after both updates
+      return res.status(200).json({
+        success: true,
+        message:
+          "Subcategories soft deleted successfully in both admin and user data.",
+        alreadyDeletedSubcategories,
+        changedSubcategories,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to soft delete subcategories.",
+        error: error.message,
+      });
+    }
+  };
+
+// remove soft delete(mean make active : true) only in expense "category" in admin and user database
+/*{
+  "categoryIds": ["64e8b25f1234567890abcdef", "64e8b2601234567890abcdef"]
+}
+ */
+
+
+// remove soft delete(mean make active : true) only in expense "sub-category" in admin and user database
+/*
+{
+  "softdeletedata": [
+    {
+      "categoryIds": "64e8b25f1234567890abcdef",
+      "subcategoriesId": ["64e8b25f1234567890abc001", "64e8b25f1234567890abc002"]
+    },
+    {
+      "categoryIds": "64e8b2601234567890abcdef",
+      "subcategoriesId": ["64e8b2601234567890abc003", "64e8b2601234567890abc004"]
+    }
+  ]
+}
+
+*/
+
 
 //********************Income**************************//
 // Get all Admin Income Categories
@@ -253,5 +466,57 @@ export const getAllAdminCurrencyCategoriesIsActive =
       res.status(200).json({ success: true, currencies });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
+    }
+  };
+
+// we can use soft delete here which is make the currency category isCurrencyActive:false, also form the user currency category database collection
+
+export const softDeleteAdminCurrencyCategories =
+  (adminDbConnection, userDbConnection) => async (req, res) => {
+    const { categoryIds } = req.body; // Expect an array of category IDs to deactivate
+
+    if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a valid array of currency category IDs.",
+      });
+    }
+
+    try {
+      const AdminCurrencyCategoryModel =
+        AdminCurrencyCategory(adminDbConnection);
+      // const UserCurrencyAndBudget =
+      //   UserCurrencyAndBudgetModel(userDbConnection);
+
+      // Update all provided categories in AdminCurrencyCategory
+      const updatedCategories = await AdminCurrencyCategoryModel.updateMany(
+        { _id: { $in: categoryIds } },
+        { $set: { isCurrencyActive: false } }
+      );
+
+      if (updatedCategories.modifiedCount === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "No matching currency categories found to deactivate.",
+        });
+      }
+
+      // Trigger user currency updates asynchronously for affected categories
+      softDeleteUserCurrencyByAdminChanged(adminDbConnection, userDbConnection)(
+        () => {},
+        categoryIds
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "Currency categories deactivated successfully.",
+        data: { deactivatedCategoryIds: categoryIds },
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to deactivate currency categories.",
+        error: error.message,
+      });
     }
   };
