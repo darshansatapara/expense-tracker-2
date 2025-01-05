@@ -656,6 +656,12 @@ export const getAllAdminCurrencyCategoriesIsActive =
   };
 
 // we can use soft delete here which is make the currency category isCurrencyActive:false, also form the user currency category database collection
+/*{
+  "categoryIds": [
+    "6774e15f0ae028dfbf4f2c67",
+    "6774e1600ae028dfbf4f2c6c"
+  ]
+}*/
 export const softDeleteAdminCurrencyCategories =
   (adminDbConnection, userDbConnection) => async (req, res) => {
     const { categoryIds } = req.body; // Expect an array of category IDs to deactivate
@@ -706,6 +712,15 @@ export const softDeleteAdminCurrencyCategories =
     }
   };
 
+// restore the currency categories which is softdeleted
+/*{
+  "categoryIds": [
+    "6774e15f0ae028dfbf4f2c67",
+    "6774e1600ae028dfbf4f2c6c"
+  ]
+}
+
+*/
 export const restoreCurrencyCategories =
   (adminDbConnection, userDbConnection) => async (req, res) => {
     const { categoryIds } = req.body;
