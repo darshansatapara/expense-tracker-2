@@ -11,7 +11,7 @@ export default function PasswordSection() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const userMail = location.state?.user?.email || location.state?.email || "";
-
+  
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
 
