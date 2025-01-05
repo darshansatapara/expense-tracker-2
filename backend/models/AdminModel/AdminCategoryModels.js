@@ -30,26 +30,7 @@ const AdminExpenseCategorySchema = new mongoose.Schema({
     },
   ],
 });
-// Admin Expense Category Schema
-// const AdminExpenseCategorySchema = new mongoose.Schema({
-//   name: {
-//     type: String,
-//     required: true,
-//     unique: true, // Ensure each category name is unique
-//   },
-//   subcategories: [
-//     {
-//       _id: {
-//         type: mongoose.Schema.Types.ObjectId,
-//         required: true,
-//       },
-//       name: {
-//         type: String,
-//         required: true,
-//       },
-//     },
-//   ],
-// });
+
 
 // copy Admin Income Category Schema
 const AdminIncomeCategorySchema = new mongoose.Schema({
@@ -85,26 +66,6 @@ const AdminIncomeCategorySchema = new mongoose.Schema({
     },
   ],
 });
-// Admin Income Category Schema
-// const AdminIncomeCategorySchema = new mongoose.Schema({
-//   name: {
-//     type: String,
-//     required: true,
-//     unique: true, // Ensure each category name is unique
-//   },
-//   subcategories: [
-//     {
-//       _id: {
-//         type: mongoose.Schema.Types.ObjectId,
-//         required: true,
-//       },
-//       name: {
-//         type: String,
-//         required: true,
-//       },
-//     },
-//   ],
-// });
 
 // Admin Currency Category Schema
 const AdminCurrencyCategorySchema = new mongoose.Schema({
@@ -134,12 +95,6 @@ export const AdminExpenseCategory = (adminDbConnection) => {
     AdminExpenseCategorySchema
   );
 };
-// export const CopyAdminExpenseCategory = (adminDbConnection) => {
-//   return adminDbConnection.model(
-//     "CopyAdminExpenseCategory",
-//     CopyAdminExpenseCategorySchema
-//   );
-// };
 
 export const AdminIncomeCategory = (adminDbConnection) => {
   return adminDbConnection.model(
@@ -147,12 +102,6 @@ export const AdminIncomeCategory = (adminDbConnection) => {
     AdminIncomeCategorySchema
   );
 };
-// export const CopyAdminIncomeCategory = (adminDbConnection) => {
-//   return adminDbConnection.model(
-//     "CopyAdminIncomeCategory",
-//     CopyAdminIncomeCategorySchema
-//   );
-// };
 
 export const AdminCurrencyCategory = (adminDbConnection) => {
   // Check if the model is already registered to prevent errors
