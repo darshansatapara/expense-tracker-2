@@ -25,6 +25,7 @@ const userExpenseRoute = (userDbConnection, adminDbConnection) => {
   router.delete(
     "/deleteExpense/:userId/:expenseDate",
     deleteUserExpense(userDbConnection)
+
   );
 
   return router;

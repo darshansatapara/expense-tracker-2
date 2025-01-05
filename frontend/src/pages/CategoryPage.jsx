@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import CategorySection from "../components/signupComponents/CategorySection.jsx";
 import SubCategorySection from "../components/signupComponents/SubCategorySection.jsx";
+import CurrencyBudgetSelection from "../components/signupComponents/CurrencyBudgetSelection.jsx";
 
 export default function CategoryPage() {
   const location = useLocation();
@@ -20,6 +21,13 @@ export default function CategoryPage() {
       )}
       {subpath === "subCategorySection" && (
         <SubCategorySection
+          userId={userId}
+          email={email}
+          profession={profession}
+        />
+      )}
+      {subpath === "currencyBudgetSelection" && (
+        <CurrencyBudgetSelection
           userId={userId}
           email={email}
           profession={profession}

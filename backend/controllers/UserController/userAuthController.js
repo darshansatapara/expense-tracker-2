@@ -103,7 +103,8 @@ export const signUp = (userDbConnection) => async (req, res, next) => {
       const duplicateKey = Object.keys(err.keyValue)[0];
       return res.status(400).json({
         success: false,
-        message: `${duplicateKey} already exists. Please use a different ${duplicateKey}.`,
+        message:
+          "${duplicateKey} already exists. Please use a different ${duplicateKey}.",
       });
     }
 
@@ -118,7 +119,6 @@ export const signIn = (userDbConnection) => async (req, res, next) => {
   try {
     const UserCredentialModel = UserCredential(userDbConnection);
     const UserProfileModel = UserProfile(userDbConnection);
-
 
     const userCredential = await UserCredentialModel.findOne({ email });
 
@@ -174,7 +174,6 @@ export const googlesignin = (userDbConnection) => async (req, res) => {
   }
 
   try {
-
     const UserCredentialModel = UserCredential(userDbConnection);
     const UserProfileModel = UserProfile(userDbConnection);
 
