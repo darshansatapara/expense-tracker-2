@@ -46,7 +46,10 @@ dotenv.config(); // Load environment variables
     );
 
     // Admin-specific routes (if any)****************************************************************
-    app.use("/api/admincategories", adminCategoryRoutes(adminDbConnection));
+    app.use(
+      "/api/admincategories",
+      adminCategoryRoutes(adminDbConnection, userDbConnection)
+    );
 
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
