@@ -8,7 +8,7 @@ import {
   SettingOutlined,
   FileTextOutlined,
 } from "@ant-design/icons";
-import MobileSidebar from "../homeComponent/Mobilescreen/MobileSidebar"; // Importing the Mobile Sidebar component
+import MobileSidebar from "../MobileScreenComponents/SidebarMobileScreen"; // Importing the Mobile Sidebar component
 
 const { Header } = Layout;
 const { Text } = Typography;

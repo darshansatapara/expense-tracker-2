@@ -22,10 +22,10 @@ export default function HomePage() {
         {/* Adjusted position */}
         <Sidebar onSelectItem={setSelectedItem} />
       </div>
-      <Layout></Layout>
-      {/* <Layout className="pl-82 pt-16">
+      {/* <Layout></Layout> */}
+      <Layout className="pl-82 pt-16">
           <Main />
-      </Layout> */}
+      </Layout>
     </Layout>
   );
 }
