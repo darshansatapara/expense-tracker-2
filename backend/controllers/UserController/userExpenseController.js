@@ -284,7 +284,6 @@ export const updateUserExpense = (userDbConnection) => async (req, res) => {
 
     // Handle the three possible scenarios:
     // 1. Only the date changes, but mode remains the same
-    // 1. Only the date changes, but mode remains the same
     if (expenseToUpdate.date !== expenseDate && expenseToUpdate.mode === mode) {
       // Remove the expense from the old date's mode array by expenseId
       const oldExpenseDateObj = userExpenses.expenses.find(
