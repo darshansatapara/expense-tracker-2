@@ -4,16 +4,20 @@ const expenseSchema = new mongoose.Schema({
   date: { type: String, required: true },
   mode: { type: String, enum: ["Online", "Offline"], required: true },
   amount: { type: String, required: true },
-  currency: { type: mongoose.Schema.Types.ObjectId, required: true },
+  currency: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "AdminCurrencyCategory",
+    required: true,
+  },
   category: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "CopyAdminExpenseCategory",
+    ref: "AdminExpenseCategory",
   },
   subcategory: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "CopyAdminExpenseCategory.subcategories",
+    ref: "AdminExpenseCategory.subcategories",
   },
   note: { type: String, required: false },
 });
@@ -32,7 +36,8 @@ const userExpenseSchema = new mongoose.Schema({
     },
   ],
 });
-
-const UserExpense = mongoose.model("UserExpenseData", userExpenseSchema);
+const UserExpense = (userDbConnection) => {
+  return userDbConnection.model("UserExpenseData", userExpenseSchema);
+};
 
 export default UserExpense;
