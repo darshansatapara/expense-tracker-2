@@ -60,11 +60,11 @@ export default function ProfileSection() {
       const res = await signup(payload); // Call the signup API from userstore
       if (res) {
         message.success("Profile saved successfully!");
-        const { _id, email, profession } = res;
+        const { _id } = res;
 
         // Navigate to the CategoryPage with the data
         navigate("/category", {
-          state: { userId: _id, email, profession },
+          state: { userId: _id },
         });
       }
     } catch (error) {

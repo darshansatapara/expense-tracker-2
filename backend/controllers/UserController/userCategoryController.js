@@ -28,6 +28,7 @@ import {
 export const addUserExpenseCategory =
   (userDbConnection) => async (req, res) => {
     const { userId, expenseCategories } = req.body;
+    console.log(userId, expenseCategories);
 
     if (!userId || !expenseCategories) {
       return res.status(400).json({

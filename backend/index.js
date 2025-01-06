@@ -44,7 +44,7 @@ dotenv.config(); // Load environment variables
     );
     app.use("/api/income", userIncomeRoute(userDbConnection));
     app.use(
-      "/api/category",
+      "/api/usercategories",
       userCategoryRoute(userDbConnection, adminDbConnection)
     );
 

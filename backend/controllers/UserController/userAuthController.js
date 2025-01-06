@@ -53,6 +53,7 @@ export const signUp = (userDbConnection) => async (req, res, next) => {
     // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    console.log(hashedPassword);
 
     // Create a new user in the user database using the model
     const UserProfileModel = UserProfile(userDbConnection); // Get model for this connection
@@ -103,11 +104,66 @@ export const signUp = (userDbConnection) => async (req, res, next) => {
       const duplicateKey = Object.keys(err.keyValue)[0];
       return res.status(400).json({
         success: false,
-        message: `${duplicateKey} already exists. Please use a different ${duplicateKey}.`,
+        message:
+          "${duplicateKey} already exists. Please use a different ${duplicateKey}.",
       });
     }
 
     next(err); // Pass other errors to error-handling middleware
+  }
+};
+
+// update the profilestatus when complete the signup process
+export const updateProfileStatus = (userDbConnection) => async (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, error: "Invalid userId" });
+  }
+
+  try {
+    const UserProfileModel = UserProfile(userDbConnection);
+    // Update the profile_complated field to true
+    const user = await UserProfileModel.findOneAndUpdate(
+      { _id: userId },
+      { profile_complated: true },
+      { new: true } // Return the updated document
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "Profile marked as completed", user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// update the profilestatus when complete the signup process
+export const updateCategoryStatus = (userDbConnection) => async (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(401).json({ success: false, error: "Invalid userId" });
+  }
+
+  try {
+    const UserProfileModel = UserProfile(userDbConnection);
+    // Update the profile_complated field to true
+    const user = await UserProfileModel.findOneAndUpdate(
+      { _id: userId },
+      { category_completed: true },
+      { new: true } // Return the updated document
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "Profile marked as completed", user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -119,7 +175,6 @@ export const signIn = (userDbConnection) => async (req, res, next) => {
     const UserCredentialModel = UserCredential(userDbConnection);
     const UserProfileModel = UserProfile(userDbConnection);
 
-
     const userCredential = await UserCredentialModel.findOne({ email });
 
     if (!userCredential) {
@@ -128,6 +183,8 @@ export const signIn = (userDbConnection) => async (req, res, next) => {
         .json({ success: false, error: "Invalid credentials" });
     }
 
+    console.log(password, userCredential.password);
+
     const isPasswordCorrect = await bcrypt.compare(
       password,
       userCredential.password
@@ -135,7 +192,7 @@ export const signIn = (userDbConnection) => async (req, res, next) => {
     if (!isPasswordCorrect) {
       return res
         .status(401)
-        .json({ success: false, error: "Invalid credentials" });
+        .json({ success: false, error: "Invalid password" });
     }
 
     // Fetch user profile using the UserProfile model
@@ -156,6 +213,8 @@ export const signIn = (userDbConnection) => async (req, res, next) => {
         mobile_no: user.mobile_no,
         date_of_birth: user.date_of_birth,
         profession: user.profession,
+        profile_complated: user.profile_complated,
+        category_completed: user.category_completed,
       },
     });
   } catch (error) {
@@ -174,7 +233,6 @@ export const googlesignin = (userDbConnection) => async (req, res) => {
   }
 
   try {
-
     const UserCredentialModel = UserCredential(userDbConnection);
     const UserProfileModel = UserProfile(userDbConnection);
 
@@ -205,6 +263,8 @@ export const googlesignin = (userDbConnection) => async (req, res) => {
         mobile_no: user.mobile_no,
         date_of_birth: user.date_of_birth,
         profession: user.profession,
+        profile_complated: user.profile_complated,
+        category_completed: user.category_completed,
       },
     });
   } catch (error) {
