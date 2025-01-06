@@ -4,7 +4,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import React from "react";
 import { app } from "../../utils/firebase.js";
 import { useNavigate } from "react-router-dom";
-import { userStore } from "../../store/userStore";
+import { userStore } from "../../store/userStore.js";
 
 export default function OAuth2() {
   const auth = getAuth(app);
@@ -16,22 +16,65 @@ export default function OAuth2() {
     provider.setCustomParameters({ prompt: "select_account" });
 
     try {
-      const resultfromgoogle = await signInWithPopup(auth, provider);
+      // Sign in with Google
+      const resultFromGoogle = await signInWithPopup(auth, provider);
 
       // Extract user email from Google sign-in response
-      const email = resultfromgoogle.user.email;
+      const email = resultFromGoogle.user.email;
 
-      // Call the store's googlesignin function with email
+      // Call the store's googlesignin function with the email
       await googlesignin({ email });
 
-      // Redirect to the /category page on success
-      navigate("/");
+      // Wait for `currentUser` to update
+      const waitForCurrentUser = () =>
+        new Promise((resolve, reject) => {
+          const interval = setInterval(() => {
+            if (userStore.getState().currentUser) {
+              clearInterval(interval);
+              resolve(userStore.getState().currentUser);
+            }
+          }, 100); // Check every 100ms
 
-      // Show success message
-      message.success("Signed in successfully!");
+          // Timeout after 5 seconds
+          setTimeout(() => {
+            clearInterval(interval);
+            reject(
+              new Error("Failed to fetch currentUser after Google Sign-In.")
+            );
+          }, 1000);
+        });
+
+      const updatedUser = await waitForCurrentUser();
+
+      // Safeguard: Check if updatedUser exists and has the required structure
+      if (updatedUser && updatedUser.user) {
+        const { user } = updatedUser;
+        const userId = user._id;
+
+        if (!user.profile_complated) {
+          if (!user.category_completed) {
+            console.log("Navigating to /category with user ID:", user._id);
+            navigate("/category", { state: { userId: user._id } });
+          } else {
+            navigate("/category/currencyBudgetSelection", {
+              state: { userId: userId },
+            });
+            console.log(
+              "Navigating to /category/currencyBudgetSelection with user ID:",
+              user._id
+            );
+          }
+        } else {
+          message.success("Signed in successfully!");
+          navigate("/");
+        }
+      } else {
+        console.error("currentUser is null or user data is missing.");
+        message.error("User data not found. Please try again.");
+      }
     } catch (error) {
       console.error("Google Sign-In Error:", error);
-      toast.error("Google Sign-In failed. Please try again.");
+      message.error("Google Sign-In failed. Please try again.");
     }
   };
 

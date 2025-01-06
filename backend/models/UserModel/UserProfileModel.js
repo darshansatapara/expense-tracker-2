@@ -33,6 +33,10 @@ const userProfileSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  category_completed: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Export model for the specific connection

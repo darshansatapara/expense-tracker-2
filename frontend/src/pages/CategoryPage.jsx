@@ -6,32 +6,18 @@ import CurrencyBudgetSelection from "../components/signupComponents/CurrencyBudg
 
 export default function CategoryPage() {
   const location = useLocation();
-  const { userId, email, profession } = location.state || {}; // Get the user data passed from ProfileSection
+  const { userId } = location.state || {}; // Get the user data passed from ProfileSection
   const subpath = location.pathname.split("/")[2]; // e.g., "subCategorySection"
 
   return (
     <div>
       {/* Pass user data to CategorySection or SubCategorySection */}
-      {!subpath && (
-        <CategorySection
-          userId={userId}
-          email={email}
-          profession={profession}
-        />
-      )}
+      {!subpath && <CategorySection userId={userId} />}
       {subpath === "subCategorySection" && (
-        <SubCategorySection
-          userId={userId}
-          email={email}
-          profession={profession}
-        />
+        <SubCategorySection userId={userId} />
       )}
       {subpath === "currencyBudgetSelection" && (
-        <CurrencyBudgetSelection
-          userId={userId}
-          email={email}
-          profession={profession}
-        />
+        <CurrencyBudgetSelection userId={userId} />
       )}
     </div>
   );

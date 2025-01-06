@@ -5,6 +5,8 @@ import {
   getUserById,
   googlesignin,
   signOut,
+  updateProfileStatus,
+  updateCategoryStatus,
 } from "../../controllers/UserController/userAuthController.js";
 
 const userAuthRoute = (userDbConnection) => {
@@ -20,6 +22,12 @@ const userAuthRoute = (userDbConnection) => {
   router.post("/googlesignin", googlesignin(userDbConnection));
   router.post("/signout", signOut); // Assuming signOut doesn't require the database connection
   router.get("/user/:userId", getUserById(userDbConnection));
+
+  // update the profile status when the profile is completed
+  router.put("/profilestatus", updateProfileStatus(userDbConnection));
+
+  // update the Categgory status when the profile is completed
+  router.put("/categorystatus", updateCategoryStatus(userDbConnection));
 
   return router;
 };
