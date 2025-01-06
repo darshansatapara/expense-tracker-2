@@ -1,5 +1,5 @@
 import React from "react";
-import { Layout, Menu, Avatar, Divider } from "antd";
+import { Layout, Menu, Avatar } from "antd";
 import {
   HomeOutlined,
   BarChartOutlined,
@@ -11,6 +11,35 @@ import {
 const { Sider } = Layout;
 
 export default function Sidebar({ onSelectItem, username = "User Name" }) {
+  // Menu items array for the new `items` prop
+  const menuItems = [
+    {
+      key: "Home",
+      icon: <HomeOutlined />,
+      label: "Home",
+    },
+    {
+      key: "Analysis",
+      icon: <BarChartOutlined />,
+      label: "Analysis",
+    },
+    {
+      key: "History",
+      icon: <HistoryOutlined />,
+      label: "History",
+    },
+    {
+      key: "Settings",
+      icon: <SettingOutlined />,
+      label: "Settings",
+    },
+    {
+      key: "Reports",
+      icon: <FileTextOutlined />,
+      label: "Reports",
+    },
+  ];
+
   return (
     <Sider
       width={300} // Increase width of the sidebar
@@ -35,48 +64,8 @@ export default function Sidebar({ onSelectItem, username = "User Name" }) {
           mode="inline"
           onClick={({ key }) => onSelectItem(key)} // Set selected item to display in Navbar
           className="bg-transparent border-none flex-1"
-        >
-          {/* Home */}
-          <Menu.Item key="Home" icon={<HomeOutlined />} className="font-nunito">
-            Home
-          </Menu.Item>
-
-          {/* Analysis */}
-          <Menu.Item
-            key="Analysis"
-            icon={<BarChartOutlined />}
-            className="font-nunito"
-          >
-            Analysis
-          </Menu.Item>
-
-          {/* History */}
-          <Menu.Item
-            key="History"
-            icon={<HistoryOutlined />}
-            className="font-nunito"
-          >
-            History
-          </Menu.Item>
-
-          {/* Settings */}
-          <Menu.Item
-            key="Settings"
-            icon={<SettingOutlined />}
-            className="font-nunito"
-          >
-            Settings
-          </Menu.Item>
-
-          {/* Reports */}
-          <Menu.Item
-            key="Reports"
-            icon={<FileTextOutlined />}
-            className="font-nunito"
-          >
-            Reports
-          </Menu.Item>
-        </Menu>
+          items={menuItems} // Updated to use `items` prop
+        />
 
         {/* Footer Logo */}
         <div className="flex justify-center items-center mt-auto mb-7">

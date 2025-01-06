@@ -5,6 +5,11 @@ import SignInPage from "./pages/SigninPage";
 import CategoryPage from "./pages/CategoryPage";
 import HomePage from "./pages/HomePage";
 import ContactusPage from "./pages/ContactPage";
+// import { Settings } from "lucide-react";
+import SettingsPage from "./pages/SettingPage";
+import PersonDetails from "./components/PersonalDetailsComponents/PersonalDetails";
+import HelpAndSupport from "./components/HelpandSupportcomponents/HelpandSupport";
+import PrivacyAndPolicy from "./pages/PrivacyPolicyPage";
 
 
 function App() {
@@ -18,6 +23,10 @@ function App() {
         <Route path="/category/*" element={<CategoryPage />} />
         <Route path="/" element={<HomePage />} />
         <Route path="/contactus" element={<ContactusPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/personaldetails" element={<PersonDetails />} />
+        <Route path="/helpandsupport" element={<HelpAndSupport />} />
+        <Route path="/privacyandpolicy" element={<PrivacyAndPolicy />} />
         {/* </Route> */}
       </Routes>
     </BrowserRouter>
