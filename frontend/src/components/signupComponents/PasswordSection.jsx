@@ -11,6 +11,7 @@ export default function PasswordSection() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const userMail = location.state?.user?.email || location.state?.email || "";
+  const username = location.state?.user?.name || location.state?.name || "";
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
@@ -26,6 +27,7 @@ export default function PasswordSection() {
     const userCredentials = {
       email: userMail,
       password: password,
+      name: username,
     };
 
     notification.success({

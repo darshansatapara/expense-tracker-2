@@ -73,6 +73,7 @@ export const userCategoryStore = create((set) => ({
   addCurrencyAndBudget: async (data) => {
     set({ isPostingCategory: true });
     try {
+      console.log("Adding currency and budget", data);
       const res = await axiosInstance.post(
         `/usercategories/addCurrencyAndBudget`,
         data

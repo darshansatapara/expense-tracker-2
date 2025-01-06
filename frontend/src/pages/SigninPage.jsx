@@ -25,9 +25,55 @@ export default function SignInPage() {
     };
 
     try {
+      console.log(payload);
       await signin(payload); // Call the store's signin function
-      message.success("Profile saved successfully!");
-      navigate("/");
+      // Wait for `currentUser` to update
+      const waitForCurrentUser = () =>
+        new Promise((resolve, reject) => {
+          const interval = setInterval(() => {
+            if (userStore.getState().currentUser) {
+              clearInterval(interval);
+              resolve(userStore.getState().currentUser);
+            }
+          }, 100); // Check every 100ms
+
+          // Timeout after 5 seconds
+          setTimeout(() => {
+            clearInterval(interval);
+            reject(
+              new Error("Failed to fetch currentUser after Google Sign-In.")
+            );
+          }, 1000);
+        });
+
+      const updatedUser = await waitForCurrentUser();
+
+      // Safeguard: Check if updatedUser exists and has the required structure
+      if (updatedUser && updatedUser.user) {
+        const { user } = updatedUser;
+        const userId = user._id;
+
+        if (!user.profile_complated) {
+          if (!user.category_completed) {
+            console.log("Navigating to /category with user ID:", user._id);
+            navigate("/category", { state: { userId: user._id } });
+          } else {
+            navigate("/category/currencyBudgetSelection", {
+              state: { userId: userId },
+            });
+            console.log(
+              "Navigating to /category/currencyBudgetSelection with user ID:",
+              user._id
+            );
+          }
+        } else {
+          message.success("Signed in successfully!");
+          navigate("/");
+        }
+      } else {
+        console.error("currentUser is null or user data is missing.");
+        message.error("User data not found. Please try again.");
+      }
     } catch (error) {
       console.error("Sign-in error:", error);
     }
