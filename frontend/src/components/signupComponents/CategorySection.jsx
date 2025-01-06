@@ -8,8 +8,8 @@ export default function CategorySection() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { userId, email, profession } = location.state || {};
-  const userData = { userId, email, profession };
+  const { userId } = location.state || {};
+  const userData = { userId };
   console.log(userData);
 
   const [selectedCategories, setSelectedCategories] = useState([]); // Store selected categories with empty subcategories
@@ -61,7 +61,7 @@ export default function CategorySection() {
 
       console.log(payload);
       navigate("/category/subCategorySection", {
-        state: { userData, payload, categoriesObject },
+        state: { userId, payload, categoriesObject },
       });
     } else {
       alert("Please select at least 3 categories.");

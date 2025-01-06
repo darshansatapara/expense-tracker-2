@@ -5,12 +5,15 @@ import { CurrencySelectorButton } from "../InputComponents/CurrencySelectorButto
 import SignupLeft from "./SignUpInContent/Signup_Left.jsx";
 import { toast } from "react-toastify";
 import { userCategoryStore } from "../../store/userCategoryStore.js";
+import { userStore } from "../../store/userStore.js";
 
 export default function CurrencyBudgetSelection() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { finalCategory, userData } = location.state || {};
+  const { userId } = location.state || {};
+
+  console.log(userId);
   const addCurrencyAndBudget = userCategoryStore(
     (state) => state.addCurrencyAndBudget
   );
@@ -58,7 +61,7 @@ export default function CurrencyBudgetSelection() {
 
     try {
       const budgetData = {
-        userId: userData.userId,
+        userId: userId,
         currencyCategory: selectedCurrency,
         budget: [{ offlineBudget, onlineBudget }],
       };
@@ -67,7 +70,10 @@ export default function CurrencyBudgetSelection() {
       console.log("Submitted Budget Data:", budgetData);
 
       await addCurrencyAndBudget(budgetData);
-      navigate("/", { state: { finalCategory, budgetData } });
+
+      await userStore.getState().markProfileAsCompleted(userId);
+
+      navigate("/", { state: { budgetData } });
     } catch (error) {
       console.error("Error submitting currency and budget:", error);
       toast.error("Failed to submit currency and budget.");

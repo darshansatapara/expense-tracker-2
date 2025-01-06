@@ -8,6 +8,9 @@ export const userStore = create((set) => ({
   isSigningIn: false,
   isSigningOut: false,
   isUpdatingProfile: false,
+  isUpdatingProfileStatus: false,
+  isUpdatingCategoryStatus: false,
+
   /**
    * Check if the user is authenticated.
    * @returns {boolean} True if authenticated, false otherwise.
@@ -26,6 +29,7 @@ export const userStore = create((set) => ({
       const res = await axiosInstance.post("/auth/signup", data);
       set({ currentUser: res.data.user }); // Save the user data locally
       toast.success("Account created successfully!");
+      console.log("user signup successful!");
       return res.data.user; // Return the user data to the caller
     } catch (error) {
       console.error("Signup error:", error);
@@ -33,6 +37,72 @@ export const userStore = create((set) => ({
       throw error; // Ensure the error propagates
     } finally {
       set({ isSigningUp: false });
+    }
+  },
+
+  /**
+   * Update the profile status to true when the user completes their signup process.
+   * @param {String} userId - ID of the user to update.
+   */
+  markProfileAsCompleted: async (userId) => {
+    set({ isUpdatingProfileStatus: true });
+    try {
+      // Call the backend API to update the profile_complated field
+      const res = await axiosInstance.put(`/auth/profilestatus`, {
+        userId,
+      });
+
+      // Update the local user data to reflect the change
+      set((state) => ({
+        currentUser: {
+          ...state.currentUser,
+          profile_complated: true,
+        },
+      }));
+
+      toast.success("Profile marked as completed!");
+      return res.data; // Return the response from the API
+    } catch (error) {
+      console.error("Error marking profile as completed:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to update profile status!"
+      );
+      throw error; // Ensure the error propagates
+    } finally {
+      set({ isUpdatingProfileStatus: false });
+    }
+  },
+
+  /**
+   * Update the category status to true when the user completes their category selection process.
+   * @param {String} userId - ID of the user to update.
+   */
+  markCategoryAsCompleted: async (userId) => {
+    set({ isUpdatingCategoryStatus: true });
+    try {
+      // Call the backend API to update the profile_complated field
+      const res = await axiosInstance.put(`/auth/categorystatus`, {
+        userId,
+      });
+
+      // Update the local user data to reflect the change
+      set((state) => ({
+        currentUser: {
+          ...state.currentUser,
+          category_completed: true,
+        },
+      }));
+
+      toast.success("Profile marked as completed!");
+      return res.data; // Return the response from the API
+    } catch (error) {
+      console.error("Error marking profile as completed:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to update profile status!"
+      );
+      throw error; // Ensure the error propagates
+    } finally {
+      set({ isUpdatingCategoryStatus: false });
     }
   },
 
@@ -59,8 +129,9 @@ export const userStore = create((set) => ({
     set({ isSigningIn: true });
     try {
       const res = await axiosInstance.post("/auth/googlesignin", data);
-      console.log(res);
+      console.log(res.data);
       set({ currentUser: res.data });
+
       toast.success("Signed in successfully!");
     } catch (error) {
       console.error("Signin error:", error);

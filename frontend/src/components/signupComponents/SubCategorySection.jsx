@@ -3,13 +3,14 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { SubCategoryInputButton } from "../InputComponents/SubCategoryInputButton";
 import SignupLeft from "./SignUpInContent/Signup_Left.jsx";
 import { userCategoryStore } from "../../store/userCategoryStore.js";
+import { userStore } from "../../store/userStore.js";
 
 export default function SubCategorySection() {
   const location = useLocation();
   const navigate = useNavigate();
 
   // Extract data passed from the previous step
-  const { payload, userData, categoriesObject } = location.state || {};
+  const { payload, userId, categoriesObject } = location.state || {};
   console.log("Payload:", payload);
   console.log("Categories Object:", categoriesObject);
 
@@ -79,12 +80,14 @@ export default function SubCategorySection() {
         console.log("Posting Data to Backend:", categoryData);
 
         await addExpenseCategory({
-          userId: userData?.userId,
+          userId: userId,
           expenseCategories: categoryData,
         });
 
-        navigate("/category/currencyBudgetSelection", {
-          state: { userData },
+        await userStore.getState().markCategoryAsCompleted(userId);
+
+        await navigate("/category/currencyBudgetSelection", {
+          state: { userId },
         });
       } catch (error) {
         console.error("Error Posting Data:", error);
