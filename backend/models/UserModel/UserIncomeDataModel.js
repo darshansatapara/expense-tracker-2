@@ -5,8 +5,16 @@ const incomeSchema = new mongoose.Schema({
   date: { type: String, required: true },
   mode: { type: String, enum: ["Online", "Offline"], required: true },
   amount: { type: String, required: true },
-  currency: { type: mongoose.Schema.Types.ObjectId, required: true },
-  category: { type: mongoose.Schema.Types.ObjectId, required: true },
+  currency: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "AdminCurrencyCategory",
+    required: true,
+  },
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "AdminIncomeCategory",
+  },
   note: { type: String, required: false },
 });
 

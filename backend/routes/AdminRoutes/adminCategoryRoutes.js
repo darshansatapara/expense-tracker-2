@@ -6,8 +6,9 @@ import {
   getAllAdminExpenseCategoriesIsActive,
   getAllAdminIncomeCategories,
   getAllAdminIncomeCategoriesIsActive,
-  removeSoftDeleteExpenseCategories,
-  removeSoftDeleteExpenseSubcategories,
+  restoreCurrencyCategories,
+  restoreExpenseCategories,
+  restoreExpenseSubcategories,
   softDeleteAdminCurrencyCategories,
   softDeleteExpenseCategories,
   softDeleteExpenseSubcategories,
@@ -39,15 +40,17 @@ const adminCategoryRoutes = (adminDbConnection, userDbConnection) => {
     "/updateExpenseCategoriesAndSubcategories",
     updateExpenseCategoriesAndSubcategories(adminDbConnection)
   );
-  // remove soft delete(mean make active : true) only in expense "category" in admin and user database
+  // restore soft delete(mean make active : true) only in expense "category" in admin and user database
+  // Restore soft-deleted expense categories
   router.put(
-    "/removeSoftDeleteExpenseCategories",
-    removeSoftDeleteExpenseCategories(adminDbConnection, userDbConnection)
+    "/restoreExpenseCategories",
+    restoreExpenseCategories(adminDbConnection, userDbConnection)
   );
-  // remove soft delete(mean make active : true) only in expense "sub-category" in admin and user database
+  // restore soft delete(mean make active : true) only in expense "sub-category" in admin and user database
+  // Restore soft-deleted expense subcategories
   router.put(
-    "/removeSoftDeleteExpenseSubCategories",
-    removeSoftDeleteExpenseSubcategories(adminDbConnection, userDbConnection)
+    "/restoreExpenseSubcategories",
+    restoreExpenseSubcategories(adminDbConnection, userDbConnection)
   );
 
   // soft delete expense categories in admin database and user database
@@ -84,6 +87,11 @@ const adminCategoryRoutes = (adminDbConnection, userDbConnection) => {
   router.get(
     "/allcurrencyCategoryIsActive",
     getAllAdminCurrencyCategoriesIsActive(adminDbConnection)
+  );
+
+  router.put(
+    "/restoreCurrencyCategories",
+    restoreCurrencyCategories(adminDbConnection, userDbConnection)
   );
 
   // make softdelete request to make currency categories active false and as per that we can also update user database

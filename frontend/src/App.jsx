@@ -11,7 +11,6 @@ import PersonDetails from "./components/PersonalDetailsComponents/PersonalDetail
 import HelpAndSupport from "./components/HelpandSupportcomponents/HelpandSupport";
 import PrivacyAndPolicy from "./pages/PrivacyPolicyPage";
 
-
 function App() {
   return (
     <BrowserRouter>
