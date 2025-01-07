@@ -39,10 +39,13 @@ dotenv.config(); // Load environment variables
     app.use("/api/otp", otpRoute);
     app.use("/api/auth", userAuthRoute(userDbConnection)); // Pass the user database connection to routes
     app.use(
-      "/api/expenses",
+      "/api/expense",
       userExpenseRoute(userDbConnection, adminDbConnection)
     );
-    app.use("/api/income", userIncomeRoute(userDbConnection));
+    app.use(
+      "/api/income",
+      userIncomeRoute(userDbConnection, adminDbConnection)
+    );
     app.use(
       "/api/usercategories",
       userCategoryRoute(userDbConnection, adminDbConnection)
