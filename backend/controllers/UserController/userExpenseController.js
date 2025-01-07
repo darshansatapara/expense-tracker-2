@@ -33,14 +33,14 @@ export const addUserExpense = (userDbConnection) => async (req, res) => {
 
   try {
     const UserExpenseModel = UserExpense(userDbConnection);
-    const formattedDate = dayjs(date).format("DD-MM-YYYY");
+    // const formattedDate = dayjs(date, "DD-MM-YYYY").format("DD-MM-YYYY");
 
     // Find user expenses for the given userId
     let userExpense = await UserExpenseModel.findOne({ userId });
 
     // Build the expense object
     const newExpense = {
-      date: formattedDate,
+      date,
       mode,
       amount,
       category,
@@ -55,7 +55,7 @@ export const addUserExpense = (userDbConnection) => async (req, res) => {
         userId,
         expenses: [
           {
-            date: formattedDate,
+            date: date,
             online: mode === "Online" ? [newExpense] : [],
             offline: mode === "Offline" ? [newExpense] : [],
           },
@@ -64,7 +64,7 @@ export const addUserExpense = (userDbConnection) => async (req, res) => {
     } else {
       // Check if an expense entry for the given date exists
       let expenseForDate = userExpense.expenses.find(
-        (exp) => exp.date === formattedDate
+        (exp) => exp.date === date
       );
 
       if (expenseForDate) {
@@ -77,7 +77,7 @@ export const addUserExpense = (userDbConnection) => async (req, res) => {
       } else {
         // Create a new entry for this date
         userExpense.expenses.push({
-          date: formattedDate,
+          date: date,
           online: mode === "Online" ? [newExpense] : [],
           offline: mode === "Offline" ? [newExpense] : [],
         });
