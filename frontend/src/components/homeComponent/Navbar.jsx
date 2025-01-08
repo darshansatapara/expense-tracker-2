@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Typography, Button, Image } from "antd";
-import { AlignJustify } from "lucide-react";
+import { Layout, Typography, Button } from "antd";
 import {
   HomeOutlined,
   BarChartOutlined,
@@ -8,15 +7,14 @@ import {
   SettingOutlined,
   FileTextOutlined,
 } from "@ant-design/icons";
-import MobileSidebar from "../MobileScreenComponents/SidebarMobileScreen"; // Importing the Mobile Sidebar component
 
 const { Header } = Layout;
 const { Text } = Typography;
 
-export default function Navbar({ selectedItem, setIsDesktopSidebarOpen }) {
+export default function Navbar({ selectedItem }) {
   const [currentContent, setCurrentContent] = useState(0);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Define dynamic content
   const content = [
     "Track your daily expenses effortlessly!",
     "Save more with smarter budgeting.",
@@ -25,6 +23,7 @@ export default function Navbar({ selectedItem, setIsDesktopSidebarOpen }) {
     "Visualize your financial goals today!",
   ];
 
+  // Cycle through content every 2 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentContent((prev) => (prev + 1) % content.length);
@@ -33,78 +32,35 @@ export default function Navbar({ selectedItem, setIsDesktopSidebarOpen }) {
     return () => clearInterval(interval);
   }, [content.length]);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-    setIsDesktopSidebarOpen(false); // Close the desktop sidebar when the mobile sidebar is opened
+  // Map icons based on selected item
+  const iconMap = {
+    Home: <HomeOutlined className="text-lg text-gray-700" />,
+    Analysis: <BarChartOutlined className="text-lg text-gray-700" />,
+    History: <HistoryOutlined className="text-lg text-gray-700" />,
+    Settings: <SettingOutlined className="text-lg text-gray-700" />,
+    Reports: <FileTextOutlined className="text-lg text-gray-700" />,
   };
 
   return (
-    <Layout className="bg-[#D9EAFD] shadow-lg px-2 py-2 font-nunito">
-      <Header className="bg-[#D9EAFD] flex items-center justify-between h-10 md:h-12 px-3 rounded-md">
-        {/* App Logo */}
-        <div className="block md:hidden mt-3 w-12 h-17">
-          <Image
-            src="/images/applogo.jpg"
-            alt="App Logo"
-            className="w-2 h-1" // Smaller width and height for the logo
-          />
-        </div>
+    <Header className="bg-[#B0D4F7] flex items-center justify-between px-4 py-2 shadow-md fixed top-0 left-72 w-[calc(100%-18rem)] h-16 z-20">
+      {/* Selected Item with Icon */}
+      <div className="flex items-center space-x-2">
+        {iconMap[selectedItem]}
+        <Text className="text-gray-700 text-sm font-semibold">{selectedItem}</Text>
+      </div>
 
-        {/* Selected Item */}
-        <div className="flex items-center space-x-1 hidden md:flex">
-          {selectedItem === "Home" && (
-            <HomeOutlined className="text-xl md:text-lg" />
-          )}
-          {selectedItem === "Analysis" && (
-            <BarChartOutlined className="text-xl md:text-lg" />
-          )}
-          {selectedItem === "History" && (
-            <HistoryOutlined className="text-xl md:text-lg" />
-          )}
-          {selectedItem === "Settings" && (
-            <SettingOutlined className="text-xl md:text-lg" />
-          )}
-          {selectedItem === "Reports" && (
-            <FileTextOutlined className="text-xl md:text-lg" />
-          )}
-          <Text className="text-gray-700 text-xs md:text-sm font-semibold">
-            {selectedItem}
-          </Text>
-        </div>
+      {/* Dynamic Content */}
+      <Text className="text-gray-500 text-xs truncate text-center">
+        {content[currentContent]}
+      </Text>
 
-        {/* Dynamic Content */}
-        <div className="flex-7 flex justify-center items-center hidden md:block">
-          <div className="bg-white bg-gray-100  shadow-md max-w-4xl w-full">
-            <Text className="text-gray-700 p-3 text-xs md:text-sm font-semibold text-center">
-              {content[currentContent]}
-            </Text>
-          </div>
-        </div>
-
-        {/* Sign Out Button */}
-        <div className="hidden md:block">
-          <Button
-            onClick={() => console.log("Signed Out")}
-            type="primary"
-            className="bg-red-500 text-white hover:bg-red-600 text-xs md:text-sm"
-          >
-            Sign Out
-          </Button>
-        </div>
-
-        {/* Hamburger Menu - Only show when the sidebar is NOT open */}
-        {!isSidebarOpen && (
-          <Button
-            type="primary"
-            onClick={toggleSidebar}
-            icon={<AlignJustify />}
-            className="block md:hidden bg-[#cfcfcf] text-red-500 hover:bg-red-600 font-nunito text-lg"
-          />
-        )}
-      </Header>
-
-      {/* Mobile Sidebar */}
-      {isSidebarOpen && <MobileSidebar onClose={toggleSidebar} />}
-    </Layout>
+      {/* Sign Out Button */}
+      <Button
+        type="primary"
+        className="bg-red-500 text-white hover:bg-red-600 text-xs px-4 py-1"
+      >
+        Sign Out
+      </Button>
+    </Header>
   );
 }

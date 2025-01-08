@@ -5,16 +5,17 @@ const Settings_Lower = () => {
   const navigate = useNavigate();
 
   const options = [
-    { label: "Personal Details", path: "/personal-details" },
-    { label: "Theme Settings", path: "/theme-settings" },
-    { label: "Category Management", path: "/category-management" },
-    { label: "Subcategory Management", path: "/subcategory-management" },
-    { label: "Currency Management", path: "/currency-management" },
-    { label: "Budget Management", path: "/budget-management" },
-    { label: "Contact Us", path: "/contact-us" },
-    { label: "Help & Support", path: "/help-support" },
+    { label: "Personal Details", path: "/settings/personal-details" },
+    { label: "Theme Settings", path: "/settings/theme-settings" },
+    { label: "Category Management", path: "/settings/category-management" },
+    { label: "Subcategory Management", path: "/settings/subcategory-management" },
+    { label: "Currency Management", path: "/settings/currency-management" },
+    { label: "Budget Management", path: "/settings/budget-management" },
+    { label: "Contact Us", path: "/settings/contact-us" },
+    { label: "Help & Support", path: "/settings/help-support" },
     { label: "Privacy Policy", path: "/privacy-policy" },
   ];
+  
 
   return (
     <div className="bg-[#E5E1DA] p-6 rounded-lg shadow-md font-nunito">
