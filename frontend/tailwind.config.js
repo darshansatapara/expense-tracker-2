@@ -15,7 +15,8 @@ export default {
         bounce: "bounce 2.5s ease-in-out infinite", // Set your preferred duration here
       },
       colors: {
-        'custom-light': '#F8FAFC',  // Make sure this is defined
+        'custom-light': '#F8FAFC',
+        lightBlue: '#D9EAFD'  // Make sure this is defined
       },
     },
   },
