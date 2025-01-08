@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 
 // Define the income schema for individual income entries
 const incomeSchema = new mongoose.Schema({
-  date: { type: String, required: true },
+  date: {
+    type: String,
+    required: true,
+  },
   mode: { type: String, enum: ["Online", "Offline"], required: true },
   amount: { type: String, required: true },
   currency: {
@@ -35,6 +38,8 @@ const userIncomeSchema = new mongoose.Schema({
 });
 
 // Create the UserIncome model
-const UserIncome = mongoose.model("UserIncomeData", userIncomeSchema);
 
+const UserIncome = (userDbConnection) => {
+  return userDbConnection.model("UserIncomeData", userIncomeSchema);
+};
 export default UserIncome;
