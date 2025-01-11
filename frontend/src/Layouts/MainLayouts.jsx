@@ -3,6 +3,7 @@ import { Layout } from "antd";
 import Navbar from "../components/homeComponent/Navbar";
 import Sidebar from "../components/homeComponent/Sidebar";
 import { Outlet } from "react-router-dom";
+import "../App.css"
 
 const { Content } = Layout;
 
@@ -40,7 +41,7 @@ export default function MainLayout() {
         />
 
         {/* Page Content */}
-        <Content className="flex-1 bg-gray-100 p-4 mt-12 overflow-y-auto ">
+        <Content className="flex-1 bg-gray-100 p-4  overflow-y-auto ">
           <Outlet  />
         </Content>
       </div>

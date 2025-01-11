@@ -33,7 +33,7 @@ export default function Navbar({ selectedItem, toggleSidebar }) {
   }, [content.length]);
 
   return (
-    <header className="bg-[#B0D4F7] flex items-center justify-between px-4 py-2 shadow-md fixed top-0 left-0 w-full h-12 md:left-72 md:w-[calc(100%-18rem)] md:h-16 z-30">
+    <header className="bg-[#B0D4F7] flex items-center justify-between px-4 py-2 shadow-md fixed top-0 left-0 w-full h-14 md:left-72 md:w-[calc(100%-18rem)] md:h-16 z-30">
       <div className="flex justify-start items-center mb-8 md:hidden block ml-4">
         <img
           src="/images/applogo.jpg"
