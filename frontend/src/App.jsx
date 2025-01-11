@@ -4,11 +4,7 @@ import SignupPage from "./pages/SignupPage";
 import SignInPage from "./pages/SigninPage";
 import CategoryPage from "./pages/CategoryPage";
 import HomePage from "./pages/HomePage";
-import ContactusPage from "./pages/ContactPage";
 import SettingsPage from "./pages/SettingPage";
-import PersonalDetails from "./components/PersonalDetailsComponents/PersonalDetails";
-import HelpAndSupport from "./components/HelpandSupportcomponents/HelpandSupport";
-import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import MainLayout from "./Layouts/MainLayouts";
 
 function App() {
@@ -26,12 +22,16 @@ function App() {
           {/* Main Application Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/category" element={<CategoryPage />} />
+<<<<<<< HEAD
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/contactus" element={<ContactusPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/personal-details" element={<PersonalDetails />} />
           <Route path="/help-and-support" element={<HelpAndSupport />} />
 
+=======
+          <Route path="/settings/*" element={<SettingsPage />} />
+>>>>>>> 35f9a147fbfe3dc61b0c9c738c8e5ec594599a39
           {/* Settings Routes */}
           {/* </Route> */}
         </Route>
