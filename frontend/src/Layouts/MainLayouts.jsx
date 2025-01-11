@@ -12,19 +12,26 @@ export default function MainLayout() {
   return (
     <Layout className="min-h-screen">
       {/* Sidebar - Fixed on the left */}
-      <div className="fixed top-0 left-0 h-full z-30 w-72 bg-white shadow-lg">
+      <div className="fixed top-0 left-0 h-full z-30 w-72 bg-white shadow-lg ">
         <Sidebar onSelectItem={setSelectedItem} />
       </div>
 
       {/* Main Content Area */}
       <Layout className="ml-72">
         {/* Navbar - Positioned at the top, right of the Sidebar */}
-        <div className="fixed top-0 left-72 z-20 w-[calc(100%-18rem)]  shadow-md">
+        <div className="fixed top-0 left-72 z-20 w-[calc(100%-18rem)] shadow-md bg-white">
           <Navbar selectedItem={selectedItem} />
         </div>
 
-        {/* Content - Rendered below the Navbar */}
-        <Content className="mt-16 p-4 overflow-y-auto h-[calc(100vh-4rem)] bg-gray-100">
+        {/* Content - Adjust spacing for Navbar and Sidebar */}
+        <Content
+          className="p-4 overflow-y-auto bg-gray-100"
+          style={{
+            marginTop: "4rem", // To account for Navbar height
+            marginLeft: "18rem", // To account for Sidebar width
+            height: "calc(100vh - 4rem)", // Full height minus Navbar
+          }}
+        >
           <Outlet /> {/* Render the content for each route here */}
         </Content>
       </Layout>

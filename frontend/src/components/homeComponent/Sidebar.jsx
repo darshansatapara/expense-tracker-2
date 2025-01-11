@@ -16,14 +16,36 @@ export default function Sidebar({ onSelectItem, username = "User Name" }) {
   // Define menu items and their respective route paths
   const menuItems = [
     { key: "Home", icon: <HomeOutlined />, label: "Home", route: "/" },
-    { key: "Analysis", icon: <BarChartOutlined />, label: "Analysis", route: "/analysis" },
-    { key: "History", icon: <HistoryOutlined />, label: "History", route: "/history" },
-    { key: "Settings", icon: <SettingOutlined />, label: "Settings", route: "/settings" },
-    { key: "Reports", icon: <FileTextOutlined />, label: "Reports", route: "/reports" },
+    {
+      key: "Analysis",
+      icon: <BarChartOutlined />,
+      label: "Analysis",
+      route: "/analysis",
+    },
+    {
+      key: "History",
+      icon: <HistoryOutlined />,
+      label: "History",
+      route: "/history",
+    },
+    {
+      key: "Settings",
+      icon: <SettingOutlined />,
+      label: "Settings",
+      route: "/settings",
+    },
+    {
+      key: "Reports",
+      icon: <FileTextOutlined />,
+      label: "Reports",
+      route: "/reports",
+    },
   ];
 
   // Retrieve selected key from localStorage (if available)
-  const selectedKey = localStorage.getItem("selectedItem") || menuItems.find(item => item.route === location.pathname)?.key;
+  const selectedKey =
+    localStorage.getItem("selectedItem") ||
+    menuItems.find((item) => item.route === location.pathname)?.key;
 
   useEffect(() => {
     // Persist the selected menu item in localStorage
@@ -34,11 +56,13 @@ export default function Sidebar({ onSelectItem, username = "User Name" }) {
   }, [onSelectItem]);
 
   return (
-    <div className="fixed top-0 left-0 h-full w-72  bg-[#B0D4F7] p-4 flex flex-col justify-between z-30">
+    <div className="fixed top-0 left-0 h-full w-72  bg-[#B0D4F7] p-4 flex flex-col justify-between z-30 ">
       {/* User Avatar */}
       <div className="mb-4 flex flex-col items-center">
         <Avatar size={80} icon={<img src="/images/user.png" alt="profile" />} />
-        <span className="mt-2 text-lg font-bold font-nunito text-gray-700">{username}</span>
+        <span className="mt-2 text-lg font-bold font-nunito text-gray-700">
+          {username}
+        </span>
       </div>
 
       {/* Menu */}
@@ -51,7 +75,7 @@ export default function Sidebar({ onSelectItem, username = "User Name" }) {
           localStorage.setItem("selectedItem", key);
         }}
         className="bg-transparent border-none flex-1"
-        items={menuItems.map(item => ({
+        items={menuItems.map((item) => ({
           key: item.key,
           icon: item.icon,
           label: <Link to={item.route}>{item.label}</Link>,
@@ -59,8 +83,12 @@ export default function Sidebar({ onSelectItem, username = "User Name" }) {
       />
 
       {/* Footer Logo */}
-      <div className="flex justify-center items-center mb-4">
-        <img src="/images/applogo.jpg" alt="App Logo" className="w-30 h-20" />
+      <div className="flex justify-center items-center mb-4 ">
+        <img
+          src="/images/applogo.jpg"
+          alt="App Logo"
+          className="w-30 h-20 rounded-md"
+        />
       </div>
 
       {/* Footer Text */}

@@ -23,16 +23,16 @@ function App() {
         <Route element={<MainLayout />}>
           {/* Uncomment the ProtectedRoute wrapper to enable authentication */}
           {/* <Route element={<ProtectedRoute />}> */}
-            {/* Main Application Routes */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/category" element={<CategoryPage />} />
-         <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/contactus" element={<ContactusPage />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-              <Route path="/personal-details" element={<PersonalDetails />} />
-              <Route path="/help-and-support" element={<HelpAndSupport />} />
+          {/* Main Application Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/category" element={<CategoryPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/contactus" element={<ContactusPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/personal-details" element={<PersonalDetails />} />
+          <Route path="/help-and-support" element={<HelpAndSupport />} />
 
-            {/* Settings Routes */}
+          {/* Settings Routes */}
           {/* </Route> */}
         </Route>
       </Routes>
