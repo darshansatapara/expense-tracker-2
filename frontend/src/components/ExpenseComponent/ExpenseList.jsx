@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Table, Button } from "antd";
 import "antd/dist/reset.css"; // Ensure Ant Design styles are applied
 import useUserExpenseStore from "../../store/userExpenseStore.js";
-import { userStore } from "../../store/userStore.js";
 
 const ExpenseList = () => {
-  const { userExpenses, loading, error, fetchUserExpenses, clearUserExpenses } =
+  const { userExpenses, loading, fetchUserExpenses, clearUserExpenses } =
     useUserExpenseStore();
 
   const userId = "67792e48b3085a94fc47b110";
@@ -46,7 +45,6 @@ const ExpenseList = () => {
   // Fetch expenses when userId, startDate, or endDate changes
   useEffect(() => {
     if (userId && startDate && endDate) {
-      console.log("Fetching expenses for:", userId, startDate, endDate);
       fetchUserExpenses(userId, startDate, endDate);
     }
 
@@ -72,17 +70,20 @@ const ExpenseList = () => {
   }
 
   // Combine online and offline expenses into a single array with a unique key
-  const formattedExpenses = userExpenses.flatMap((expenseGroup) =>
-    [...expenseGroup.online, ...expenseGroup.offline].map((expense) => ({
-      key: `${expenseGroup.date}-${expense.date}-${expense.amount}`,
-      date: formatDate(expense.date),
-      category: expense.category,
-      subcategory: expense.subcategory,
-      mode: expense.mode,
-      note: expense.note,
-      amount: `${expense.amount} ${expense.currency}`,
-    }))
-  );
+  const formattedExpenses =
+    userExpenses.flatMap((expenseGroup) =>
+      [...expenseGroup.online, ...expenseGroup.offline].map((expense) => ({
+        key: `${expenseGroup.date}-${expense.date}-${expense.amount}`,
+        date: formatDate(expense.date) || "N/A",
+        category: expense.category || "N/A",
+        subcategory: expense.subcategory || "N/A",
+        mode: expense.mode || "N/A",
+        note: expense.note || "N/A",
+        amount: expense.amount
+          ? `${expense.amount} ${expense.currency || ""}`
+          : "N/A",
+      }))
+    ) || [];
 
   // Define columns for the Ant Design Table
   const columns = [
@@ -108,7 +109,7 @@ const ExpenseList = () => {
       title: "Method",
       dataIndex: "mode",
       key: "mode",
-      width: 50,
+      width: 100,
     },
     {
       title: "Amount",
@@ -120,31 +121,36 @@ const ExpenseList = () => {
   ];
 
   return (
-    <>
-      <div className="flex justify-center gap-5">
-        <Button onClick={handleTodayClick}>Today</Button>
-        <Button onClick={handleYesterdayClick}>Yesterday</Button>
+    <div className="p-5 bg-gray-50 ">
+      <div className="flex justify-center gap-5 mb-5">
+        <Button onClick={handleTodayClick} className="rounded-lg">
+          Today
+        </Button>
+        <Button onClick={handleYesterdayClick} className="rounded-lg">
+          Yesterday
+        </Button>
       </div>
-      <div className="p-4 bg-gray-50 shadow-md rounded-lg">
-        {!error && userExpenses.length > 0 ? (
-          <div className="overflow-auto" style={{ maxHeight: "500px" }}>
-            <Table
-              dataSource={formattedExpenses}
-              columns={columns}
-              pagination={false}
-              bordered
-              className="rounded-lg"
-            />
-          </div>
-        ) : error ? (
-          <p className="text-center text-lg text-red-500">Error: {error}</p>
-        ) : (
-          <p className="text-center text-lg font-semibold">
+      <div className="p-4 bg-white shadow-md rounded-lg">
+        <div
+          className="overflow-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-300"
+          style={{ maxHeight: "500px" }}
+        >
+          <Table
+            dataSource={formattedExpenses.length > 0 ? formattedExpenses : []}
+            columns={columns}
+            pagination={false}
+            bordered
+            scroll={{ x: 700 }} // Enables horizontal scrolling
+            className="rounded-lg"
+          />
+        </div>
+        {formattedExpenses.length === 0 && (
+          <p className="text-center text-lg font-semibold mt-4">
             No expenses found.
           </p>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

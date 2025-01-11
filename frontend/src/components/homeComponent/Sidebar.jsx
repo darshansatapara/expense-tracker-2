@@ -45,11 +45,7 @@ export default function Sidebar({
     },
   ];
 
-<<<<<<< HEAD
-  // Retrieve selected key from localStorage (if available)
-=======
   // Get the selected key from localStorage or from the current pathname
->>>>>>> 35f9a147fbfe3dc61b0c9c738c8e5ec594599a39
   const selectedKey =
     localStorage.getItem("selectedItem") ||
     menuItems.find((item) => item.route === location.pathname)?.key;
@@ -62,42 +58,6 @@ export default function Sidebar({
     }
   }, [onSelectItem]);
 
-<<<<<<< HEAD
-  return (
-    <div className="fixed top-0 left-0 h-full w-72  bg-[#B0D4F7] p-4 flex flex-col justify-between z-30 ">
-      {/* User Avatar */}
-      <div className="mb-4 flex flex-col items-center">
-        <Avatar size={80} icon={<img src="/images/user.png" alt="profile" />} />
-        <span className="mt-2 text-lg font-bold font-nunito text-gray-700">
-          {username}
-        </span>
-      </div>
-
-      {/* Menu */}
-      <Menu
-        mode="inline"
-        selectedKeys={[selectedKey]} // Set the active menu item based on URL or saved key
-        onClick={({ key }) => {
-          onSelectItem(key);
-          // Store the selected item in local storage
-          localStorage.setItem("selectedItem", key);
-        }}
-        className="bg-transparent border-none flex-1"
-        items={menuItems.map((item) => ({
-          key: item.key,
-          icon: item.icon,
-          label: <Link to={item.route}>{item.label}</Link>,
-        }))}
-      />
-
-      {/* Footer Logo */}
-      <div className="flex justify-center items-center mb-4 ">
-        <img
-          src="/images/applogo.jpg"
-          alt="App Logo"
-          className="w-30 h-20 rounded-md"
-        />
-=======
   const sidebarContent = (
     <div className="flex flex-col h-full ">
       <div className="mb-4 flex flex-col items-center">
@@ -130,7 +90,6 @@ export default function Sidebar({
       {/* Logo for Sidebar only, hidden in Drawer */}
       <div className="flex justify-start items-center  mb-7 hidden md:block ml-10">
         <img src="/images/applogo.jpg" alt="App Logo" className="w-30 h-20" />
->>>>>>> 35f9a147fbfe3dc61b0c9c738c8e5ec594599a39
       </div>
       {/* Footer Text */}
       <div className="flex justify-center items-center text-sm text-gray-600 font-nunito mb-8 whitespace-nowrap ">
