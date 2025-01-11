@@ -5,14 +5,14 @@ import { Card } from "antd";
 
 export default function Main() {
   return (
-    <div className="p-4 gap-10 bg-gray-100 min-h-screen">
+    <div className="p-4  gap-10 bg-gray-100 min-h-screen">
       {/* Graphs Section */}
-      <div className="flex flex-col lg:flex-row gap-10">
+      <div className="flex flex-col md:flex-row gap-10">
         {/* Graph Container 1: Expense */}
-        <Card className="w-full lg:w-[48%] bg-blue-100 border border-blue-400">
+        <Card className="w-full h-full lg:w-[48%]  border  border-blue-400">
           <LineGraph
             title="Expense"
-            bgColor="bg-blue-100" // Light blue background for Expense graph
+            // Light blue background for Expense graph
           />
         </Card>
 
@@ -33,9 +33,9 @@ export default function Main() {
       </div>
 
       {/* Additional Graphs Section */}
-      <div className="flex flex-col lg:flex-row gap-10 mt-14">
+      <div className="flex flex-col md:flex-row gap-10 mt-14">
         {/* Graph Container 3: Expense */}
-        <Card className="w-full lg:w-[48%] bg-blue-100 border border-blue-400">
+        <Card className="w-full md:w-[48%] bg-blue-100 border  border-blue-400">
           <LineGraph
             title="Expense"
             bgColor="bg-blue-100" // Light blue background for Expense graph
@@ -43,7 +43,7 @@ export default function Main() {
         </Card>
 
         {/* Graph Container 4: Income */}
-        <Card className="w-full lg:w-[48%] bg-green-100 border border-green-400">
+        <Card className="w-full md:w-[48%] bg-green-100 border border-green-400">
           <LineGraph
             title="Income"
             bgColor="bg-green-100" // Light green background for Income graph

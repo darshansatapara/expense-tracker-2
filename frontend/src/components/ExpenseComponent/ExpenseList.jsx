@@ -132,8 +132,8 @@ const ExpenseList = () => {
       </div>
       <div className="p-4 bg-white shadow-md rounded-lg">
         <div
-          className="overflow-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-300"
-          style={{ maxHeight: "500px" }}
+          className="overflow-auto "
+          style={{ maxHeight: "42vh", maxWidth: "120vw" }}
         >
           <Table
             dataSource={formattedExpenses.length > 0 ? formattedExpenses : []}

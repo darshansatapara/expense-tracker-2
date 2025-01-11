@@ -50,7 +50,7 @@ const LineGraph = ({ title, bgColor }) => {
       </div>
 
       {/* Graph Container with Reduced Height */}
-      <div className="w-full h-[150px] md:h-[200px] lg:h-[250px]">
+      <div className="w-full h-[300px]">
         <Line {...config} />
       </div>
     </div>

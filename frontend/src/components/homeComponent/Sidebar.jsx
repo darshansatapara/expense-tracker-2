@@ -61,34 +61,39 @@ export default function Sidebar({
   const sidebarContent = (
     <div className="flex flex-col h-full ">
       <div className="mb-4 flex flex-col items-center">
-        <Avatar size={80} icon={<img src="/images/user.png" alt="profile" />} className="mt-6" />
+        <Avatar
+          size={80}
+          icon={<img src="/images/user.png" alt="profile" />}
+          className="mt-6"
+        />
         <span className="mt-4 text-lg font-bold text-gray-700">{username}</span>
       </div>
 
-
       <Menu
-  mode="inline"
-  selectedKeys={[selectedKey]} // The selected menu item
-  onClick={({ key }) => {
-    onSelectItem(key);
-    localStorage.setItem("selectedItem", key); // Save the selected key to localStorage
-    onClose(); // Close the drawer after selecting an item
-  }}
-  className="bg-transparent border-none flex-1 space-y-4 py-4 px-6"
-  items={menuItems.map((item) => ({
-    key: item.key,
-    icon: <span className="text-xl">{item.icon}</span>, // Adjust icon size for better visibility
-    label: (
-      <Link to={item.route} className="text-gray-700 hover:text-blue-600 font-semibold transition-all duration-300 ease-in-out">
-        {item.label}
-      </Link>
-    ), // Wrap the label with Link for navigation and added hover effects
-  }))}
-/>
+        mode="inline"
+        selectedKeys={[selectedKey]} // The selected menu item
+        onClick={({ key }) => {
+          onSelectItem(key);
+          localStorage.setItem("selectedItem", key); // Save the selected key to localStorage
+          onClose(); // Close the drawer after selecting an item
+        }}
+        className="bg-transparent border-none flex-1 space-y-4 py-4 px-6"
+        items={menuItems.map((item) => ({
+          key: item.key,
+          icon: <span className="text-xl">{item.icon}</span>, // Adjust icon size for better visibility
+          label: (
+            <Link
+              to={item.route}
+              className="text-gray-700 hover:text-blue-600 font-semibold transition-all duration-300 ease-in-out"
+            >
+              {item.label}
+            </Link>
+          ), // Wrap the label with Link for navigation and added hover effects
+        }))}
+      />
 
-      
       {/* Logo for Sidebar only, hidden in Drawer */}
-      <div className="flex justify-start items-center  mb-7 hidden md:block ml-10">
+      <div className=" justify-start items-center  mb-7 hidden lg:block ml-10">
         <img src="/images/applogo.jpg" alt="App Logo" className="w-30 h-20" />
       </div>
       {/* Footer Text */}
@@ -101,7 +106,7 @@ export default function Sidebar({
   return (
     <>
       {/* Desktop Sidebar - visible on medium and larger screens */}
-      <div className="fixed top-0 left-0 h-full w-72 bg-[#B0D4F7] hidden md:block p-4">
+      <div className="fixed top-0 left-0 h-full w-72 bg-[#B0D4F7] hidden lg:block p-4">
         {sidebarContent}
       </div>
 
@@ -110,7 +115,7 @@ export default function Sidebar({
         placement="left"
         onClose={onClose}
         open={isVisible} // Controlled by the parent component
-        width={250} // You can adjust the width here
+        width={"50%"} // You can adjust the width here
         className="!bg-[#B0D4F7] !border-none !bg-opacity-80" // Apply custom Tailwind styles to the drawer
       >
         {sidebarContent}

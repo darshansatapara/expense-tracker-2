@@ -33,8 +33,8 @@ export default function Navbar({ selectedItem, toggleSidebar }) {
   }, [content.length]);
 
   return (
-    <header className="bg-[#B0D4F7] flex items-center justify-between px-4 py-2 shadow-md fixed top-0 left-0 w-full h-12 md:left-72 md:w-[calc(100%-18rem)] md:h-16 z-30">
-      <div className="flex justify-start items-center mb-8 md:hidden block ml-4">
+    <header className="bg-[#B0D4F7] flex items-center justify-between px-4 py-2 shadow-md fixed top-0 left-0 w-full h-12 lg:left-72 lg:w-[calc(100%-18rem)] lg:h-16 z-30">
+      <div className=" justify-start items-center mb-8 lg:hidden block ml-4">
         <img
           src="/images/applogo.jpg"
           alt="App Logo"
@@ -51,19 +51,18 @@ export default function Navbar({ selectedItem, toggleSidebar }) {
       </div>
 
       {/* Dynamic Content */}
-      <span className="text-gray-500 text-lg   truncate hidden md:block">
+      <span className="text-gray-500 text-lg   truncate hidden lg:block">
         {content[currentContent] || "Default Content"} {/* Safeguard */}
       </span>
 
       {/* Sign Out Button */}
-      <button className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 text-white px-5 py-2 text-sm font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out hidden md:block">
-  Sign Out
-</button>
-
+      <button className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 text-white px-5 py-2 text-sm font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out hidden lg:block">
+        Sign Out
+      </button>
 
       {/* Hamburger Menu for Mobile */}
       <button
-        className="md:hidden text-white focus:outline-none flex items-center justify-center w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-500 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 ease-in-out"
+        className="lg:hidden text-white focus:outline-none flex items-center justify-center w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-500 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 ease-in-out"
         onClick={toggleSidebar}
       >
         <MenuOutlined className="text-lg" /> {/* Ant Design Menu icon */}
