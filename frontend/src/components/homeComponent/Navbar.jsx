@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Layout, Typography, Button, Image } from "antd";
-import { AlignJustify } from "lucide-react";
+import { MenuOutlined } from "@ant-design/icons";
 import {
   HomeOutlined,
   BarChartOutlined,
@@ -8,15 +7,9 @@ import {
   SettingOutlined,
   FileTextOutlined,
 } from "@ant-design/icons";
-import MobileSidebar from "../MobileScreenComponents/SidebarMobileScreen"; // Importing the Mobile Sidebar component
 
-const { Header } = Layout;
-const { Text } = Typography;
-
-export default function Navbar({ selectedItem, setIsDesktopSidebarOpen }) {
+export default function Navbar({ selectedItem, toggleSidebar }) {
   const [currentContent, setCurrentContent] = useState(0);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   const content = [
     "Track your daily expenses effortlessly!",
     "Save more with smarter budgeting.",
@@ -24,87 +17,57 @@ export default function Navbar({ selectedItem, setIsDesktopSidebarOpen }) {
     "Stay on top of your spending habits.",
     "Visualize your financial goals today!",
   ];
+  const iconMap = {
+    Home: <HomeOutlined className="text-lg text-gray-700" />,
+    Analysis: <BarChartOutlined className="text-lg text-gray-700" />,
+    History: <HistoryOutlined className="text-lg text-gray-700" />,
+    Settings: <SettingOutlined className="text-lg text-gray-700" />,
+    Reports: <FileTextOutlined className="text-lg text-gray-700" />,
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentContent((prev) => (prev + 1) % content.length);
     }, 2000);
-
     return () => clearInterval(interval);
   }, [content.length]);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-    setIsDesktopSidebarOpen(false); // Close the desktop sidebar when the mobile sidebar is opened
-  };
-
   return (
-    <Layout className="bg-[#D9EAFD] shadow-lg px-2 py-2 font-nunito">
-      <Header className="bg-[#D9EAFD] flex items-center justify-between h-10 md:h-12 px-3 rounded-md">
-        {/* App Logo */}
-        <div className="block md:hidden mt-3 w-12 h-17">
-          <Image
-            src="/images/applogo.jpg"
-            alt="App Logo"
-            className="w-2 h-1" // Smaller width and height for the logo
-          />
-        </div>
+    <header className="bg-[#B0D4F7] flex items-center justify-between px-4 py-2 shadow-md fixed top-0 left-0 w-full h-12 md:left-72 md:w-[calc(100%-18rem)] md:h-16 z-30">
+      <div className="flex justify-start items-center mb-8 md:hidden block ml-4">
+        <img
+          src="/images/applogo.jpg"
+          alt="App Logo"
+          className="w-18 h-10 mt-7"
+        />
+      </div>
 
-        {/* Selected Item */}
-        <div className="flex items-center space-x-1 hidden md:flex">
-          {selectedItem === "Home" && (
-            <HomeOutlined className="text-xl md:text-lg" />
-          )}
-          {selectedItem === "Analysis" && (
-            <BarChartOutlined className="text-xl md:text-lg" />
-          )}
-          {selectedItem === "History" && (
-            <HistoryOutlined className="text-xl md:text-lg" />
-          )}
-          {selectedItem === "Settings" && (
-            <SettingOutlined className="text-xl md:text-lg" />
-          )}
-          {selectedItem === "Reports" && (
-            <FileTextOutlined className="text-xl md:text-lg" />
-          )}
-          <Text className="text-gray-700 text-xs md:text-sm font-semibold">
-            {selectedItem}
-          </Text>
-        </div>
+      {/* Selected Item */}
+      <div className="md:flex items-center space-x-2">
+        {iconMap[selectedItem]}
+        <span className="text-gray-700 text-lg font-semibold">
+          {selectedItem}
+        </span>
+      </div>
 
-        {/* Dynamic Content */}
-        <div className="flex-7 flex justify-center items-center hidden md:block">
-          <div className="bg-white bg-gray-100  shadow-md max-w-4xl w-full">
-            <Text className="text-gray-700 p-3 text-xs md:text-sm font-semibold text-center">
-              {content[currentContent]}
-            </Text>
-          </div>
-        </div>
+      {/* Dynamic Content */}
+      <span className="text-gray-500 text-lg   truncate hidden md:block">
+        {content[currentContent] || "Default Content"} {/* Safeguard */}
+      </span>
 
-        {/* Sign Out Button */}
-        <div className="hidden md:block">
-          <Button
-            onClick={() => console.log("Signed Out")}
-            type="primary"
-            className="bg-red-500 text-white hover:bg-red-600 text-xs md:text-sm"
-          >
-            Sign Out
-          </Button>
-        </div>
+      {/* Sign Out Button */}
+      <button className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 text-white px-5 py-2 text-sm font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out hidden md:block">
+  Sign Out
+</button>
 
-        {/* Hamburger Menu - Only show when the sidebar is NOT open */}
-        {!isSidebarOpen && (
-          <Button
-            type="primary"
-            onClick={toggleSidebar}
-            icon={<AlignJustify />}
-            className="block md:hidden bg-[#cfcfcf] text-red-500 hover:bg-red-600 font-nunito text-lg"
-          />
-        )}
-      </Header>
 
-      {/* Mobile Sidebar */}
-      {isSidebarOpen && <MobileSidebar onClose={toggleSidebar} />}
-    </Layout>
+      {/* Hamburger Menu for Mobile */}
+      <button
+        className="md:hidden text-white focus:outline-none flex items-center justify-center w-8 h-8 bg-gradient-to-r from-purple-600 to-pink-500 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 ease-in-out"
+        onClick={toggleSidebar}
+      >
+        <MenuOutlined className="text-lg" /> {/* Ant Design Menu icon */}
+      </button>
+    </header>
   );
 }

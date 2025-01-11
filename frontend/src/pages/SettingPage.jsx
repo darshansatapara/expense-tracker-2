@@ -1,56 +1,41 @@
 import React, { useState, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
 import Settings_Upper from "../components/SettingsComponents/Settings_Upper";
 import Settings_Lower from "../components/SettingsComponents/Settings_Lower";
-import SettingsMobile from "../components/MobileScreenComponents/SettingsmobileScreen";
-import Navbar from '../components/homeComponent/Navbar/'
+import PersonalDetails from "../components/SettingsComponents/PersonalDetails";
+import ThemeSettings from "../components/SettingsComponents/Theme";
+import CategoryManagement from "../components/SettingsComponents/CategoryManagment";
+import SubcategoryManagement from "../components/SettingsComponents/SubCategoryManagment";
+import CurrencyManagement from "../components/SettingsComponents/CurrencyManagment";
+import BudgetManagement from "../components/SettingsComponents/BudgetManagment";
+import ContactUs from "../components/SettingsComponents/Contactus";
+import HelpSupport from "../components/SettingsComponents/HelpandSupport";
+import PrivacyPolicy from "../components/SettingsComponents/PrivacyAndPolicy";
 
 const SettingsPage = () => {
   const [isMobile, setIsMobile] = useState(false);
 
-  // Detect screen size
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768); // Set breakpoint for mobile
-    };
-
-    handleResize(); // Check on initial render
-    window.addEventListener("resize", handleResize); // Add event listener
-
-    return () => {
-      window.removeEventListener("resize", handleResize); // Cleanup
-    };
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
-    <div>
-      {isMobile ? (
-        // Mobile View
-        <div className="p-4 bg-gray-50 min-h-screen">
-          <SettingsMobile />
-        </div>
-      ) : (
-        // Desktop View
-        <div className="flex">
-          {/* Sidebar */}
-          <div className="w-1/6 bg-gray-100 h-screen shadow-md">
-            <h2 className="text-lg font-bold p-4">Sidebar</h2>
-          </div>
+    <div className="min-h-screen bg-gray-50">
+      {isMobile ? null : <Settings_Upper />}{" "}
+      {/* Hide Settings_Upper on mobile */}
+      <div
+  className={`p-4 ${
+    isMobile
+      ? "w-full max-w-sm mx-auto" // For mobile: full width with a maximum width
+      : "max-w-4xl mx-auto" // For larger screens: centered and max width
+  }`}
+>
+  <Settings_Lower />
+</div>
 
-          {/* Main Content Area */}
-          <div className="flex-1 flex flex-col  bg-gray-50 min-h-screen">
-            {/* Navbar */}
-            <div className="bg-white shadow-md p-4 sticky top-0 z-10">
-              <h1 className="text-xl font-bold">Navbar</h1>
-            </div>
-
-            {/* Content Area */}
-            <div className="flex flex-col space-y-6 mt-6">
-              <Settings_Upper />
-              <Settings_Lower />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
