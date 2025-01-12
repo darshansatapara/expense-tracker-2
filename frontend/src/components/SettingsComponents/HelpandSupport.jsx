@@ -72,7 +72,6 @@ const HelpAndSupport = () => {
         </span>
       ),
     },
-    
     {
       question: "Can I share my account with others?",
       answer:
@@ -87,7 +86,7 @@ const HelpAndSupport = () => {
       question: "How can I view my transaction history?",
       answer:
         "You can view your transaction history by going to the 'History' page, where all your past expenses are listed with options to filter and search.",
-    },    
+    },
     {
       question: "What happens if I forget my login credentials?",
       answer:
@@ -97,7 +96,7 @@ const HelpAndSupport = () => {
       question: "How can I manage categories and subcategories?",
       answer:
         "To manage categories and subcategories, go to the 'Settings' page, then navigate to the 'Category and Subcategory Management' option, where you can add or remove categories and subcategories as needed.",
-    },    
+    },
   ];
 
   return (
@@ -115,15 +114,15 @@ const HelpAndSupport = () => {
         </h2>
 
         {/* FAQ Sections */}
-        <div className="grid grid-cols-1  md:grid-cols-2 gap-8 font-nunito">
+        <div className="grid grid-cols-1 sm-plus:grid-cols-1 md:grid-cols-2 gap-8 font-nunito">
           {faqList.map((item, index) => (
             <div
               key={index}
-              className="bg-[#E5E1DA] p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+              className="bg-[#E5E1DA] p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 "
             >
               <button
                 onClick={() => handleDropdownClick(index)}
-                className="w-full text-left font-medium text-lg flex justify-between items-center"
+                className="w-full text-left font-medium text-lg flex justify-between items-center "
               >
                 <span>{item.question}</span>
                 <span
@@ -154,11 +153,11 @@ const HelpAndSupport = () => {
       </div>
 
       {/* Feedback Box */}
-      <div className="bg-white p-8 rounded-lg shadow-lg space-y-6">
+      <div className="p-8 rounded-lg shadow-lg space-y-6">
         <textarea
           value={feedback}
           onChange={handleFeedbackChange}
-          className="w-full p-4 border bg-[#DFF2E3] border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+          className="w-full p-4 border bg-gray-100 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
           placeholder="Write your feedback here..."
           rows="5"
         />
