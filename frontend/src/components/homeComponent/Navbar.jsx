@@ -57,9 +57,8 @@ export default function Navbar({ selectedItem, toggleSidebar }) {
 
       {/* Sign Out Button */}
       <button className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 text-white px-5 py-2 text-sm font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out hidden md:block">
-  Sign Out
-</button>
-
+        Sign Out
+      </button>
 
       {/* Hamburger Menu for Mobile */}
       <button
