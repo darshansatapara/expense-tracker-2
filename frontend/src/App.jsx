@@ -5,6 +5,7 @@ import SignInPage from "./pages/SigninPage";
 import CategoryPage from "./pages/CategoryPage";
 import HomePage from "./pages/HomePage";
 import SettingsPage from "./pages/SettingPage";
+import HistoryPage from "./pages/HistoryPage";
 import MainLayout from "./Layouts/MainLayouts";
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/settings/*" element={<SettingsPage />} />
+          <Route path="/history" element={<HistoryPage />} />
           {/* Settings Routes */}
           {/* </Route> */}
         </Route>
