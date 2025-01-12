@@ -5,6 +5,7 @@ import SignInPage from "./pages/SigninPage";
 import CategoryPage from "./pages/CategoryPage";
 import HomePage from "./pages/HomePage";
 import SettingsPage from "./pages/SettingPage";
+import HistoryPage from "./pages/HistoryPage";
 import MainLayout from "./Layouts/MainLayouts";
 import AnalysisPage from "./pages/AnalysisPage";
 import HistoryPage from "./pages/HistoryPage";
@@ -26,11 +27,14 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/settings/*" element={<SettingsPage />} />
-          <Route path="/analysis" element={<AnalysisPage />} />
           <Route path="/history" element={<HistoryPage />} />
+
+
+          <Route path="/analysis" element={<AnalysisPage />} />
+        
           <Route path="/reports" element={<ReportPage />} />
-           {/* Settings Routes */}
-          {/* </Route> */}
+
+       
         </Route>
       </Routes>
     </BrowserRouter>

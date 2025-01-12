@@ -15,13 +15,13 @@ export default {
         bounce: "bounce 2.5s ease-in-out infinite", // Set your preferred duration here
       },
       colors: {
-        'custom-light': '#F8FAFC',
-        lightBlue: '#D9EAFD'  // Make sure this is defined
+        "custom-light": "#F8FAFC",
+        lightBlue: "#D9EAFD", // Make sure this is defined
       },
       screens:{
         'sm-plus': {'max':'1139px'}
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwind-scrollbar")],
 };
