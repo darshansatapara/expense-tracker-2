@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import dayjs from "dayjs";
 import { HistoryEntry } from "../components/HistoryPageComponent/HistoryEntry";
@@ -90,3 +91,4 @@ const HistoryPage = () => {
 };
 
 export default HistoryPage;
+

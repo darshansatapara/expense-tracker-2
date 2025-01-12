@@ -18,6 +18,9 @@ export default {
         "custom-light": "#F8FAFC",
         lightBlue: "#D9EAFD", // Make sure this is defined
       },
+      screens:{
+        'sm-plus': {'max':'1139px'}
+      },
     },
   },
   plugins: [require("tailwind-scrollbar")],

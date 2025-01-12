@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Settings_Upper from "../components/SettingsComponents/Settings_Upper";
 import Settings_Lower from "../components/SettingsComponents/Settings_Lower";
+import ContactUs from "../components/SettingsComponents/Contactus";
 import PersonalDetails from "../components/SettingsComponents/PersonalDetails";
 import ThemeSettings from "../components/SettingsComponents/Theme";
 import CategoryManagement from "../components/SettingsComponents/CategoryManagment";
 import SubcategoryManagement from "../components/SettingsComponents/SubCategoryManagment";
 import CurrencyManagement from "../components/SettingsComponents/CurrencyManagment";
 import BudgetManagement from "../components/SettingsComponents/BudgetManagment";
-import ContactUs from "../components/SettingsComponents/Contactus";
 import HelpSupport from "../components/SettingsComponents/HelpandSupport";
 import PrivacyPolicy from "../components/SettingsComponents/PrivacyAndPolicy";
 
 const SettingsPage = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -22,20 +23,39 @@ const SettingsPage = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Check if the current route is the main settings page
+  const isMainSettingsPage = location.pathname === "/settings";
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {isMobile ? null : <Settings_Upper />}{" "}
-      {/* Hide Settings_Upper on mobile */}
-      <div
-  className={`p-4 ${
-    isMobile
-      ? "w-full max-w-sm mx-auto" // For mobile: full width with a maximum width
-      : "max-w-4xl mx-auto" // For larger screens: centered and max width
-  }`}
->
-  <Settings_Lower />
-</div>
+      {/* Render Settings_Upper only if it's the main settings page and not mobile */}
+      {!isMobile && isMainSettingsPage && <Settings_Upper />}
 
+      <div
+        className={` ${
+          isMobile
+            ? "max-w-full " // Mobile-specific styles
+            : "max-w-full  " // Larger screens
+        }`}
+      >
+        {isMainSettingsPage ? (
+          // Render Settings_Lower only on the main settings page
+          <Settings_Lower />
+        ) : (
+          // Render Routes for submenu items
+          <Routes>
+            <Route path="contact-us" element={<ContactUs />} />
+            <Route path="personal-details" element={<PersonalDetails />} />
+            <Route path="theme-settings" element={<ThemeSettings />} />
+            <Route path="category-management" element={<CategoryManagement />} />
+            <Route path="subcategory-management" element={<SubcategoryManagement />} />
+            <Route path="currency-management" element={<CurrencyManagement />} />
+            <Route path="budget-management" element={<BudgetManagement />} />
+            <Route path="help-support" element={<HelpSupport />} />
+            <Route path="privacy-policy" element={<PrivacyPolicy />} />
+          </Routes>
+        )}
+      </div>
     </div>
   );
 };
