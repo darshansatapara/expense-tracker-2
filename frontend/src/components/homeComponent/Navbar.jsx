@@ -33,7 +33,7 @@ export default function Navbar({ selectedItem, toggleSidebar }) {
   }, [content.length]);
 
   return (
-    <header className="bg-[#B0D4F7] flex items-center justify-between px-4 py-2 shadow-md fixed top-0 left-0 w-full h-12 lg:left-72 lg:w-[calc(100%-18rem)] lg:h-16 z-30">
+    <header className="bg-[fff] bg-opacity-80 backdrop-blur-md shadow-sm flex items-center justify-between px-4 py-2 fixed border top-0 left-0 w-full h-12 lg:left-72 lg:w-[calc(100%-18rem)] lg:h-16 z-30">
       <div className=" justify-start items-center mb-8 lg:hidden block ml-4">
         <img
           src="/images/applogo.jpg"
@@ -45,13 +45,11 @@ export default function Navbar({ selectedItem, toggleSidebar }) {
       {/* Selected Item */}
       <div className="md:flex items-center space-x-2">
         {iconMap[selectedItem]}
-        <span className="text-gray-700 text-lg font-semibold">
-          {selectedItem}
-        </span>
+        <span className=" text-lg font-semibold">{selectedItem}</span>
       </div>
 
       {/* Dynamic Content */}
-      <span className="text-gray-500 text-lg   truncate hidden lg:block">
+      <span className="text-[#696d75] text-lg   truncate hidden lg:block">
         {content[currentContent] || "Default Content"} {/* Safeguard */}
       </span>
 

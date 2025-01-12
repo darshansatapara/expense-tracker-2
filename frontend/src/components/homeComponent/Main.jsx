@@ -5,11 +5,11 @@ import { Card } from "antd";
 
 export default function Main() {
   return (
-    <div className="p-4  gap-10 bg-gray-100 min-h-screen">
+    <div className="pt-4 bg-[#fff] min-h-screen ">
       {/* Graphs Section */}
-      <div className="flex flex-col md:flex-row gap-10">
+      <div className="flex flex-col md:flex-row gap-10 ">
         {/* Graph Container 1: Expense */}
-        <Card className="w-full h-full lg:w-[48%]  border  border-blue-400">
+        <Card className="w-full h-full lg:w-[48%] border-2 border-indigo-500  ">
           <LineGraph
             title="Expense"
             // Light blue background for Expense graph
@@ -17,7 +17,7 @@ export default function Main() {
         </Card>
 
         {/* Graph Container 2: Income */}
-        <Card className="w-full lg:w-[48%] bg-green-100 border border-green-400">
+        <Card className="w-full lg:w-[48%]  border-2 border-indigo-500">
           <LineGraph
             title="Income"
             bgColor="bg-green-100" // Light green background for Income graph
@@ -27,7 +27,7 @@ export default function Main() {
 
       {/* Expense List Section */}
       <div className="mt-14">
-        <Card className="w-full bg-[#D9D9D9] border border-green-400">
+        <Card className="w-full  border-2 border-indigo-500">
           <ExpenseList />
         </Card>
       </div>
@@ -35,7 +35,7 @@ export default function Main() {
       {/* Additional Graphs Section */}
       <div className="flex flex-col md:flex-row gap-10 mt-14">
         {/* Graph Container 3: Expense */}
-        <Card className="w-full md:w-[48%] bg-blue-100 border  border-blue-400">
+        <Card className="w-full md:w-[48%]  border-2 border-indigo-500 ">
           <LineGraph
             title="Expense"
             bgColor="bg-blue-100" // Light blue background for Expense graph
@@ -43,7 +43,7 @@ export default function Main() {
         </Card>
 
         {/* Graph Container 4: Income */}
-        <Card className="w-full md:w-[48%] bg-green-100 border border-green-400">
+        <Card className="w-full md:w-[48%] border-2 border-indigo-500">
           <LineGraph
             title="Income"
             bgColor="bg-green-100" // Light green background for Income graph

@@ -121,7 +121,8 @@ const ExpenseList = () => {
   ];
 
   return (
-    <div className="p-5 bg-gray-50 ">
+    <>
+      
       <div className="flex justify-center gap-5 mb-5">
         <Button onClick={handleTodayClick} className="rounded-lg">
           Today
@@ -144,13 +145,9 @@ const ExpenseList = () => {
             className="rounded-lg"
           />
         </div>
-        {formattedExpenses.length === 0 && (
-          <p className="text-center text-lg font-semibold mt-4">
-            No expenses found.
-          </p>
-        )}
+        
       </div>
-    </div>
+    </>
   );
 };
 

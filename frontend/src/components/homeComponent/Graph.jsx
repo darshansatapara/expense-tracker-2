@@ -36,11 +36,9 @@ const LineGraph = ({ title, bgColor }) => {
   };
 
   return (
-    <div
-      className={`flex flex-col items-center justify-center ${bgColor} shadow-lg rounded-lg w-full p-4 relative`}
-    >
+    <div className="flex flex-col items-center justify-center rounded-lg w-full relative">
       {/* Graph Title */}
-      <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-800 mb-4 text-center">
+      <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-gray-500 mb-4 text-center">
         {title}
       </h2>
 

@@ -40,7 +40,7 @@ export default function MainLayout() {
         />
 
         {/* Page Content */}
-        <Content className="flex-1 bg-gray-100 p-4 mt-12 overflow-y-auto ">
+        <Content className="flex-1  p-4 mt-12 bg-black ">
           <Outlet />
         </Content>
       </div>
