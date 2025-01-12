@@ -3,7 +3,7 @@ import { Layout } from "antd";
 import Navbar from "../components/homeComponent/Navbar";
 import Sidebar from "../components/homeComponent/Sidebar";
 import { Outlet } from "react-router-dom";
-import "../App.css"
+import "../App.css";
 
 const { Content } = Layout;
 

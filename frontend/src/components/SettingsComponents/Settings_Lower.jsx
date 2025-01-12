@@ -18,7 +18,7 @@ const Settings_Lower = () => {
   ];
 
   return (
-    <div className="bg-[#E5E1DA] p-7 rounded-lg shadow-md font-nunito mt-4">
+    <div className="bg-[#dfdbdb] p-7 rounded-lg shadow-md font-nunito mt-4">
       <ul className="space-y-4">
         {/* Loop through options to render each navigation item */}
         {options.map((option, index) => (

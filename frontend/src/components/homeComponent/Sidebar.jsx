@@ -100,7 +100,7 @@ export default function Sidebar({
       />
 
       {/* Logo for Sidebar only, hidden in Drawer */}
-      <div className=" justify-start items-center   mb-7 hidden lg:block ml-10">
+      <div className=" justify-start items-center mb-7 hidden lg:block ml-10">
         <img
           src="/images/applogo.jpg"
           alt="App Logo"
@@ -113,20 +113,24 @@ export default function Sidebar({
   return (
     <>
       {/* Desktop Sidebar - visible on medium and larger screens */}
-      <div className="fixed top-0 left-0 h-full w-72 bg-[#fff] border hidden lg:block p-4">
+      <div className="fixed top-0 left-0 h-full w-72 bg-[#fff]  border hidden lg:block p-4">
         {sidebarContent}
       </div>
 
       {/* Mobile Drawer - visible on smaller screens */}
       <Drawer
-        placement="left"
-        onClose={onClose}
-        open={isVisible} // Controlled by the parent component
-        width={"75%"} // You can adjust the width here
-        className="bg-[#fff] bg-opacity-80 backdrop-blur-md shadow-sm " // Apply custom Tailwind styles to the drawer
-      >
-        {sidebarContent}
-      </Drawer>
+  placement="left"
+  onClose={onClose}
+  open={isVisible}
+  width="35%"
+  overlayClassName="!bg-transparent !backdrop-blur-md z-50"  // Overlay is now transparent and blurred
+>
+  {sidebarContent}
+</Drawer>
+
+   {/* // Apply custom Tailwind styles to the drawer contentt */}
+
+
     </>
   );
 }

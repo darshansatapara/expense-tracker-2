@@ -3,7 +3,7 @@ import { FaUserCircle } from "react-icons/fa";
 
 const Settings_Upper = () => {
   return (
-    <div className="bg-[#E5E1DA] p-6 rounded-lg shadow-md flex items-center space-x-6">
+    <div className="bg-[#dfdbdb] p-6 rounded-lg shadow-md flex items-center space-x-6">
       {/* Icon on the left side */}
       <FaUserCircle className="text-7xl text-gray-700" /> {/* Increased size */}
       <div>

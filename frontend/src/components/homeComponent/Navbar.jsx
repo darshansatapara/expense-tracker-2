@@ -49,7 +49,7 @@ export default function Navbar({ selectedItem, toggleSidebar }) {
       </div>
 
       {/* Dynamic Content */}
-      <span className="text-[#696d75] text-lg   truncate hidden lg:block">
+      <span className="text-[#010306] text-lg   truncate hidden lg:block">
         {content[currentContent] || "Default Content"} {/* Safeguard */}
       </span>
 

@@ -66,7 +66,7 @@ const HelpAndSupport = () => {
       answer: (
         <span>
           You can contact customer support by clicking on the{" "}
-          <Link to="/contactus" className="text-blue-600 underline hover:text-blue-800">
+          <Link to="/settings/contact-us" className="text-blue-600 underline hover:text-blue-800">
             Contact Us
           </Link>{" "}
         </span>
@@ -101,20 +101,18 @@ const HelpAndSupport = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 md:px-16 lg:px-32">
-      {/* Help & Support Title */}
       <div className="text-center mb-10">
         <h1 className="text-4xl font-bold text-gray-800 font-nunito">Help & Support</h1>
         <p className="text-gray-600 mt-2 text-lg font-nunito">We're here to help you</p>
       </div>
 
-      {/* Frequently Asked Questions Title */}
       <div className="mb-8">
         <h2 className="text-3xl font-semibold text-gray-700 text-left mb-6 font-nunito">
           Frequently Asked Questions
         </h2>
 
-        {/* FAQ Sections */}
-        <div className="grid grid-cols-1 sm-plus:grid-cols-1 md:grid-cols-2 gap-8 font-nunito">
+        {/* Responsive Grid */}
+        <div className="space-y-5 sm:grid-cols-2 gap-6 lg:gap-8 font-nunito">
           {faqList.map((item, index) => (
             <div
               key={index}
@@ -122,7 +120,7 @@ const HelpAndSupport = () => {
             >
               <button
                 onClick={() => handleDropdownClick(index)}
-                className="w-full text-left font-medium text-lg flex justify-between items-center "
+                className="w-full text-left font-medium text-lg flex justify-between items-center"
               >
                 <span>{item.question}</span>
                 <span
@@ -133,18 +131,20 @@ const HelpAndSupport = () => {
                   ▼
                 </span>
               </button>
-              {openQuestion === index && (
+              <div
+                className={`overflow-hidden transition-all duration-300 ${
+                  openQuestion === index ? "max-h-[500px]" : "max-h-0"
+                }`}
+              >
                 <div className="mt-4 text-gray-700">{item.answer}</div>
-              )}
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Divider Line */}
       <hr className="my-10 border-gray-300" />
 
-      {/* Send Feedback Section */}
       <div className="text-left mb-6">
         <h2 className="text-3xl font-semibold font-nunito text-gray-700">Send us your feedback</h2>
         <p className="text-gray-600 mt-2 font-nunito">
@@ -152,7 +152,6 @@ const HelpAndSupport = () => {
         </p>
       </div>
 
-      {/* Feedback Box */}
       <div className="p-8 rounded-lg shadow-lg space-y-6">
         <textarea
           value={feedback}
@@ -164,7 +163,10 @@ const HelpAndSupport = () => {
         <div className="flex justify-center">
           <button
             onClick={handleSubmitFeedback}
-            className="px-8 py-3 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600"
+            className={`px-8 py-3 bg-gray-800 text-white font-medium rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 ${
+              !feedback ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={!feedback}
           >
             Submit Feedback
           </button>
