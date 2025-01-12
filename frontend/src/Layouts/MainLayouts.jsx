@@ -14,9 +14,9 @@ export default function MainLayout() {
   const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
-    <div className="flex h-screen">
+    <div className="flex min-h-screen">
       {/* Sidebar for Desktop */}
-      <div className="w-72 hidden md:block">
+      <div className="w-72 hidden lg:block">
         <Sidebar onSelectItem={setSelectedItem} />
       </div>
 
@@ -40,6 +40,7 @@ export default function MainLayout() {
         />
 
         {/* Page Content */}
+
         <Content className="flex-1 bg-red p-4 mt-12">
           <Outlet />
         </Content>
