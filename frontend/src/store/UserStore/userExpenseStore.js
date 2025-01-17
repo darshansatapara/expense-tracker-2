@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { axiosInstance } from "../utils/axios.js";
+import { axiosInstance } from "../../utils/axios.js";
 
 const useUserExpenseStore = create((set) => ({
   userExpenses: [], // State to store user expenses

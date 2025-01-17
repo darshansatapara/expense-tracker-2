@@ -8,7 +8,6 @@ import SettingsPage from "./pages/SettingPage";
 import HistoryPage from "./pages/HistoryPage";
 import MainLayout from "./Layouts/MainLayouts";
 import AnalysisPage from "./pages/AnalysisPage";
-import HistoryPage from "./pages/HistoryPage";
 import ReportPage from "./pages/ReportPage";
 
 function App() {
@@ -16,8 +15,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
-        <Route path="/signup" element={<SignupPage />} />
-        <Route path="/signin" element={<SignInPage />} />
+        <Route path="/signup/*" element={<SignupPage />} />
+        <Route path="/signin/*" element={<SignInPage />} />
+        <Route path="/category/*" element={<CategoryPage />} />
 
         {/* Protected Routes inside MainLayout */}
         <Route element={<MainLayout />}>
@@ -25,16 +25,12 @@ function App() {
           {/* <Route element={<ProtectedRoute />}> */}
           {/* Main Application Routes */}
           <Route path="/" element={<HomePage />} />
-          <Route path="/category" element={<CategoryPage />} />
           <Route path="/settings/*" element={<SettingsPage />} />
           <Route path="/history" element={<HistoryPage />} />
 
-
           <Route path="/analysis" element={<AnalysisPage />} />
-        
-          <Route path="/reports" element={<ReportPage />} />
 
-       
+          <Route path="/reports" element={<ReportPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -3,7 +3,7 @@ import React from "react";
 export const TransactionList = ({ transactions }) => {
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden">
-      <div className="overflow-x-auto p-4">
+      <div className="overflow-x-auto p-2">
         <div className="flex flex-col">
           <div className="flex bg-gray-200 font-medium text-gray-700 p-2 rounded-t-lg">
             <div className="w-1/4 p-2 text-left">Amount</div>
