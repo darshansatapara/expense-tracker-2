@@ -15,8 +15,13 @@ export default {
         bounce: "bounce 2.5s ease-in-out infinite", // Set your preferred duration here
       },
       colors: {
-        "custom-light": "#F8FAFC",
-        lightBlue: "#D9EAFD", // Make sure this is defined
+        "light-bg": "#fff",
+        "light-tranferant": "fff",
+        "light-text": "#696d75",
+
+        "dark-bg": "#0d1117",
+        "dark-tranferant": "0d1117",
+        "dark-text": "#fff",
       },
       screens:{
         'sm-plus': {'max':'1139px'}

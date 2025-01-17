@@ -3,9 +3,9 @@ import LineGraph from "./Graph";
 import ExpenseList from "../ExpenseComponent/ExpenseList";
 import { Card } from "antd";
 
-export default function Main() {
+export default function IncomeHome() {
   return (
-    <div className="pt-4 bg-[#fff] min-h-screen ">
+    <div className="pt-4 bg-[#fff] min-h-full ">
       {/* Graphs Section */}
       <div className="flex flex-col md:flex-row gap-10 ">
         {/* Graph Container 1: Expense */}

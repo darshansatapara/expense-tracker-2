@@ -7,6 +7,10 @@ import HomePage from "./pages/HomePage";
 import SettingsPage from "./pages/SettingPage";
 import HistoryPage from "./pages/HistoryPage";
 // import MainLayout from "./Layouts/MainLayouts";
+
+import ExpenseHome from "../src/components/homeComponent/ExpenseHome";
+import IncomeHome from "../src/components/homeComponent/IncomeHome";
+
 import AnalysisPage from "./pages/AnalysisPage";
 import ReportPage from "./pages/ReportPage";
 
@@ -24,7 +28,13 @@ function App() {
         {/* Uncomment the ProtectedRoute wrapper to enable authentication */}
         {/* <Route element={<ProtectedRoute />}> */}
         {/* Main Application Routes */}
-        <Route path="/" element={<HomePage />} />
+
+        <Route path="/" element={<HomePage />}>
+          <Route index element={<ExpenseHome />} />
+          <Route path="/expensehome" element={<ExpenseHome />} />
+          <Route path="/incomehome" element={<IncomeHome />} />
+        </Route>
+
         <Route path="/settings/*" element={<SettingsPage />} />
         <Route path="/history" element={<HistoryPage />} />
 
