@@ -5,9 +5,11 @@ import SignInPage from "./pages/SigninPage";
 import CategoryPage from "./pages/CategoryPage";
 import HomePage from "./pages/HomePage";
 import SettingsPage from "./pages/SettingPage";
+import HistoryPage from "./pages/HistoryPage";
 import MainLayout from "./Layouts/MainLayouts";
-import ExpenseHome from "./components/homeComponent/ExpenseHome";
-import IncomeHome from "./components/homeComponent/IncomeHome";
+import AnalysisPage from "./pages/AnalysisPage";
+import HistoryPage from "./pages/HistoryPage";
+import ReportPage from "./pages/ReportPage";
 
 function App() {
   return (
@@ -29,8 +31,14 @@ function App() {
             <Route path="/incomehome" element={<IncomeHome />} />
           </Route>
           <Route path="/settings/*" element={<SettingsPage />} />
-          
-          {/* </Route> */}
+          <Route path="/history" element={<HistoryPage />} />
+
+
+          <Route path="/analysis" element={<AnalysisPage />} />
+        
+          <Route path="/reports" element={<ReportPage />} />
+
+       
         </Route>
       </Routes>
     </BrowserRouter>

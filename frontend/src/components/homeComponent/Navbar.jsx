@@ -56,7 +56,13 @@ export default function Navbar({ selectedItem, toggleSidebar }) {
       </span>
 
       {/* Sign Out Button */}
+<<<<<<< HEAD
       <button className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 text-white px-5 py-2 text-md font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out hidden lg:block ">
+=======
+
+      <button className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 text-white px-5 py-2 text-sm font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out hidden lg:block">
+
+>>>>>>> b9e796cb4d2b2a065e78723d3b74aff14e4ed039
         Sign Out
       </button>
 

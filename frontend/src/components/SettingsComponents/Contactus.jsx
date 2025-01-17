@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const ContactUs = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-[#D9EAFD] items-center justify-center px-6 font-nunito">
+    <div className="min-h-screen flex flex-col  items-center justify-center px-6 font-nunito">
       {/* Header Section */}
       <div className="text-center mb-12 w-full max-w-3xl">
         <h1 className="text-4xl md:text-5xl font-bold text-[#ff6f61] drop-shadow-lg">
@@ -66,10 +66,7 @@ const ContactUs = () => {
         </motion.div>
       </div>
 
-      {/* Footer Section */}
-      <div className="mt-12 text-center text-sm text-gray-500">
-        © 2024 Expense Tracker. All Rights Reserved.
-      </div>
+
     </div>
   );
 };

@@ -23,6 +23,9 @@ export default {
         "dark-tranferant": "0d1117",
         "dark-text": "#fff",
       },
+      screens:{
+        'sm-plus': {'max':'1139px'}
+      },
     },
   },
   plugins: [require("tailwind-scrollbar")],
