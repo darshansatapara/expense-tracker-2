@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Layout, Menu, Avatar, Drawer } from "antd";
+import { Menu, Avatar, Drawer } from "antd";
 import { Link, useLocation } from "react-router-dom";
 import {
   HomeOutlined,

@@ -18,11 +18,11 @@ export default function Navbar({ selectedItem, toggleSidebar }) {
     "Visualize your financial goals today!",
   ];
   const iconMap = {
-    Home: <HomeOutlined className="text-lg text-gray-700" />,
-    Analysis: <BarChartOutlined className="text-lg text-gray-700" />,
-    History: <HistoryOutlined className="text-lg text-gray-700" />,
-    Settings: <SettingOutlined className="text-lg text-gray-700" />,
-    Reports: <FileTextOutlined className="text-lg text-gray-700" />,
+    Home: <HomeOutlined />,
+    Analysis: <BarChartOutlined />,
+    History: <HistoryOutlined />,
+    Settings: <SettingOutlined />,
+    Reports: <FileTextOutlined />,
   };
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function Navbar({ selectedItem, toggleSidebar }) {
   }, [content.length]);
 
   return (
-    <header className="bg-[fff] bg-opacity-80 backdrop-blur-md shadow-sm flex items-center justify-between px-4 py-2 fixed border top-0 left-0 w-full h-12 lg:left-72 lg:w-[calc(100%-18rem)] lg:h-16 z-30">
+    <header className="bg-light-tranferant dark:bg-dark-tranferant bg-opacity-80 backdrop-blur-md  shadow-sm flex items-center justify-between px-4 py-2 fixed border top-0 left-0 w-full h-12 lg:left-72 lg:w-[calc(100%-18rem)] lg:h-16 z-30">
       <div className=" justify-start items-center mb-8 lg:hidden block ml-4">
         <img
           src="/images/applogo.jpg"
@@ -45,16 +45,18 @@ export default function Navbar({ selectedItem, toggleSidebar }) {
       {/* Selected Item */}
       <div className="md:flex items-center space-x-2">
         {iconMap[selectedItem]}
-        <span className=" text-lg font-semibold">{selectedItem}</span>
+        <span className=" text-lg font-semibold text-light-text">
+          {selectedItem}
+        </span>
       </div>
 
       {/* Dynamic Content */}
-      <span className="text-[#696d75] text-lg   truncate hidden lg:block">
+      <span className="text-light-text text-lg   truncate hidden lg:block">
         {content[currentContent] || "Default Content"} {/* Safeguard */}
       </span>
 
       {/* Sign Out Button */}
-      <button className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 text-white px-5 py-2 text-sm font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out hidden lg:block">
+      <button className="bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 text-white px-5 py-2 text-md font-semibold rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out hidden lg:block ">
         Sign Out
       </button>
 

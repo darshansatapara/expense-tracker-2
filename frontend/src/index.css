@@ -3,21 +3,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Tailwind Custom Scrollbar */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 8px;
-  /* Adjust scrollbar width */
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: #a0aec0;
-  /* Thumb color */
-  border-radius: 8px;
-  /* Rounded corners */
-}
-
-.scrollbar-thin::-webkit-scrollbar-track {
-  background-color: #edf2f7;
-  /* Track color */
-}
