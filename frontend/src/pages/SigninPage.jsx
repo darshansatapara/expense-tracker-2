@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Input, Button, message } from "antd";
 import { Mail, Lock } from "lucide-react";
-import { userStore } from "../store/userStore.js";
+import { userStore } from "../store/UserStore/userStore.js";
 import Signup from "../components/signupComponents/SignUpInContent/Signup_Left.jsx";
 import { useNavigate } from "react-router-dom";
 import OAuth2 from "../components/signinComponent/GoogleSignin.jsx";

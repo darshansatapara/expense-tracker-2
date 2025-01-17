@@ -9,7 +9,7 @@ import {
   ClipboardPen,
   Lock,
 } from "lucide-react";
-import { userStore } from "../../store/userStore.js";
+import { userStore } from "../../store/UserStore/userStore.js";
 
 const { Option } = Select;
 
