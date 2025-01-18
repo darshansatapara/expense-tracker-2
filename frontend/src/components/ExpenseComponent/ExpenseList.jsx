@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button } from "antd";
 import "antd/dist/reset.css"; // Ensure Ant Design styles are applied
-import useUserExpenseStore from "../../store/userExpenseStore.js";
+import useUserExpenseStore from "../../store/UserStore/userExpenseStore.js";
 
 const ExpenseList = () => {
   const { userExpenses, loading, fetchUserExpenses, clearUserExpenses } =
@@ -122,7 +122,6 @@ const ExpenseList = () => {
 
   return (
     <>
-      
       <div className="flex justify-center gap-5 mb-5">
         <Button onClick={handleTodayClick} className="rounded-lg">
           Today
@@ -145,7 +144,6 @@ const ExpenseList = () => {
             className="rounded-lg"
           />
         </div>
-        
       </div>
     </>
   );

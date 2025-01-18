@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import dayjs from "dayjs";
 import { HistoryEntry } from "../components/HistoryPageComponent/HistoryEntry";
@@ -54,13 +53,13 @@ const HistoryPage = () => {
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6 bg-gray-50 min-h-screen">
       <div className="bg-white shadow-md rounded-lg p-4 md:p-6 max-w-full md:max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-          <div className="flex flex-wrap space-x-6 mb-4 md:mb-0">
+        <div className="flex flex-col lg:flex-row justify-between items-center mb-6 space-y-4 lg:space-y-0">
+          <div className="flex flex-wrap lg:w-auto space-x-6 mb-4 md:mb-0">
             <TabButton
               label="Expense"
               isActive={activeTab === "Expense"}
               onClick={() => setActiveTab("Expense")}
-              className="mb-2 md:mb-0"
+              className="mb-2 lg:mb-0 "
             />
             <TabButton
               label="Income"
@@ -72,7 +71,7 @@ const HistoryPage = () => {
           <DateRangeSelector
             defaultValue={dateRange}
             onChange={(range) => setDateRange(range)}
-            className="w-full md:w-auto"
+            className="items-center lg:w-auto "
           />
         </div>
         <div className="space-y-4">
@@ -91,4 +90,3 @@ const HistoryPage = () => {
 };
 
 export default HistoryPage;
-

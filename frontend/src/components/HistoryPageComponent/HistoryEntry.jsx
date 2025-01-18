@@ -27,7 +27,7 @@ export const HistoryEntry = ({ entry, isExpanded, toggleExpand }) => {
 
   return (
     <div className="mb-4 border rounded-lg overflow-hidden">
-      <div className="bg-gray-200 p-4 flex justify-between items-center">
+      <div className="bg-gray-200 p-4 flex flex-col sm:flex-row justify-between items-center">
         <span className="text-gray-600">Date: {entry.date}</span>
         <span
           className={`text-gray-600 transition-all duration-500 ${
