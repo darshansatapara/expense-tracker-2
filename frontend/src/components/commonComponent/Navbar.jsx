@@ -1,10 +1,53 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import {
+  HomeOutlined,
+  BarChartOutlined,
+  HistoryOutlined,
+  SettingOutlined,
+  FileTextOutlined,
+  MenuOutlined,
+} from "@ant-design/icons";
+import { BellPlus, LogOut, ShieldQuestion } from "lucide-react";
 
-const Navbar = () => {
+const Navbar = ({ toggleSidebar }) => {
+  const location = useLocation();
+
+  const pathMap = {
+    "/": {
+      name: "Home",
+      icon: <HomeOutlined className="text-lg text-gray-700" />,
+    },
+    "/analysis": {
+      name: "Analysis",
+      icon: <BarChartOutlined className="text-lg text-gray-700" />,
+    },
+    "/history": {
+      name: "History",
+      icon: <HistoryOutlined className="text-lg text-gray-700" />,
+    },
+    "/settings": {
+      name: "Settings",
+      icon: <SettingOutlined className="text-lg text-gray-700" />,
+    },
+    "/reports": {
+      name: "Reports",
+      icon: <FileTextOutlined className="text-lg text-gray-700" />,
+    },
+  };
+
+  const mainPath = location.pathname.split("/")[1];
+  const { name, icon } = pathMap[`/${mainPath}`] || {
+    name: "Unknown",
+    icon: <ShieldQuestion />,
+  };
+
   const dialogs = [
-    "Hi, I am Expense Tracker. How may I help you?",
-    "Track your expenses effortlessly!",
-    "Stay on top of your finances!",
+    "Track your daily expenses effortlessly!",
+    "Save more with smarter budgeting.",
+    "Plan your finances for a brighter future.",
+    "Stay on top of your spending habits.",
+    "Visualize your financial goals today!",
   ];
 
   const [dialogIndex, setDialogIndex] = useState(0);
@@ -17,30 +60,19 @@ const Navbar = () => {
   }, [dialogs.length]);
 
   return (
-    <div className="w-full bg-gray-100 shadow-md">
+    <div className="w-full bg-white border-b-2">
       <nav className="flex items-center justify-between px-4 py-2 md:px-8">
         {/* Left Section */}
         <div className="flex items-center space-x-2">
-          <div className="bg-gray-300 p-2 rounded-full">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 10h11M9 21V3M17 16l4-4m0 0l-4-4m4 4H9"
-              />
-            </svg>
+          <div className="p-2">
+            <div className="flex items-center space-x-2">
+              {icon}
+              <span className="text-lg font-semibold">{name}</span>
+            </div>
           </div>
-          <span className="text-lg font-semibold">Expense Tracker</span>
         </div>
 
-        {/* Middle Section */}
+        {/* Middle Section (Hidden on small screens) */}
         <div className="hidden md:flex justify-center flex-grow">
           <div className="text-center text-sm md:text-lg font-medium text-gray-600 transition-opacity">
             {dialogs[dialogIndex]}
@@ -49,26 +81,20 @@ const Navbar = () => {
 
         {/* Right Section */}
         <div className="flex items-center space-x-4">
-          <button className="relative">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 text-gray-500 hover:text-gray-700"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 6.165 7 7.388 7 9v5.159c0 .538-.214 1.055-.595 1.436L5 17h5m5 0v1a3 3 0 11-6 0v-1m6 0H9"
-              />
-            </svg>
-            <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
+          <button className="relative hover:cursor-pointer">
+            <BellPlus />
           </button>
-          <div className="bg-yellow-400 rounded-full h-8 w-8 flex items-center justify-center">
-            <span className="font-bold text-white">U</span>
+          {/* Logout Button Hidden on Small Screens */}
+          <div className="hidden lg:flex hover:cursor-pointer rounded-md h-8 w-8 items-center justify-center">
+            <LogOut />
           </div>
+          {/* Hamburger Menu for Small Screens */}
+          <button
+            className="lg:hidden p-2 bg-gray-100 rounded-md shadow-lg"
+            onClick={toggleSidebar}
+          >
+            <MenuOutlined className="text-xl text-gray-600" />
+          </button>
         </div>
       </nav>
     </div>

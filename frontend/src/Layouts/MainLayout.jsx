@@ -3,22 +3,28 @@ import Sidebar from "../components/commonComponent/Sidebar";
 import Navbar from "../components/commonComponent/Navbar";
 import { Outlet } from "react-router-dom";
 const MainLayout = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
-      <div className="w-1/4 bg-gray-100 shadow-md p-4 md:w-1/5 lg:w-1/6">
-        <Sidebar />
+      <div className="border-2 h-screen ">
+        <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col w-3/4 md:w-4/5 lg:w-5/6">
+      <div className="flex flex-col w-full ">
         {/* Navbar */}
-        <div className="w-full bg-gray-100 shadow-md">
-          <Navbar />
+        <div className="bg-gray-700 ">
+          <Navbar toggleSidebar={toggleSidebar} />
         </div>
 
         {/* Content Box */}
-        <div className="flex-grow p-4 overflow-auto bg-gray-50">
+        <div className=" flex-grow overflow-auto bg-red-700 rounded-md">
           {/* The Outlet renders the child route content here */}
           <Outlet />
         </div>
