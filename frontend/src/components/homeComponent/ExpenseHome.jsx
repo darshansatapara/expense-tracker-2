@@ -5,7 +5,7 @@ import { Card } from "antd";
 
 export default function ExpenseHome() {
   return (
-    <div className="pt-4 bg-[#fff] min-h-full ">
+    <div className="pt-4  min-h-full ">
       {/* Graphs Section */}
       <div className="flex flex-col md:flex-row gap-10 ">
         {/* Graph Container 1: Expense */}
