@@ -1,16 +1,81 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import { HistoryEntry } from "../components/HistoryPageComponent/HistoryEntry";
 import DateRangeSelector from "../components/InputComponents/DateRangeSelector";
 import { TabButton } from "../components/commonComponent/TabButton";
+import userExpenseStore from "../store/UserStore/userExpenseStore";
+import userIncomeStore from "../store/UserStore/userIncomeStore";
 
 const HistoryPage = () => {
+  const { fetchUserExpenses } = userExpenseStore();
+  const { fetchUserIncomes } = userIncomeStore();
   const [expandedIndexes, setExpandedIndexes] = useState([]);
   const [dateRange, setDateRange] = useState([
     dayjs().startOf("month"),
     dayjs().endOf("month"),
   ]);
-  const [activeTab, setActiveTab] = useState("Expense");
+  const [activeTab, setActiveTab] = useState("Income");
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const userId = "677bc096bd8c6f677ef507d3";
+  const profession = "Student";
+
+  const fetchTransactions = async () => {
+    setLoading(true);
+    setError(null);
+    const startDate = dateRange[0];
+    const endDate = dateRange[1];
+
+    try {
+      if (activeTab === "Expense") {
+        await fetchUserExpenses(userId, startDate, endDate); // Fetch expenses
+        const stateExpenses = userExpenseStore.getState().userExpenses; // Get updated state
+        console.log(stateExpenses, "state expenses");
+
+        setTransactions(
+          stateExpenses.map((entry) => ({
+            ...entry,
+            offlineTotal: entry.offline.reduce(
+              (sum, t) => sum + parseFloat(t.amount),
+              0
+            ),
+            onlineTotal: entry.online.reduce(
+              (sum, t) => sum + parseFloat(t.amount),
+              0
+            ),
+            transactions: [...entry.offline, ...entry.online],
+          }))
+        );
+      } else if (activeTab === "Income") {
+        await fetchUserIncomes(userId, startDate, endDate, profession);
+        const stateIncomes = userIncomeStore.getState().userIncomes;
+        setTransactions(
+          stateIncomes.map((entry) => ({
+            ...entry,
+            offlineTotal: entry.offline.reduce(
+              (sum, t) => sum + parseFloat(t.amount),
+              0
+            ),
+            onlineTotal: entry.online.reduce(
+              (sum, t) => sum + parseFloat(t.amount),
+              0
+            ),
+            transactions: [...entry.offline, ...entry.online],
+          }))
+        );
+      }
+    } catch (err) {
+      setError("Failed to fetch data. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [activeTab, dateRange]);
 
   const toggleExpand = (index) => {
     setExpandedIndexes((prev) =>
@@ -18,40 +83,8 @@ const HistoryPage = () => {
     );
   };
 
-  const dummyData = [
-    {
-      date: "01-01-2025",
-      offlineTotal: 10000,
-      onlineTotal: 10000,
-      transactions: [
-        {
-          amount: 100,
-          category: "Travel",
-          subCategory: "Rixa",
-        },
-        {
-          amount: 100,
-          category: "Travel",
-          subCategory: "Rixa",
-        },
-      ],
-    },
-    {
-      date: "02-01-2025",
-      offlineTotal: 10000,
-      onlineTotal: 10000,
-      transactions: [
-        {
-          amount: 100,
-          category: "Travel",
-          subCategory: "Rixa",
-        },
-      ],
-    },
-  ];
-
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-6 bg-gray-50 min-h-screen">
+    <div className="p-4 md:p-6 lg:p-4 space-y-2 lg:w-full  min-h-screen">
       <div className="bg-white shadow-md rounded-lg p-4 md:p-6 max-w-full md:max-w-6xl mx-auto">
         <div className="flex flex-col lg:flex-row justify-between items-center mb-6 space-y-4 lg:space-y-0">
           <div className="flex flex-wrap lg:w-auto space-x-6 mb-4 md:mb-0">
@@ -69,18 +102,25 @@ const HistoryPage = () => {
             />
           </div>
           <DateRangeSelector
-            defaultValue={dateRange}
-            onChange={(range) => setDateRange(range)}
+            startValue={dateRange[0]}
+            endValue={dateRange[1]}
+            onChange={(dates) => setDateRange(dates)}
             className="items-center lg:w-auto "
           />
         </div>
+        {loading && <p>Loading...</p>}
+        {error && <p className="text-red-500">{error}</p>}
         <div className="space-y-4">
-          {dummyData.map((entry, index) => (
+          {transactions.length === 0 && !loading && (
+            <p>No transactions found for the selected range.</p>
+          )}
+          {transactions.map((entry, index) => (
             <HistoryEntry
               key={index}
               entry={entry}
               isExpanded={expandedIndexes.includes(index)}
               toggleExpand={() => toggleExpand(index)}
+              isExpense={activeTab === "Expense"}
             />
           ))}
         </div>

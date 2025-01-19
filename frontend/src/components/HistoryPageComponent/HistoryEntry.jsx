@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { TransactionList } from "./TransactionList";
 
-export const HistoryEntry = ({ entry, isExpanded, toggleExpand }) => {
+export const HistoryEntry = ({
+  entry,
+  isExpanded,
+  toggleExpand,
+  isExpense,
+}) => {
   return (
     <div className="mb-4 border rounded-lg overflow-hidden">
       <div className="bg-gray-200 p-4 flex flex-col sm:flex-row justify-between items-center">
@@ -24,7 +29,12 @@ export const HistoryEntry = ({ entry, isExpanded, toggleExpand }) => {
           )}
         </button>
       </div>
-      {isExpanded && <TransactionList transactions={entry.transactions} />}
+      {isExpanded && (
+        <TransactionList
+          transactions={entry.transactions}
+          isExpense={isExpense}
+        />
+      )}
     </div>
   );
 };

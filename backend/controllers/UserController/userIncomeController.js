@@ -160,6 +160,7 @@ export const getUserIncome =
                   (sub) => sub._id.toString() === income.category?.toString()
                 )?.name || "Unknown", // Match category ID to subcategories
               note: income.note,
+              _id: income._id,
             })),
             offline: incomeGroup.offline.map((income) => ({
               date: income.date,
@@ -171,6 +172,7 @@ export const getUserIncome =
                   (sub) => sub._id.toString() === income.category?.toString()
                 )?.name || "Unknown", // Match category ID to subcategories
               note: income.note,
+              _id: income._id,
             })),
           });
         }
