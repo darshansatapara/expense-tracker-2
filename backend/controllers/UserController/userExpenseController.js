@@ -175,6 +175,7 @@ export const getUserExpense =
 
               // Handle null subcategory
               note: expense.note,
+              _id: expense._id,
             })),
             offline: expenseGroup.offline.map((expense) => ({
               date: expense.date,
@@ -190,6 +191,7 @@ export const getUserExpense =
 
               // Handle null subcategory
               note: expense.note,
+              _id: expense._id,
             })),
           });
         }
