@@ -2,16 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Table, Button } from "antd";
 import "antd/dist/reset.css"; // Ensure Ant Design styles are applied
 import useUserExpenseStore from "../../store/UserStore/userExpenseStore.js";
+import { TabButton } from "../commonComponent/TabButton.jsx";
 
 const ExpenseList = () => {
   const { userExpenses, loading, fetchUserExpenses, clearUserExpenses } =
     useUserExpenseStore();
 
-  const userId = "67792e48b3085a94fc47b110";
+  const userId = "677bc096bd8c6f677ef507d3";
 
   // Manage start and end dates as local states
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [activeButton, setActiveButton] = useState("Today");
 
   // Helper function to format date as DD-MM-YYYY
   const formatDate = (date) => {
@@ -54,12 +56,14 @@ const ExpenseList = () => {
 
   // Handle button clicks
   const handleTodayClick = () => {
+    setActiveButton("Today");
     const today = getCurrentDate();
     setStartDate(today);
     setEndDate(today);
   };
 
   const handleYesterdayClick = () => {
+    setActiveButton("Yesterday");
     const yesterday = getYesterdayDate();
     setStartDate(yesterday);
     setEndDate(yesterday);
@@ -73,8 +77,8 @@ const ExpenseList = () => {
   const formattedExpenses =
     userExpenses.flatMap((expenseGroup) =>
       [...expenseGroup.online, ...expenseGroup.offline].map((expense) => ({
-        key: `${expenseGroup.date}-${expense.date}-${expense.amount}`,
-        date: formatDate(expense.date) || "N/A",
+        key: expense._id,
+        date: expense.date || "N/A",
         category: expense.category || "N/A",
         subcategory: expense.subcategory || "N/A",
         mode: expense.mode || "N/A",
@@ -85,64 +89,89 @@ const ExpenseList = () => {
       }))
     ) || [];
 
+  // Calculate total expenses for online and offline
+  const totalOnlineExpenses = userExpenses
+    .flatMap((expenseGroup) => expenseGroup.online)
+    .reduce((sum, expense) => sum + (Number(expense.amount) || 0), 0); // Convert string to number
+
+  const totalOfflineExpenses = userExpenses
+    .flatMap((expenseGroup) => expenseGroup.offline)
+    .reduce((sum, expense) => sum + (Number(expense.amount) || 0), 0); // Convert string to number
+
   // Define columns for the Ant Design Table
   const columns = [
     {
       title: "Date",
       dataIndex: "date",
       key: "date",
-      width: 120,
     },
     {
       title: "Category",
       dataIndex: "category",
       key: "category",
-      width: 120,
     },
     {
       title: "Subcategory",
       dataIndex: "subcategory",
       key: "subcategory",
-      width: 120,
     },
     {
       title: "Method",
       dataIndex: "mode",
       key: "mode",
-      width: 100,
     },
     {
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
-      width: 120,
-      align: "right",
     },
   ];
 
   return (
     <>
-      <div className="flex justify-center gap-5 mb-5">
-        <Button onClick={handleTodayClick} className="rounded-lg">
-          Today
-        </Button>
-        <Button onClick={handleYesterdayClick} className="rounded-lg">
-          Yesterday
-        </Button>
+      <div className="flex justify-center gap-5 mb-3">
+        <TabButton
+          label="Today"
+          isActive={activeButton === "Today"}
+          onClick={handleTodayClick}
+        />
+        <TabButton
+          label="Yesterday"
+          isActive={activeButton === "Yesterday"}
+          onClick={handleYesterdayClick}
+        />
       </div>
-      <div className="p-4 bg-white shadow-md rounded-lg">
-        <div
-          className="overflow-auto "
-          style={{ maxHeight: "42vh", maxWidth: "120vw" }}
-        >
+
+      {/* Table Section */}
+      <div className="bg-white rounded-lg ">
+        <div className="overflow-x-auto">
           <Table
             dataSource={formattedExpenses.length > 0 ? formattedExpenses : []}
             columns={columns}
             pagination={false}
-            bordered
-            scroll={{ x: 700 }} // Enables horizontal scrolling
-            className="rounded-lg"
+            scroll={{ x: 700, y: 180 }}
+            className="rounded-lg min-w-full"
+            style={{ scrollbarWidth: "thin" }}
           />
+        </div>
+      </div>
+      {/* Total Expenses Section */}
+      <div className="mt-5 flex flex-col ">
+        <div className="flex flex-col md:flex-row justify-around items-center p-4 bg-gray-100 rounded-md border gap-5 md:gap-0">
+          {/* Total Online Section */}
+          <div className="text-center  flex-1">
+            <h3 className="text-lg font-bold text-gray-700">Total Online</h3>
+            <p className="text-xl font-semibold text-green-500">
+              ₹{totalOnlineExpenses.toFixed(2)}
+            </p>
+          </div>
+          {/* Total Offline Section */}
+          <div className="text-center flex-1">
+            <h3 className="text-lg font-bold text-gray-700">Total Offline</h3>
+            <p className="text-xl font-semibold text-blue-500">
+              ₹{totalOfflineExpenses.toFixed(2)}
+            </p>
+          </div>
         </div>
       </div>
     </>
