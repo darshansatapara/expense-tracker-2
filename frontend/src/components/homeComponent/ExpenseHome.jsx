@@ -1,7 +1,6 @@
 import React from "react";
 import LineGraph from "./Graph";
 import ExpenseList from "../ExpenseComponent/ExpenseList";
-import { Card } from "antd";
 
 export default function ExpenseHome() {
   return (

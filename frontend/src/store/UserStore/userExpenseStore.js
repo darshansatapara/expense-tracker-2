@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { axiosInstance } from "../../utils/axios.js";
+import { formatExpensesData } from "../../components/commonComponent/formatEAndIData .js";
 
 const useUserExpenseStore = create((set) => ({
   userExpenses: [], // State to store user expenses
@@ -15,10 +16,16 @@ const useUserExpenseStore = create((set) => ({
         `/expense/getExpenses/${userId}/${startDate}/${endDate}` // Adjust the endpoint as needed
       );
 
-      console.log(response.data.expenses, "user expense");
+      // console.log(response.data.expenses, "user expense");
+
       if (response.data.success) {
+        const formattedExpenses = formatExpensesData(
+          response.data.expenses,
+          startDate,
+          endDate
+        );
         set({
-          userExpenses: response.data.expenses, // Update the state with fetched expenses
+          userExpenses: formattedExpenses, // Update the state with fetched expenses
           loading: false,
           error: null,
         });

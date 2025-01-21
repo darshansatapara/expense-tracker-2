@@ -14,7 +14,7 @@ const HistoryPage = () => {
     dayjs().startOf("month"),
     dayjs().endOf("month"),
   ]);
-  const [activeTab, setActiveTab] = useState("Income");
+  const [activeTab, setActiveTab] = useState("Expense");
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -32,7 +32,7 @@ const HistoryPage = () => {
       if (activeTab === "Expense") {
         await fetchUserExpenses(userId, startDate, endDate); // Fetch expenses
         const stateExpenses = userExpenseStore.getState().userExpenses; // Get updated state
-        console.log(stateExpenses, "state expenses");
+        // console.log(stateExpenses, "state expenses");
 
         setTransactions(
           stateExpenses.map((entry) => ({
@@ -108,21 +108,31 @@ const HistoryPage = () => {
             className="items-center lg:w-auto "
           />
         </div>
-        {loading && <p>Loading...</p>}
+
         {error && <p className="text-red-500">{error}</p>}
         <div className="space-y-4">
           {transactions.length === 0 && !loading && (
             <p>No transactions found for the selected range.</p>
           )}
-          {transactions.map((entry, index) => (
-            <HistoryEntry
-              key={index}
-              entry={entry}
-              isExpanded={expandedIndexes.includes(index)}
-              toggleExpand={() => toggleExpand(index)}
-              isExpense={activeTab === "Expense"}
-            />
-          ))}
+
+          {loading
+            ? transactions.map((_, index) => (
+                <HistoryEntry
+                  key={index}
+                  isExpanded={false} // Prevent expansion during loading
+                  loading={true} // Pass loading state
+                />
+              ))
+            : transactions.map((entry, index) => (
+                <HistoryEntry
+                  key={index}
+                  entry={entry}
+                  isExpanded={expandedIndexes.includes(index)}
+                  toggleExpand={() => toggleExpand(index)}
+                  isExpense={activeTab === "Expense"}
+                  loading={false} // No loading state
+                />
+              ))}
         </div>
       </div>
     </div>
