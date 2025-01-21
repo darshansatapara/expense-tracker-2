@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button } from "antd";
+import { Table, Spin } from "antd";
 import "antd/dist/reset.css"; // Ensure Ant Design styles are applied
 import useUserExpenseStore from "../../store/UserStore/userExpenseStore.js";
 import { TabButton } from "../commonComponent/TabButton.jsx";
+import { Empty } from "antd";
 
 const ExpenseList = () => {
-  const { userExpenses, loading, fetchUserExpenses, clearUserExpenses } =
-    useUserExpenseStore();
+  const { userExpenses, loading, fetchUserExpenses } = useUserExpenseStore();
 
   const userId = "677bc096bd8c6f677ef507d3";
 
@@ -39,7 +39,8 @@ const ExpenseList = () => {
 
   // Set default to today's date on mount
   useEffect(() => {
-    const today = getCurrentDate();
+    const today = "19-01-2025";
+    //  getCurrentDate();
     setStartDate(today);
     setEndDate(today);
   }, []);
@@ -51,8 +52,8 @@ const ExpenseList = () => {
     }
 
     // Cleanup expenses when component unmounts
-    return () => clearUserExpenses();
-  }, [userId, startDate, endDate, fetchUserExpenses, clearUserExpenses]);
+    return () => useUserExpenseStore.setState({ userExpenses: [] });
+  }, [userId, startDate, endDate, fetchUserExpenses]);
 
   // Handle button clicks
   const handleTodayClick = () => {
@@ -68,10 +69,6 @@ const ExpenseList = () => {
     setStartDate(yesterday);
     setEndDate(yesterday);
   };
-
-  if (loading) {
-    return <p className="text-center text-lg font-semibold">Loading...</p>;
-  }
 
   // Combine online and offline expenses into a single array with a unique key
   const formattedExpenses =
@@ -104,26 +101,31 @@ const ExpenseList = () => {
       title: "Date",
       dataIndex: "date",
       key: "date",
-    },
-    {
-      title: "Category",
-      dataIndex: "category",
-      key: "category",
-    },
-    {
-      title: "Subcategory",
-      dataIndex: "subcategory",
-      key: "subcategory",
-    },
-    {
-      title: "Method",
-      dataIndex: "mode",
-      key: "mode",
+      width: 120,
     },
     {
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
+      width: 120,
+    },
+    {
+      title: "Method",
+      dataIndex: "mode",
+      key: "mode",
+      width: 100,
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
+      width: 120,
+    },
+    {
+      title: "Subcategory",
+      dataIndex: "subcategory",
+      key: "subcategory",
+      width: 120,
     },
   ];
 
@@ -144,31 +146,43 @@ const ExpenseList = () => {
 
       {/* Table Section */}
       <div className="bg-white rounded-lg ">
-        <div className="overflow-x-auto">
+        <div className="overflow-auto">
           <Table
             dataSource={formattedExpenses.length > 0 ? formattedExpenses : []}
             columns={columns}
             pagination={false}
-            scroll={{ x: 700, y: 180 }}
-            className="rounded-lg min-w-full"
-            style={{ scrollbarWidth: "thin" }}
+            scroll={{ x: 700 }}
+            sticky
+            size="middle"
+            locale={{
+              emptyText: loading ? (
+                <Spin
+                  className="h-[35.5vh] flex flex-col items-center justify-center"
+                  size="large"
+                />
+              ) : (
+                <Empty className="h-[35.5vh] flex flex-col items-center justify-center" />
+              ),
+            }} // Customize empty text
+            className="rounded-lg"
+            style={{ height: "50vh" }}
           />
         </div>
       </div>
       {/* Total Expenses Section */}
-      <div className="mt-5 flex flex-col ">
-        <div className="flex flex-col md:flex-row justify-around items-center p-4 bg-gray-100 rounded-md border gap-5 md:gap-0">
+      <div className="flex flex-col ">
+        <div className="flex flex-col md:flex-row justify-around items-center p-2 bg-gray-100 rounded-md border gap-3 md:gap-5">
           {/* Total Online Section */}
-          <div className="text-center  flex-1">
-            <h3 className="text-lg font-bold text-gray-700">Total Online</h3>
-            <p className="text-xl font-semibold text-green-500">
+          <div className="flex text-center md:flex-col gap-5">
+            <h3 className="text-lg font-bold text-gray-700">Total Online: </h3>
+            <p className="text-lg font-semibold text-green-500">
               ₹{totalOnlineExpenses.toFixed(2)}
             </p>
           </div>
           {/* Total Offline Section */}
-          <div className="text-center flex-1">
-            <h3 className="text-lg font-bold text-gray-700">Total Offline</h3>
-            <p className="text-xl font-semibold text-blue-500">
+          <div className=" flex text-center md:flex-col gap-5">
+            <h3 className="text-lg font-bold text-gray-700">Total Offline: </h3>
+            <p className="text-lg font-semibold text-blue-500">
               ₹{totalOfflineExpenses.toFixed(2)}
             </p>
           </div>

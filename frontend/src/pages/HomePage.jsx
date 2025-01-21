@@ -16,6 +16,8 @@ function HomePage() {
   const handleOptionClick = (option) => {
     console.log(option); // Handle the click (e.g., navigate or show forms)
     setIsOpen(false); // Close the dropdown after selecting an option
+
+    
   };
 
   // Close the dropdown if clicked outside
@@ -86,8 +88,8 @@ function HomePage() {
         </div>
 
         {/* Content */}
-        <div className="border border-gray-300 rounded-lg w-full overflow-hidden">
-          <div className="h-full overflow-y-auto p-4">
+        <div className="border border-gray-300 rounded-lg w-full">
+          <div className="h-full overflow-auto p-4">
             {activeTab === "Expense" ? <ExpenseHome /> : <IncomeHome />}
           </div>
         </div>
