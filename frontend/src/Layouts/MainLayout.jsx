@@ -24,7 +24,7 @@ const MainLayout = () => {
         </div>
 
         {/* Content Box */}
-        <div className=" flex-grow overflow-auto bg-red-700 rounded-md">
+        <div className=" flex-grow overflow-auto h-auto bg-red-700 rounded-md">
           {/* The Outlet renders the child route content here */}
           <Outlet />
         </div>

@@ -54,5 +54,5 @@ const LineGraph = ({ title, bgColor }) => {
     </div>
   );
 };
-
+  
 export default LineGraph;
