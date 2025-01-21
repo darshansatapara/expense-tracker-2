@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { axiosInstance } from "../../utils/axios.js";
-import { formatExpensesData } from "../../components/commonComponent/formatEAndIData .js";
+import { formatData } from "../../components/commonComponent/formatEAndIData.js";
 
 const useUserExpenseStore = create((set) => ({
   userExpenses: [], // State to store user expenses
@@ -16,25 +16,19 @@ const useUserExpenseStore = create((set) => ({
       const response = await axiosInstance.get(
         `/expense/getExpenses/${userId}/${startDate}/${endDate}` // Adjust the endpoint as needed
       );
-
-      // console.log(response.data.expenses, "user expense");
-
+      // console.log(response.data.expenses);
       if (response.data.success) {
-        const formattedExpenses = formatExpensesData(
+        // Format the data using the utility function
+        const formattedData = formatData(
           response.data.expenses,
           startDate,
           endDate
         );
+        // console.log(formattedData, "user expense");
         set({
-          userExpenses: formattedExpenses, // Update the state with fetched expenses
+          userExpenses: formattedData, // Update the state with formatted expenses
           loading: false,
           error: null,
-        });
-      } else {
-        set({
-          userExpenses: [],
-          loading: false,
-          error: response.data.message || "Failed to fetch expenses.",
         });
       }
     } catch (error) {
@@ -80,7 +74,6 @@ const useUserExpenseStore = create((set) => ({
       });
     }
   },
-
 }));
 
 export default useUserExpenseStore;

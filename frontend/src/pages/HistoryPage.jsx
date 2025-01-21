@@ -32,7 +32,7 @@ const HistoryPage = () => {
       if (activeTab === "Expense") {
         await fetchUserExpenses(userId, startDate, endDate); // Fetch expenses
         const stateExpenses = userExpenseStore.getState().userExpenses; // Get updated state
-        // console.log(stateExpenses, "state expenses");
+        // console.log(startDate, endDate, "state expenses");
 
         setTransactions(
           stateExpenses.map((entry) => ({

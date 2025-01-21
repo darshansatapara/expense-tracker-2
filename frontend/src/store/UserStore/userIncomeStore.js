@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { axiosInstance } from "../../utils/axios.js";
+import { formatData } from "../../components/commonComponent/formatEAndIData.js";
 
 const useUserIncomeStore = create((set) => ({
   userIncomes: [], // State to store user incomes
@@ -8,17 +9,24 @@ const useUserIncomeStore = create((set) => ({
 
   // Fetch user incomes based on userId, startDate, endDate, and profession
   fetchUserIncomes: async (userId, startDate, endDate, profession) => {
-    // console.log(userId, startDate, endDate, profession);
+    console.log(userId, startDate, endDate, profession);
     set({ loading: true, error: null }); // Set loading to true and clear any errors
     try {
       const response = await axiosInstance.get(
         `/income/getIncomes/${userId}/${startDate}/${endDate}/${profession}` // Adjust the endpoint as needed
       );
 
-      console.log(response.data.incomes);
+      // console.log(response.data.incomes);
       if (response.data.success) {
+        // Format the fetched incomes using formatData
+        const formattedData = formatData(
+          response.data.incomes,
+          startDate,
+          endDate
+        );
+
         set({
-          userIncomes: response.data.incomes, // Update the state with fetched incomes
+          userIncomes: formattedData, // Update the state with formatted incomes
           loading: false,
           error: null,
         });
