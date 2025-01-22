@@ -43,17 +43,22 @@ const useUserExpenseStore = create((set) => ({
   },
 
   fetchUserWeeklyExpenses: async (userId, startDate, endDate) => {
-    console.log(userId, startDate, endDate);
+    // console.log(userId, startDate, endDate);
     set({ loading: true, error: null }); // Set loading to true and clear any errors
     try {
       const response = await axiosInstance.get(
         `/expense/getExpenses/${userId}/${startDate}/${endDate}` // Adjust the endpoint as needed
       );
 
-      console.log(response.data.expenses);
+      // console.log(response.data.expenses);
       if (response.data.success) {
+        const formattedData = formatData(
+          response.data.expenses,
+          startDate,
+          endDate
+        );
         set({
-          weeklyUserExpenses: response.data.expenses, // Update the state with fetched expenses
+          weeklyUserExpenses: formattedData, // Update the state with fetched expenses
           loading: false,
           error: null,
         });

@@ -9,7 +9,7 @@ const useUserIncomeStore = create((set) => ({
 
   // Fetch user incomes based on userId, startDate, endDate, and profession
   fetchUserIncomes: async (userId, startDate, endDate, profession) => {
-    console.log(userId, startDate, endDate, profession);
+    // console.log(userId, startDate, endDate, profession);
     set({ loading: true, error: null }); // Set loading to true and clear any errors
     try {
       const response = await axiosInstance.get(
