@@ -1,68 +1,104 @@
-import React from "react";
+import React, { useState } from "react";
+import { Table, Button, Select } from "antd";
 
 export const TransactionList = ({ transactions, isExpense }) => {
+  const [selectedMode, setSelectedMode] = useState("All");
+
+  // Filter transactions based on the selected mode
+  const filteredTransactions =
+    selectedMode === "All"
+      ? transactions
+      : transactions.filter(
+          (transaction) =>
+            transaction.mode?.toLowerCase() === selectedMode.toLowerCase()
+        );
+  // Define the columns with Ant Design filter for "Mode"
+  const columns = [
+    {
+      title: "Amount",
+      dataIndex: "amount",
+      key: "amount",
+      render: (amount) => (
+        <span>₹{amount ? parseFloat(amount).toFixed(2) : "N/A"}</span>
+      ),
+    },
+    {
+      title: "Mode",
+      dataIndex: "mode",
+      key: "mode",
+      filters: [
+        { text: "Online", value: "Online" },
+        { text: "Offline", value: "Offline" },
+      ],
+      filterMultiple: false, // Allow single selection
+      onFilter: (value, record) =>
+        record.mode?.toLowerCase() === value.toLowerCase(),
+      filterDropdown: ({ confirm }) => (
+        <div className="flex flex-col items-start p-1  bg-white shadow-md rounded-md">
+          <Select
+            id="mode-filter"
+            value={selectedMode}
+            onChange={(value) => {
+              setSelectedMode(value);
+              confirm();
+            }}
+            style={{
+              minWidth: "100%",
+              maxWidth: "100%",
+              marginTop: "2%",
+            }}
+            options={[
+              { value: "All", label: "All" },
+              { value: "Online", label: "Online" },
+              { value: "Offline", label: "Offline" },
+            ]}
+          />
+        </div>
+      ),
+    },
+
+    {
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
+      render: (category) => <span>{category || "N/A"}</span>,
+    },
+    ...(isExpense
+      ? [
+          {
+            title: "Sub-Category",
+            dataIndex: "subcategory",
+            key: "subcategory",
+            render: (subcategory) => <span>{subcategory || "N/A"}</span>,
+          },
+        ]
+      : []),
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Button type="link" className="text-blue-500 hover:underline">
+          View & Edit
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden p-2">
       <div className="overflow-x-auto">
-        <table className="table-auto w-full border-collapse border ">
-          {/* Table Header */}
-          <thead>
-            <tr className="bg-gray-200 font-medium text-gray-700">
-              <th className="w-1/4 p-3 text-left border ">Amount</th>
-              <th className="w-1/4 p-3 text-left border ">Mode</th>
-              <th className="w-1/4 p-3 text-left border ">Category</th>
-              {isExpense && (
-                <th className="w-1/4 p-3 text-left border ">Sub-Category</th>
-              )}
-              <th
-                className={`${
-                  isExpense ? "w-1/4" : "w-1/2"
-                } p-3 text-left border `}
-              >
-                Actions
-              </th>
-            </tr>
-          </thead>
-          {/* Table Body */}
-          <tbody>
-            {transactions.map((transaction, tIndex) => (
-              <tr
-                key={tIndex}
-                className={`${
-                  tIndex % 2 === 0 ? "bg-white" : "bg-gray-50"
-                } hover:bg-gray-100`}
-              >
-                {/* Amount */}
-                <td className="p-3 text-gray-700  ">
-                  ₹
-                  {transaction.amount
-                    ? parseFloat(transaction.amount).toFixed(2)
-                    : "N/A"}
-                </td>
-                {/* Mode */}
-                <td className="p-3 text-gray-700  ">
-                  {transaction.mode || "N/A"}
-                </td>
-                {/* Category */}
-                <td className="p-3 text-gray-700  ">
-                  {transaction.category || "N/A"}
-                </td>
-                {/* Sub-Category (Only for Expense) */}
-                {isExpense && (
-                  <td className="p-3 text-gray-700  ">
-                    {transaction.subcategory || "N/A"}
-                  </td>
-                )}
-                {/* Actions */}
-                <td className="p-3  ">
-                  <button className="text-blue-500 hover:underline">
-                    View & Edit
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table
+          columns={columns}
+          dataSource={filteredTransactions.map((transaction, index) => ({
+            ...transaction,
+            key: index, // Unique key for each row
+          }))}
+          pagination={false}
+          rowClassName={(record, index) =>
+            index % 2 === 0 ? "bg-white" : "bg-gray-50"
+          }
+          className="border-collapse  w-full table-auto"
+        />
       </div>
     </div>
   );
