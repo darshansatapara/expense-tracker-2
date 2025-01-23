@@ -9,6 +9,7 @@ import {
   MenuOutlined,
 } from "@ant-design/icons";
 import { BellPlus, LogOut, ShieldQuestion } from "lucide-react";
+import NotificationModal from "../NotificationComponents/Notification";  // Import the new modal component
 
 const Navbar = ({ toggleSidebar }) => {
   const location = useLocation();
@@ -51,13 +52,26 @@ const Navbar = ({ toggleSidebar }) => {
   ];
 
   const [dialogIndex, setDialogIndex] = useState(0);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setDialogIndex((prevIndex) => (prevIndex + 1) % dialogs.length);
-    }, 3000);
+    }, 2000);
     return () => clearInterval(interval);
   }, [dialogs.length]);
+
+  // Add a mock notification when the user lands on the homepage
+  useEffect(() => {
+    const currentDate = new Date();
+    setNotifications([
+      {
+        message: "Welcome to Expense Tracker!",
+        time: `${currentDate.toLocaleDateString()} ${currentDate.toLocaleTimeString()}`,
+      },
+    ]);
+  }, []);
 
   return (
     <div className="w-full bg-white border-b-2">
@@ -81,8 +95,14 @@ const Navbar = ({ toggleSidebar }) => {
 
         {/* Right Section */}
         <div className="flex items-center space-x-4">
-          <button className="relative hover:cursor-pointer">
+          <button
+            className="relative hover:cursor-pointer"
+            onClick={() => setShowNotification(true)}  // Show modal on click
+          >
             <BellPlus />
+            {notifications.length > 0 && (
+              <span className="absolute top-0 right-0 w-3 h-3 bg-red-600 rounded-full"></span>
+            )}
           </button>
           {/* Logout Button Hidden on Small Screens */}
           <div className="hidden lg:flex hover:cursor-pointer rounded-md h-8 w-8 items-center justify-center">
@@ -97,6 +117,13 @@ const Navbar = ({ toggleSidebar }) => {
           </button>
         </div>
       </nav>
+
+      {/* Notification Modal Box */}
+      <NotificationModal
+        showModal={showNotification}  // Pass modal visibility
+        notifications={notifications}  // Pass notifications data
+        onClose={() => setShowNotification(false)}  // Pass close handler
+      />
     </div>
   );
 };
