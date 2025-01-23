@@ -3,11 +3,9 @@ import { axiosInstance } from "../../utils/axios.js";
 import { formatData } from "../../components/commonComponent/formatEAndIData.js";
 
 const useUserExpenseStore = create((set) => ({
-  userExpenses: [], // State to store user expenses
-  weeklyUserExpenses: [], // State to store
-  loading: false, // State to track the loading status
-  error: null, // State to track any errors
+  userExpenses: [],
 
+  // as per date range
   // Fetch user expenses based on userId, startDate, and endDate
   fetchUserExpenses: async (userId, startDate, endDate) => {
     // console.log(userId, startDate, endDate);
@@ -47,7 +45,7 @@ const useUserExpenseStore = create((set) => ({
     set({ loading: true, error: null }); // Set loading to true and clear any errors
     try {
       const response = await axiosInstance.get(
-        `/expense/getExpenses/${userId}/${startDate}/${endDate}` // Adjust the endpoint as needed
+        `/expense/getExpenses/${userId}/${startDate}/${endDate}` 
       );
 
       // console.log(response.data.expenses);
@@ -64,18 +62,12 @@ const useUserExpenseStore = create((set) => ({
         });
       } else {
         set({
-          weeklyUserExpenses: [],
-          loading: false,
-          error: response.data.message || "Failed to fetch expenses.",
+          userExpenses: [],
         });
       }
     } catch (error) {
       set({
-        weeklyUserExpenses: [],
-        loading: false,
-        error:
-          error.response?.data?.message ||
-          "An error occurred while fetching expenses.",
+        userExpenses: [],
       });
     }
   },

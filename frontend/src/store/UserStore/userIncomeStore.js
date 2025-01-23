@@ -9,13 +9,14 @@ const useUserIncomeStore = create((set) => ({
 
   // Fetch user incomes based on userId, startDate, endDate, and profession
   fetchUserIncomes: async (userId, startDate, endDate, profession) => {
-    // console.log(userId, startDate, endDate, profession);
-    set({ loading: true, error: null }); // Set loading to true and clear any errors
+    
+    set({ loading: true, error: null }); 
     try {
       const response = await axiosInstance.get(
-        `/income/getIncomes/${userId}/${startDate}/${endDate}/${profession}` // Adjust the endpoint as needed
+        `/income/getIncomes/${userId}/${startDate}/${endDate}/${profession}`
       );
 
+      // console.log(response.data.incomes);
       // console.log(response.data.incomes);
       if (response.data.success) {
         // Format the fetched incomes using formatData
@@ -47,9 +48,6 @@ const useUserIncomeStore = create((set) => ({
       });
     }
   },
-
-  // Clear the incomes data
-  clearUserIncomes: () => set({ userIncomes: [], error: null }),
 }));
 
 export default useUserIncomeStore;
