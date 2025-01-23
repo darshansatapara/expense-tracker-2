@@ -9,7 +9,7 @@ import dayjs from "dayjs";
 /*
 {
   "userId": "67792e48b3085a94fc47b110",
-  "date": "2025-01-04",
+  "date": "04-01-2025",
   "mode": "Offline",
   "amount": "250.00",
   "category": "6774dfd2a75ec7e9ef49e89e",
@@ -219,6 +219,121 @@ export const getUserExpense =
     }
   };
 
+export const getWeeklyUserExpense =
+  (userDbConnection, adminDbConnection) => async (req, res) => {
+    const { userId, startDate, endDate } = req.params;
+
+    try {
+      // Initialize the UserExpense model for the userDbConnection
+      const UserExpenseModel = UserExpense(userDbConnection);
+
+      // Parse start and end dates
+      const formattedStartDate = new Date(
+        startDate.split("-").reverse().join("-")
+      ); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
+      const formattedEndDate = new Date(endDate.split("-").reverse().join("-")); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
+
+      // Fetch user expenses and populate the related fields
+      const userExpenses = await UserExpenseModel.findOne({ userId })
+        .populate({
+          path: "expenses.online.currency",
+          model: AdminCurrencyCategory(adminDbConnection),
+          select: "symbol", // Select only the symbol for currency
+        })
+        .populate({
+          path: "expenses.offline.currency",
+          model: AdminCurrencyCategory(adminDbConnection),
+          select: "symbol", // Select only the symbol for currency
+        })
+        .populate({
+          path: "expenses.online.category",
+          model: AdminExpenseCategory(adminDbConnection),
+          select: "name subcategories", // Select only the name for subcategory
+        })
+        .populate({
+          path: "expenses.offline.category",
+          model: AdminExpenseCategory(adminDbConnection),
+          select: "name subcategories", // Select only the name for subcategory
+        });
+
+      if (!userExpenses) {
+        return res.status(404).json({
+          success: false,
+          message: "No expenses found for this user.",
+        });
+      }
+
+      const filteredExpenses = [];
+
+      // Filter expenses by the specified date range
+      userExpenses.expenses.forEach((expenseGroup) => {
+        const expenseDate = new Date(
+          expenseGroup.date.split("-").reverse().join("-")
+        );
+
+        if (
+          expenseDate >= formattedStartDate &&
+          expenseDate <= formattedEndDate
+        ) {
+          filteredExpenses.push({
+            date: expenseGroup.date,
+            online: expenseGroup.online.map((expense) => ({
+              date: expense.date,
+              mode: expense.mode,
+              amount: expense.amount,
+              currency: expense.currency ? expense.currency.symbol : "Unknown", // Handle null currency
+              category: expense.category ? expense.category.name : "Unknown", // Handle null category
+              subcategory:
+                expense.category?.subcategories.find(
+                  (sub) =>
+                    sub._id.toString() === expense.subcategory?.toString()
+                )?.name || "Unknown",
+
+              // Handle null subcategory
+              note: expense.note,
+              _id: expense._id,
+            })),
+            offline: expenseGroup.offline.map((expense) => ({
+              date: expense.date,
+              mode: expense.mode,
+              amount: expense.amount,
+              currency: expense.currency ? expense.currency.symbol : "Unknown", // Handle null currency
+              category: expense.category ? expense.category.name : "Unknown", // Handle null category
+              subcategory:
+                expense.category?.subcategories.find(
+                  (sub) =>
+                    sub._id.toString() === expense.subcategory?.toString()
+                )?.name || "Unknown",
+
+              // Handle null subcategory
+              note: expense.note,
+              _id: expense._id,
+            })),
+          });
+        }
+      });
+
+      if (!filteredExpenses.length) {
+        return res.status(404).json({
+          success: false,
+          message: "No expenses found for the specified date range.",
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Expenses retrieved successfully.",
+        expenses: filteredExpenses,
+      });
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error fetching expenses.",
+        error: error.message,
+      });
+    }
+  };
 // Update expense details
 /**{
   "date": "05-01-2025",          // New Date

@@ -3,6 +3,7 @@ import {
   addUserExpense,
   deleteUserExpense,
   getUserExpense,
+  getWeeklyUserExpense,
   updateUserExpense,
 } from "../../controllers/UserController/userExpenseController.js";
 
@@ -18,6 +19,10 @@ const userExpenseRoute = (userDbConnection, adminDbConnection) => {
     "/getExpenses/:userId/:startDate/:endDate",
     getUserExpense(userDbConnection, adminDbConnection)
   );
+  router.get(
+    "/getWeeklyUserExpense/:userId/:startDate/:endDate",
+    getWeeklyUserExpense(userDbConnection, adminDbConnection)
+  );
   router.put(
     "/updateExpense/:userId/:expenseDate",
     updateUserExpense(userDbConnection)
@@ -25,7 +30,6 @@ const userExpenseRoute = (userDbConnection, adminDbConnection) => {
   router.delete(
     "/deleteExpense/:userId/:expenseDate",
     deleteUserExpense(userDbConnection)
-
   );
 
   return router;

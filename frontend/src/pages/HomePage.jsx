@@ -1,23 +1,74 @@
 import React, { useState, useEffect, useRef } from "react";
 import { CirclePlus } from "lucide-react";
 import { TabButton } from "../components/commonComponent/TabButton";
-import ExpenseHome from "../components/homeComponent/ExpenseHome";
-import IncomeHome from "../components/homeComponent/IncomeHome";
+import ExpenseHome from "../components/homeComponent/IncomeAndExpenseHome";
+import dayjs from "dayjs";
+import useUserExpenseStore from "../store/UserStore/userExpenseStore";
+import { filterDataByDateRange } from "../components/commonComponent/formatEAndIData ";
+import useUserIncomeStore from "../store/UserStore/userIncomeStore";
+import IncomeAndExpenseHome from "../components/homeComponent/IncomeAndExpenseHome";
 
 function HomePage() {
+  const { userExpenses, fetchUserExpenses } = useUserExpenseStore();
+  const { fetchUserIncomes, userIncomes } = useUserIncomeStore();
+  const userId = "677bc096bd8c6f677ef507d3";
+  const profession = "Student";
+
+  const [filteredExpense, setFilteredExpense] = useState(null); // State to store filtered data
+  const [filteredIncome, setfilteredIncome] = useState(null); // State to store filtered data
   const [activeTab, setActiveTab] = useState("Expense");
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  // get current month of ghe user expense
+  const getCurrentMonthDates = () => {
+    const startDate = dayjs().startOf("month").format("DD-MM-YYYY"); // Start of the month
+    const endDate = dayjs().endOf("month").format("DD-MM-YYYY"); // End of the month
+    return { startDate, endDate };
+  };
+  const { startDate, endDate } = getCurrentMonthDates();
+
+  // call the store to get user expense data of the current month
+  if (activeTab === "Expense") {
+    useEffect(() => {
+      if (userId && startDate && endDate) {
+        fetchUserExpenses(userId, startDate, endDate);
+      }
+    }, [fetchUserExpenses]);
+  } else {
+    useEffect(() => {
+      if (userId && startDate && endDate && profession) {
+        fetchUserIncomes(userId, startDate, endDate, profession);
+      }
+    }, [fetchUserIncomes]);
+  }
+
+  // console.log("fetched data", userIncomes);
+  if (activeTab === "Expense") {
+    useEffect(() => {
+      if (userExpenses) {
+        const data = filterDataByDateRange(userExpenses);
+        setFilteredExpense(data);
+      }
+    }, [userExpenses]);
+    // console.log("userExpenses", userExpenses);
+  } else {
+    useEffect(() => {
+      if (userIncomes) {
+        const data = filterDataByDateRange(userIncomes);
+        setfilteredIncome(data);
+      }
+    }, [userIncomes]);
+    // console.log("userIncomes", userIncomes);
+  }
 
   const toggleDropdown = () => {
     setIsOpen((prev) => !prev);
   };
 
   const handleOptionClick = (option) => {
-    console.log(option); // Handle the click (e.g., navigate or show forms)
+    // console.log(option); // Handle the click (e.g., navigate or show forms)
     setIsOpen(false); // Close the dropdown after selecting an option
-
-    
   };
 
   // Close the dropdown if clicked outside
@@ -39,22 +90,22 @@ function HomePage() {
       <div className="flex flex-col items-center p-4 shadow-lg">
         <div className="w-full border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
-            <ul className="flex flex-wrap text-lg font-semibold text-center text-gray-500 dark:text-gray-400">
-              <li className="me-2">
+            <div className="flex flex-wrap text-lg font-semibold text-center text-gray-500 dark:text-gray-400 mb-4">
+              <div className="me-2">
                 <TabButton
                   label="Expense"
                   isActive={activeTab === "Expense"}
                   onClick={() => setActiveTab("Expense")}
                 />
-              </li>
-              <li className="me-2">
+              </div>
+              <div className="me-2">
                 <TabButton
                   label="Income"
                   isActive={activeTab === "Income"}
                   onClick={() => setActiveTab("Income")}
                 />
-              </li>
-            </ul>
+              </div>
+            </div>
 
             {/* Add Button */}
             <div className="relative" ref={dropdownRef}>
@@ -90,7 +141,12 @@ function HomePage() {
         {/* Content */}
         <div className="border border-gray-300 rounded-lg w-full">
           <div className="h-full overflow-auto p-4">
-            {activeTab === "Expense" ? <ExpenseHome /> : <IncomeHome />}
+            <IncomeAndExpenseHome
+              activeTab={activeTab}
+              filteredData={
+                activeTab === "Expense" ? filteredExpense : filteredIncome
+              }
+            />
           </div>
         </div>
       </div>
