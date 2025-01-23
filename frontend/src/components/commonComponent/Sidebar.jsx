@@ -35,7 +35,10 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
             >
               <CloseOutlined className="text-xl" />
             </button>
-            <SidebarContent toggleSidebar={toggleSidebar} />
+            <SidebarContent
+              toggleSidebar={toggleSidebar}
+              isSmallScreen={true}
+            />
           </div>
         </div>
       )}
@@ -43,7 +46,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
   );
 };
 
-const SidebarContent = ({ toggleSidebar }) => {
+const SidebarContent = ({ toggleSidebar, isSmallScreen }) => {
   return (
     <div className="grid h-screen">
       {/* Top Section */}
@@ -99,7 +102,9 @@ const SidebarContent = ({ toggleSidebar }) => {
                   : "hover:bg-gray-200"
               }`
             }
-            onClick={toggleSidebar} // Auto close sidebar when clicking on a link
+            onClick={() => {
+              if (isSmallScreen) toggleSidebar(); // Only close sidebar on small screens
+            }}
           >
             {icon} <span>{name}</span>
           </NavLink>

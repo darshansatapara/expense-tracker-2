@@ -48,11 +48,11 @@ const LineGraph = ({ title, bgColor }) => {
       </div>
 
       {/* Graph Container with Reduced Height */}
-      <div className="w-full h-[300px]">
+      <div className="w-full h-[150px]">
         <Line {...config} />
       </div>
     </div>
   );
 };
-
+  
 export default LineGraph;
