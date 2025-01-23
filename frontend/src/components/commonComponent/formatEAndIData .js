@@ -6,7 +6,7 @@ import weekOfYear from "dayjs/plugin/weekOfYear";
 
 // format the data in the store (add the data if not existing in database and sort according to the date)
 
-export const formatExpensesData = (expenses, startDate, endDate) => {
+export const formatData = (expenses, startDate, endDate) => {
   // Helper function to parse and format dates
   const parseDate = (dateStr) =>
     new Date(dateStr.split("-").reverse().join("-"));
