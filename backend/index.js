@@ -16,6 +16,7 @@ import userIncomeRoute from "./routes/UserRoutes/userIncomeRoutes.js";
 import otpRoute from "./routes/CommonRoute/otpRoutes.js";
 import adminCategoryRoutes from "./routes/AdminRoutes/adminCategoryRoutes.js";
 import userCategoryRoute from "./routes/UserRoutes/userCategoryRoutes.js";
+import userProfileRoute from "./routes/UserRoutes/userProfileRoutes.js";
 
 dotenv.config(); // Load environment variables
 
@@ -49,6 +50,10 @@ dotenv.config(); // Load environment variables
     app.use(
       "/api/usercategories",
       userCategoryRoute(userDbConnection, adminDbConnection)
+    );
+    app.use(
+      "/api/userprofile",
+      userProfileRoute(userDbConnection, adminDbConnection)
     );
 
     // Admin-specific routes (if any)****************************************************************

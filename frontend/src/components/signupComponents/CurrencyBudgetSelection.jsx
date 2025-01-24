@@ -5,7 +5,7 @@ import { CurrencySelectorButton } from "../InputComponents/CurrencySelectorButto
 import SignupLeft from "./SignUpInContent/Signup_Left.jsx";
 import { toast } from "react-toastify";
 import { userCategoryStore } from "../../store/UserStore/userCategoryStore.js";
-import { userStore } from "../../store/UserStore/userStore.js";
+import { userStore } from "../../store/UserStore/userAuthStore.js";
 
 export default function CurrencyBudgetSelection() {
   const location = useLocation();
