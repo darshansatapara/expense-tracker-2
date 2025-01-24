@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
-import Settings_Upper from "../components/SettingsComponents/Settings_Upper";
-import Settings_Lower from "../components/SettingsComponents/Settings_Lower";
+import Settings from "../components/SettingsComponents/SettingComponent";
 import ContactUs from "../components/SettingsComponents/Contactus";
 import PersonalDetails from "../components/SettingsComponents/PersonalDetails";
 import ThemeSettings from "../components/SettingsComponents/Theme";
@@ -27,9 +26,8 @@ const SettingsPage = () => {
   const isMainSettingsPage = location.pathname === "/settings";
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Render Settings_Upper only if it's the main settings page and not mobile */}
-      {!isMobile && isMainSettingsPage && <Settings_Upper />}
+    <div className="min-h-screen ml-5 mr-5">
+      {/* {!isMobile && isMainSettingsPage && <Settings_Upper />} */}
 
       <div
         className={` ${
@@ -40,7 +38,7 @@ const SettingsPage = () => {
       >
         {isMainSettingsPage ? (
           // Render Settings_Lower only on the main settings page
-          <Settings_Lower />
+          <Settings />
         ) : (
           // Render Routes for submenu items
           <Routes>

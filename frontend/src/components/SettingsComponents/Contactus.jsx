@@ -22,7 +22,7 @@ const ContactUs = () => {
       </div>
 
       {/* Main Content Section */}
-      <div className="flex flex-wrap justify-center items-center gap-8 w-full max-w-6xl">
+      <div className="flex flex-wrap justify-center items-center gap-8 w-full max-w-6xl ">
         {/* Left Side Image */}
         <motion.div
           initial={{ y: 50, opacity: 0 }}

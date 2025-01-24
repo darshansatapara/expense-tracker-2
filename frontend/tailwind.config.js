@@ -26,6 +26,9 @@ export default {
       screens:{
         'sm-plus': {'max':'1139px'}
       },
+      backdropBlur: {
+        md: '12px', // or another value for the blur effect
+      },
     },
   },
   plugins: [require("tailwind-scrollbar")],
