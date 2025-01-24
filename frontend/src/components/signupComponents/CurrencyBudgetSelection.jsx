@@ -4,7 +4,7 @@ import { adminCategoryStore } from "../../store/AdminStore/adminCategoryStore.js
 import { CurrencySelectorButton } from "../InputComponents/CurrencySelectorButton.jsx";
 import SignupLeft from "./SignUpInContent/Signup_Left.jsx";
 import { toast } from "react-toastify";
-import { userCategoryStore } from "../../store/UserStore/userCategoryStore.js";
+import { userCategoryStore } from "../../store/UserStore/addUserCategoryStore.js";
 import { userStore } from "../../store/UserStore/userStore.js";
 
 export default function CurrencyBudgetSelection() {
@@ -14,18 +14,11 @@ export default function CurrencyBudgetSelection() {
   const { userId } = location.state || {};
 
   console.log(userId);
-  const addCurrencyAndBudget = userCategoryStore(
-    (state) => state.addCurrencyAndBudget
-  );
-  const fetchCurrencyCategories = adminCategoryStore(
-    (state) => state.fetchCurrencyCategories
-  );
+  const addCurrencyAndBudget = userCategoryStore();
+  const { fetchCurrencyCategories, allCurrencyCategories } =
+    adminCategoryStore();
 
-  const allcurrencyCategories = adminCategoryStore(
-    (state) => state.currencyCategories
-  );
-
-  const currencyCategories = allcurrencyCategories.currencies;
+  const currencyCategories = allCurrencyCategories.currencies;
   console.log(currencyCategories);
 
   const [selectedCurrency, setSelectedCurrency] = useState([]);
@@ -114,7 +107,7 @@ export default function CurrencyBudgetSelection() {
             )}
 
             {/* Empty Fallback */}
-            {!fetchError && allcurrencyCategories.length === 0 && (
+            {!fetchError && fetchCurrencyCategories.length === 0 && (
               <div className="text-center text-gray-500">
                 No currencies available to display.
               </div>

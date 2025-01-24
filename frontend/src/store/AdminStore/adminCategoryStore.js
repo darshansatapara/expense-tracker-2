@@ -3,7 +3,7 @@ import { axiosInstance } from "../../utils/axios.js";
 import { toast } from "react-toastify";
 
 export const adminCategoryStore = create((set) => ({
-  currencyCategories: [],
+  allCurrencyCategories: [],
   expenseCategories: [],
   incomeCategories: [],
   isLoadingCategories: false,
@@ -17,7 +17,7 @@ export const adminCategoryStore = create((set) => ({
       const res = await axiosInstance.get(
         "/admincategories/allcurrencyCategoryIsActive"
       );
-      set({ currencyCategories: res.data });
+      set({ allCurrencyCategories: res.data });
       console.log(res.data);
     } catch (error) {
       console.error("Error fetching currency categories:", error);
@@ -25,7 +25,7 @@ export const adminCategoryStore = create((set) => ({
     } finally {
       set({ isLoadingCategories: false });
     }
-  },
+  },  
 
   fetchExpenseCategories: async () => {
     set({ isLoadingCategories: true });

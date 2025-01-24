@@ -24,7 +24,7 @@ const useUserExpenseStore = create((set) => ({
         );
         // console.log(formattedData, "user expense");
         set({
-          userExpenses: formattedData, // Update the state with formatted expenses
+          userExpenses: formattedData,
           loading: false,
           error: null,
         });
@@ -36,38 +36,6 @@ const useUserExpenseStore = create((set) => ({
         error:
           error.response?.data?.message ||
           "An error occurred while fetching expenses.",
-      });
-    }
-  },
-
-  fetchUserWeeklyExpenses: async (userId, startDate, endDate) => {
-    // console.log(userId, startDate, endDate);
-    set({ loading: true, error: null }); // Set loading to true and clear any errors
-    try {
-      const response = await axiosInstance.get(
-        `/expense/getExpenses/${userId}/${startDate}/${endDate}` 
-      );
-
-      // console.log(response.data.expenses);
-      if (response.data.success) {
-        const formattedData = formatData(
-          response.data.expenses,
-          startDate,
-          endDate
-        );
-        set({
-          weeklyUserExpenses: formattedData, // Update the state with fetched expenses
-          loading: false,
-          error: null,
-        });
-      } else {
-        set({
-          userExpenses: [],
-        });
-      }
-    } catch (error) {
-      set({
-        userExpenses: [],
       });
     }
   },

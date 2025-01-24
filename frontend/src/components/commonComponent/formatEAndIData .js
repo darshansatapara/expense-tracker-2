@@ -109,7 +109,7 @@ export function filterDataByDateRange(data) {
     filterByDateRange(item.date, startOfMonth, endOfMonth)
   );
 
-  console.log("Filtering today data", todayData,yesterdayData);
+  // console.log("Filtering today data", todayData,yesterdayData);
   return {
     today: {
       data: todayData,

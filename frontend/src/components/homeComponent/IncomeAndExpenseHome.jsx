@@ -22,8 +22,8 @@ export default function IncomeAndExpenseHome({ activeTab, filteredData }) {
   // console.log("Active Tab:", activeTab);
   // console.log("Weekly Total:", weeklyTotal);
   // console.log("Monthly Total:", monthlyTotal);
-  console.log("todayData", todayData);
-  console.log("yesterdayData", yesterdayData);
+  // console.log("todayData", todayData);
+  // console.log("yesterdayData", yesterdayData);
   return (
     <div className="h-full">
       {/* Graphs Section */}
