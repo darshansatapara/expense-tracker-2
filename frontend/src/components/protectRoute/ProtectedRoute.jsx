@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { userStore } from "../../store/UserStore/userStore.js";
+import { userStore } from "../../store/UserStore/userAuthStore.js";
 
 const ProtectedRoute = () => {
   const isAuthenticated = userStore.getState().checkAuth();
