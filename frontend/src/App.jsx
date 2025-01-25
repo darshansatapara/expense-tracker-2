@@ -34,6 +34,7 @@ function App() {
 
           <Route path="/reports" element={<ReportPage />} />
         </Route>
+        {/* </Route> */}
       </Routes>
     </BrowserRouter>
   );
