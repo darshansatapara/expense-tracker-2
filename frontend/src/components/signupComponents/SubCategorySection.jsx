@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { SubCategoryInputButton } from "../InputComponents/SubCategoryInputButton";
 import SignupLeft from "./SignUpInContent/Signup_Left.jsx";
 import { userCategoryStore } from "../../store/UserStore/userCategoryStore.js";
-import { userStore } from "../../store/UserStore/userStore.js";
+import { userStore } from "../../store/UserStore/userAuthStore.js";
 
 export default function SubCategorySection() {
   const location = useLocation();

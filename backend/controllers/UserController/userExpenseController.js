@@ -111,12 +111,19 @@ export const getUserExpense =
       // Initialize the UserExpense model for the userDbConnection
       const UserExpenseModel = UserExpense(userDbConnection);
 
-      // Parse start and end dates
       const formattedStartDate = new Date(
         startDate.split("-").reverse().join("-")
       ); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
+
+      // Add 1 day to the formatted start date
+      formattedStartDate.setDate(formattedStartDate.getDate() + 1);
+
       const formattedEndDate = new Date(endDate.split("-").reverse().join("-")); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
 
+      // Add 1 day to the formatted end date
+      // formattedEndDate.setDate(formattedEndDate.getDate() + 1);
+
+      // console.log("date range ", formattedStartDate, formattedEndDate);
       // Fetch user expenses and populate the related fields
       const userExpenses = await UserExpenseModel.findOne({ userId })
         .populate({

@@ -4,7 +4,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import React from "react";
 import { app } from "../../utils/firebase.js";
 import { useNavigate } from "react-router-dom";
-import { userStore } from "../../store/UserStore/userStore.js";
+import { userStore } from "../../store/UserStore/userAuthStore.js";
 
 export default function OAuth2() {
   const auth = getAuth(app);

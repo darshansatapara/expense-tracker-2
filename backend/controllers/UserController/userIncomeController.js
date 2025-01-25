@@ -97,10 +97,13 @@ export const getUserIncome =
       const UserIncomeModel = UserIncome(userDbConnection);
       const AdminIncomeCategoryModel = AdminIncomeCategory(adminDbConnection);
 
-      // Parse the start and end dates
       const formattedStartDate = new Date(
         startDate.split("-").reverse().join("-")
-      );
+      ); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
+
+      // Add 1 day to the formatted start date
+      formattedStartDate.setDate(formattedStartDate.getDate() + 1);
+
       const formattedEndDate = new Date(endDate.split("-").reverse().join("-"));
 
       // Step 1: Find the AdminIncomeCategory for the given profession
