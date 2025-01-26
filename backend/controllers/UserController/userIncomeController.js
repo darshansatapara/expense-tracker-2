@@ -91,7 +91,7 @@ export const addUserIncome = (userDbConnection) => async (req, res) => {
 // Controller for get incomes as per date range
 export const getUserIncome =
   (userDbConnection, adminDbConnection) => async (req, res) => {
-    const { userId, startDate, endDate, profession } = req.params;
+    const { userId, startDate, endDate, professionId } = req.params;
 
     try {
       const UserIncomeModel = UserIncome(userDbConnection);
@@ -108,13 +108,13 @@ export const getUserIncome =
 
       // Step 1: Find the AdminIncomeCategory for the given profession
       const professionCategory = await AdminIncomeCategoryModel.findOne({
-        name: profession,
+        _id: professionId,
       });
 
       if (!professionCategory) {
         return res.status(404).json({
           success: false,
-          message: `No active category found for profession: ${profession}`,
+          message: `No active category found for profession: ${professionId}`,
         });
       }
 
