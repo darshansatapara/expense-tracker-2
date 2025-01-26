@@ -26,7 +26,7 @@ const SettingsPage = () => {
   const isMainSettingsPage = location.pathname === "/settings";
 
   return (
-    <div className="min-h-screen ml-5 mr-5">
+    <div className="min-h-screen mr-5">
       {/* {!isMobile && isMainSettingsPage && <Settings_Upper />} */}
 
       <div

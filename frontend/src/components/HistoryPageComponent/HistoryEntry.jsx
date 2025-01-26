@@ -1,31 +1,3 @@
-<<<<<<< HEAD
-import React, { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { TransactionList } from "./TransactionList";
-
-export const HistoryEntry = ({ entry, isExpanded, toggleExpand }) => {
-  const [offlineAnimate, setOfflineAnimate] = useState(false);
-  const [onlineAnimate, setOnlineAnimate] = useState(false);
-
-  const [prevOfflineTotal, setPrevOfflineTotal] = useState(entry.offlineTotal);
-  const [prevOnlineTotal, setPrevOnlineTotal] = useState(entry.onlineTotal);
-
-  useEffect(() => {
-    if (prevOfflineTotal !== entry.offlineTotal) {
-      setOfflineAnimate(true);
-      setTimeout(() => setOfflineAnimate(false), 500); // Reset after animation
-      setPrevOfflineTotal(entry.offlineTotal);
-    }
-  }, [entry.offlineTotal, prevOfflineTotal]);
-
-  useEffect(() => {
-    if (prevOnlineTotal !== entry.onlineTotal) {
-      setOnlineAnimate(true);
-      setTimeout(() => setOnlineAnimate(false), 500); // Reset after animation
-      setPrevOnlineTotal(entry.onlineTotal);
-    }
-  }, [entry.onlineTotal, prevOnlineTotal]);
-=======
 import React from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { TransactionList } from "./TransactionList";
@@ -56,7 +28,6 @@ export const HistoryEntry = ({
       </div>
     );
   }
->>>>>>> fb6aab3cf0fea852b21dd4ce51b9f2f35fd4be0b
 
   return (
     <div className="mb-4 border rounded-lg overflow-hidden">
