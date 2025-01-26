@@ -13,8 +13,8 @@ export default function CurrencyBudgetSelection() {
 
   const { userId } = location.state || {};
 
-  console.log(userId);
-  const addCurrencyAndBudget = userCategoryStore();
+  // console.log(userId);
+  const { addCurrencyAndBudget } = userCategoryStore();
   const { fetchCurrencyCategories, allCurrencyCategories } =
     adminCategoryStore();
 
@@ -59,8 +59,7 @@ export default function CurrencyBudgetSelection() {
         budget: [{ offlineBudget, onlineBudget }],
       };
 
-      console.log(budgetData.userId);
-      console.log("Submitted Budget Data:", budgetData);
+      // console.log("Submitted Budget Data:", budgetData);
 
       await addCurrencyAndBudget(budgetData);
 

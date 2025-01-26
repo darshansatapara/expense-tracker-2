@@ -5,18 +5,16 @@ import ExpenseHome from "../components/homeComponent/IncomeAndExpenseHome";
 import dayjs from "dayjs";
 import useUserExpenseStore from "../store/UserStore/userExpenseStore";
 import { filterDataByDateRange } from "../components/commonComponent/formatEAndIData ";
-import useUserIncomeStore from "../store/UserStore/userIncomeStore";
+import useUserIncomeStore from "../store/UserStore/userIncomeStore.js";
 import IncomeAndExpenseHome from "../components/homeComponent/IncomeAndExpenseHome";
 import AddIncomeExpenseModel from "../components/commonComponent/AddIncomeExpenseModel";
-
 
 function HomePage() {
   const { userExpenses, fetchUserExpenses } = useUserExpenseStore();
   const { fetchUserIncomes, userIncomes } = useUserIncomeStore();
- 
- 
+
   const userId = "677bc096bd8c6f677ef507d3";
-  const profession = "Student";
+  const profession = "6774e0884930e249cf39daa0";
 
   const [option, setOption] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -25,8 +23,6 @@ function HomePage() {
   const [activeTab, setActiveTab] = useState("Expense");
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
-
 
   // get current month of ghe user expense
   const getCurrentMonthDates = () => {
@@ -43,7 +39,7 @@ function HomePage() {
         fetchUserExpenses(userId, startDate, endDate);
       }
     }, [fetchUserExpenses]);
-  } else {
+  } else if (activeTab === "Income") {
     useEffect(() => {
       if (userId && startDate && endDate && profession) {
         fetchUserIncomes(userId, startDate, endDate, profession);
@@ -60,9 +56,10 @@ function HomePage() {
       }
     }, [userExpenses]);
     // console.log("userExpenses", userExpenses);
-  } else {
+  } else if (activeTab === "Income") {
     useEffect(() => {
       if (userIncomes) {
+        // console.log("userIncome", userIncomes);
         const data = filterDataByDateRange(userIncomes);
         setfilteredIncome(data);
       }

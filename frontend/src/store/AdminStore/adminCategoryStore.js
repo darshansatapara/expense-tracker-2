@@ -25,7 +25,7 @@ export const adminCategoryStore = create((set) => ({
     } finally {
       set({ isLoadingCategories: false });
     }
-  },  
+  },
 
   fetchExpenseCategories: async () => {
     set({ isLoadingCategories: true });
@@ -45,11 +45,14 @@ export const adminCategoryStore = create((set) => ({
     }
   },
 
-  fetchIncomeCategories: async () => {
+  fetchIncomeCategoriesIsActive: async () => {
     set({ isLoadingCategories: true });
     try {
-      const res = await axiosInstance.get("/admincategories/allincomeCategory");
-      set({ incomeCategories: Array.isArray(res.data) ? res.data : [] });
+      const res = await axiosInstance.get(
+        "/admincategories/allincomeCategoryIsActive"
+      );
+      console.log(res.data);
+      return res.data;
     } catch (error) {
       console.error("Error fetching income categories:", error);
       toast.error("Failed to fetch income categories!");
