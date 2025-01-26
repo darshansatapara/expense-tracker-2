@@ -127,11 +127,12 @@ const TableList = ({ today, yesterday, activeTab }) => {
             columns={columns}
             pagination={false}
             scroll={{ x: 700 }}
+            sticky
             locale={{
               emptyText: loading ? (
-                <Spin className="h-[35.5vh]" size="large" />
+                <Spin className="h-[27.5vh]" size="large" />
               ) : (
-                <Empty />
+                <Empty className="h-[27.5vh]" />
               ),
             }}
             rowClassName={(record, index) =>

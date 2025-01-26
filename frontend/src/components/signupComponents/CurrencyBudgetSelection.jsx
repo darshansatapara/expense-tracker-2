@@ -13,19 +13,12 @@ export default function CurrencyBudgetSelection() {
 
   const { userId } = location.state || {};
 
-  console.log(userId);
-  const addCurrencyAndBudget = userCategoryStore(
-    (state) => state.addCurrencyAndBudget
-  );
-  const fetchCurrencyCategories = adminCategoryStore(
-    (state) => state.fetchCurrencyCategories
-  );
+  // console.log(userId);
+  const { addCurrencyAndBudget } = userCategoryStore();
+  const { fetchCurrencyCategories, allCurrencyCategories } =
+    adminCategoryStore();
 
-  const allcurrencyCategories = adminCategoryStore(
-    (state) => state.currencyCategories
-  );
-
-  const currencyCategories = allcurrencyCategories.currencies;
+  const currencyCategories = allCurrencyCategories.currencies;
   console.log(currencyCategories);
 
   const [selectedCurrency, setSelectedCurrency] = useState([]);
@@ -66,8 +59,7 @@ export default function CurrencyBudgetSelection() {
         budget: [{ offlineBudget, onlineBudget }],
       };
 
-      console.log(budgetData.userId);
-      console.log("Submitted Budget Data:", budgetData);
+      // console.log("Submitted Budget Data:", budgetData);
 
       await addCurrencyAndBudget(budgetData);
 
@@ -114,7 +106,7 @@ export default function CurrencyBudgetSelection() {
             )}
 
             {/* Empty Fallback */}
-            {!fetchError && allcurrencyCategories.length === 0 && (
+            {!fetchError && fetchCurrencyCategories.length === 0 && (
               <div className="text-center text-gray-500">
                 No currencies available to display.
               </div>

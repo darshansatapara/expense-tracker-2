@@ -92,6 +92,7 @@ export const addUserIncome = (userDbConnection) => async (req, res) => {
 export const getUserIncome =
   (userDbConnection, adminDbConnection) => async (req, res) => {
     const { userId, startDate, endDate, professionId } = req.params;
+    // console.log(professionId);
 
     try {
       const UserIncomeModel = UserIncome(userDbConnection);
@@ -111,6 +112,7 @@ export const getUserIncome =
         _id: professionId,
       });
 
+      // console.log(professionCategory);
       if (!professionCategory) {
         return res.status(404).json({
           success: false,
