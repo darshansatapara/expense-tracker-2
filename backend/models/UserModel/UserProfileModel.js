@@ -26,7 +26,7 @@ const userProfileSchema = new mongoose.Schema({
     required: true,
   },
   profession: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   profile_complated: {
