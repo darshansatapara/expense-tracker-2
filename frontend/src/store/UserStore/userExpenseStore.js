@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { axiosInstance } from "../../utils/axios.js";
-import { formatData } from "../../components/commonComponent/formatEAndIData .js";
+import { formatData } from "../../components/commonComponent/formatEAndIData.js";
 
 const useUserExpenseStore = create((set) => ({
   userExpenses: [],
@@ -45,7 +45,7 @@ const useUserExpenseStore = create((set) => ({
     set({ loading: true, error: null }); // Set loading to true and clear any errors
     try {
       const response = await axiosInstance.get(
-        `/expense/getExpenses/${userId}/${startDate}/${endDate}` 
+        `/expense/getExpenses/${userId}/${startDate}/${endDate}`
       );
 
       // console.log(response.data.expenses);

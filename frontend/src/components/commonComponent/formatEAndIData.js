@@ -6,45 +6,51 @@ import weekOfYear from "dayjs/plugin/weekOfYear";
 
 // format the data in the store (add the data if not existing in database and sort according to the date)
 
-export const formatData = (expenses, startDate, endDate) => {
-  // Helper function to parse and format dates
-  const parseDate = (dateStr) =>
-    new Date(dateStr.split("-").reverse().join("-"));
-  const formatDate = (date) =>
-    `${String(date.getDate()).padStart(2, "0")}-${String(
-      date.getMonth() + 1
-    ).padStart(2, "0")}-${date.getFullYear()}`;
+export function formatData(data, startDate, endDate) {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  // Generate a map of existing dates in the data
+  const existingDates = new Set(data.map((item) => item.date));
 
-  // Sort expenses by date
-  expenses.sort((a, b) => parseDate(a.date) - parseDate(b.date));
+  // Generate all dates within the range
+  const dateRange = [];
+  for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
+    const formattedDate = new Date(d); // Clone the date object to avoid mutation
+    formattedDate.setDate(formattedDate.getDate() + 1); // Add 1 day to the formatted date
 
-  // Create a map for existing dates
-  const dateMap = new Map(expenses.map((item) => [item.date, item]));
-
-  // Generate the date range
-  const start = parseDate(startDate);
-  const end = parseDate(endDate);
-  const formattedExpenses = [];
-
-  for (let date = start; date <= end; date.setDate(date.getDate() + 1)) {
-    const dateStr = formatDate(date);
-    if (dateMap.has(dateStr)) {
-      // Use existing data if available
-      formattedExpenses.push(dateMap.get(dateStr));
-    } else {
-      // Add an empty object for missing dates
-      formattedExpenses.push({
-        date: dateStr,
+    const formattedString = formattedDate
+      .toISOString()
+      .slice(0, 10)
+      .split("-")
+      .reverse()
+      .join("-");
+    // console.log(formattedString, "datevrfjavdfj  ");
+    if (!existingDates.has(formattedString)) {
+      dateRange.push({
+        date: formattedString,
         online: [],
         offline: [],
-        _id: { $oid: null },
+        _id: { $oid: generateObjectId() },
       });
     }
   }
 
-  // console.log(formattedExpenses, "absvk");
-  return formattedExpenses;
-};
+  // Combine and sort the data
+  const combinedData = [...data, ...dateRange];
+  combinedData.sort((a, b) => {
+    const dateA = new Date(a.date.split("-").reverse().join("-"));
+    const dateB = new Date(b.date.split("-").reverse().join("-"));
+    return dateA - dateB;
+  });
+
+  return combinedData;
+}
+
+function generateObjectId() {
+  return (
+    Date.now().toString(16) + Math.random().toString(16).substring(2, 8)
+  ).substring(0, 24);
+}
 
 //**************************************/
 // formate the data according the currentday , yesterday , month with the total of expenses
@@ -109,7 +115,7 @@ export function filterDataByDateRange(data) {
     filterByDateRange(item.date, startOfMonth, endOfMonth)
   );
 
-  console.log("Filtering today data", todayData,yesterdayData);
+  // console.log("Filtering today data", todayData, yesterdayData);
   return {
     today: {
       data: todayData,

@@ -4,7 +4,7 @@ import { TabButton } from "../components/commonComponent/TabButton";
 import ExpenseHome from "../components/homeComponent/IncomeAndExpenseHome";
 import dayjs from "dayjs";
 import useUserExpenseStore from "../store/UserStore/userExpenseStore";
-import { filterDataByDateRange } from "../components/commonComponent/formatEAndIData ";
+import { filterDataByDateRange } from "../components/commonComponent/formatEAndIData.js";
 import useUserIncomeStore from "../store/UserStore/userIncomeStore";
 import IncomeAndExpenseHome from "../components/homeComponent/IncomeAndExpenseHome";
 
