@@ -20,7 +20,7 @@ const HistoryPage = () => {
   const [error, setError] = useState(null);
 
   const userId = "677bc096bd8c6f677ef507d3";
-  const profession = "Student";
+  const profession = "6774e0884930e249cf39daa0";
 
   const fetchTransactions = async () => {
     setLoading(true);

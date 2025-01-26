@@ -3,7 +3,7 @@ import { axiosInstance } from "../../utils/axios.js";
 import { toast } from "react-toastify";
 
 export const adminCategoryStore = create((set) => ({
-  currencyCategories: [],
+  allCurrencyCategories: [],
   expenseCategories: [],
   incomeCategories: [],
   isLoadingCategories: false,
@@ -17,7 +17,7 @@ export const adminCategoryStore = create((set) => ({
       const res = await axiosInstance.get(
         "/admincategories/allcurrencyCategoryIsActive"
       );
-      set({ currencyCategories: res.data });
+      set({ allCurrencyCategories: res.data });
       console.log(res.data);
     } catch (error) {
       console.error("Error fetching currency categories:", error);
@@ -45,11 +45,14 @@ export const adminCategoryStore = create((set) => ({
     }
   },
 
-  fetchIncomeCategories: async () => {
+  fetchIncomeCategoriesIsActive: async () => {
     set({ isLoadingCategories: true });
     try {
-      const res = await axiosInstance.get("/admincategories/allincomeCategory");
-      set({ incomeCategories: Array.isArray(res.data) ? res.data : [] });
+      const res = await axiosInstance.get(
+        "/admincategories/allincomeCategoryIsActive"
+      );
+      console.log(res.data);
+      return res.data;
     } catch (error) {
       console.error("Error fetching income categories:", error);
       toast.error("Failed to fetch income categories!");

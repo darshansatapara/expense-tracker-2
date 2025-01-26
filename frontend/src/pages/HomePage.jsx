@@ -4,18 +4,22 @@ import { TabButton } from "../components/commonComponent/TabButton";
 import ExpenseHome from "../components/homeComponent/IncomeAndExpenseHome";
 import dayjs from "dayjs";
 import useUserExpenseStore from "../store/UserStore/userExpenseStore";
-import { filterDataByDateRange } from "../components/commonComponent/formatEAndIData ";
+import { filterDataByDateRange } from "../components/commonComponent/formatEAndIData.js";
 import useUserIncomeStore from "../store/UserStore/userIncomeStore";
 import IncomeAndExpenseHome from "../components/homeComponent/IncomeAndExpenseHome";
+import AddIncomeExpenseModel from "../components/commonComponent/AddIncomeExpenseModel";
 
 function HomePage() {
   const { userExpenses, fetchUserExpenses } = useUserExpenseStore();
   const { fetchUserIncomes, userIncomes } = useUserIncomeStore();
-  const userId = "677bc096bd8c6f677ef507d3";
-  const profession = "Student";
 
-  const [filteredExpense, setFilteredExpense] = useState(null); // State to store filtered data
-  const [filteredIncome, setfilteredIncome] = useState(null); // State to store filtered data
+  const userId = "677bc096bd8c6f677ef507d3";
+  const profession = "6774e0884930e249cf39daa0";
+
+  const [option, setOption] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [filteredExpense, setFilteredExpense] = useState(null);
+  const [filteredIncome, setfilteredIncome] = useState(null);
   const [activeTab, setActiveTab] = useState("Expense");
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -35,7 +39,7 @@ function HomePage() {
         fetchUserExpenses(userId, startDate, endDate);
       }
     }, [fetchUserExpenses]);
-  } else {
+  } else if (activeTab === "Income") {
     useEffect(() => {
       if (userId && startDate && endDate && profession) {
         fetchUserIncomes(userId, startDate, endDate, profession);
@@ -52,9 +56,10 @@ function HomePage() {
       }
     }, [userExpenses]);
     // console.log("userExpenses", userExpenses);
-  } else {
+  } else if (activeTab === "Income") {
     useEffect(() => {
       if (userIncomes) {
+        // console.log("userIncome", userIncomes);
         const data = filterDataByDateRange(userIncomes);
         setfilteredIncome(data);
       }
@@ -67,8 +72,14 @@ function HomePage() {
   };
 
   const handleOptionClick = (option) => {
-    // console.log(option); // Handle the click (e.g., navigate or show forms)
-    setIsOpen(false); // Close the dropdown after selecting an option
+    // console.log("handleOptionClick", option);
+    setIsOpen(false);
+    if (option) {
+      setOption(option);
+    } else {
+      console.error("please select the option  ");
+    }
+    setIsModalVisible(true);
   };
 
   // Close the dropdown if clicked outside
@@ -122,13 +133,13 @@ function HomePage() {
                 <div className="absolute mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                   <button
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
-                    onClick={() => handleOptionClick("Add Expense")}
+                    onClick={() => handleOptionClick("Expense")}
                   >
                     Expense
                   </button>
                   <button
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
-                    onClick={() => handleOptionClick("Add Income")}
+                    onClick={() => handleOptionClick("Income")}
                   >
                     Income
                   </button>
@@ -150,6 +161,8 @@ function HomePage() {
           </div>
         </div>
       </div>
+
+      <AddIncomeExpenseModel option={option} isVisible={isModalVisible} />
     </>
   );
 }

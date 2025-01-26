@@ -17,7 +17,7 @@ const userIncomeRoute = (userDbConnection, adminDbConnection) => {
 
   // get the user incomes using userId startdate, end-date, profession
   router.get(
-    "/getIncomes/:userId/:startDate/:endDate/:profession",
+    "/getIncomes/:userId/:startDate/:endDate/:professionId",
     getUserIncome(userDbConnection, adminDbConnection)
   );
   // update the user perticular income

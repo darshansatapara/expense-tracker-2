@@ -1,26 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Form, Input, Button, DatePicker, Select, Upload, message } from "antd";
-import {
-  Mail,
-  User,
-  Phone,
-  CalendarFold,
-  ClipboardPen,
-  Lock,
-} from "lucide-react";
+import { Mail, User, Phone, CalendarFold, ClipboardPen } from "lucide-react";
+import { adminCategoryStore } from "../../store/AdminStore/adminCategoryStore.js";
 import { userStore } from "../../store/UserStore/userAuthStore.js";
 
 const { Option } = Select;
 
 export default function ProfileSection() {
+  const { fetchIncomeCategoriesIsActive } = adminCategoryStore();
   const location = useLocation();
   const navigate = useNavigate();
   const signup = userStore((state) => state.signup);
 
   const userData = location.state?.userCredentials || {};
-  console.log(userData);
+  // console.log(userData);
   const [form] = Form.useForm();
+  const [profession, setProfession] = useState();
   const [profilePic, setProfilePic] = useState("");
   const [loading, setLoading] = useState(false);
   const handleFileUpload = (file) => {
@@ -47,21 +43,29 @@ export default function ProfileSection() {
     return false; // Prevent the default upload behavior
   };
 
+  useEffect(() => {
+    const professionData = async () => {
+      const resData = await fetchIncomeCategoriesIsActive();
+      setProfession(resData.categories);
+    };
+
+    professionData();
+  }, [fetchIncomeCategoriesIsActive]);
+
   const handleFinish = async (values) => {
-    console.log("i am clicked ");
     setLoading(true);
     const payload = {
       ...values,
       password: userData.password,
       profilePic,
+      // profession: profession,
     };
-    console.log("payload", payload);
+    // console.log("payload", payload);
     try {
       const res = await signup(payload); // Call the signup API from userstore
       if (res) {
         message.success("Profile saved successfully!");
         const { _id } = res;
-
         // Navigate to the CategoryPage with the data
         navigate("/category", {
           state: { userId: _id },
@@ -184,16 +188,14 @@ export default function ProfileSection() {
               className="rounded-md"
               prefix={<ClipboardPen className="text-pink-700" />}
             >
-              <Option value="" disabled hidden>
+              <Option value="" disabled hidden virtual>
                 Select an option
               </Option>
-              <Option value="Student">Student</Option>
-              <Option value="Employee">Employee</Option>
-              <Option value="Worker">Worker</Option>
-              <Option value="Businessmen">Businessmen</Option>
-              <Option value="Housewife">House-Wife</Option>
-              <Option value="Door-to-Door Seller">Door-to-Door Seller</Option>
-              <Option value="Elder">Elder</Option>
+              {profession.map((item, index) => (
+                <Option key={index} value={item._id}>
+                  {item.name}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
 
