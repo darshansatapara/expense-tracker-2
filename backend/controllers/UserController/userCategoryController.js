@@ -104,7 +104,7 @@ export const getUserExpenseCategories =
       const UserExpenseCategory = UserExpenseCategoryModel(userDbConnection);
       const AdminExpenseCategoryModel = AdminExpenseCategory(adminDbConnection);
 
-      // Find the user's expense categories
+      // Fetch the user's expense categories
       const userExpenseData = await UserExpenseCategory.findOne({ userId });
 
       if (!userExpenseData) {
@@ -114,43 +114,42 @@ export const getUserExpenseCategories =
         });
       }
 
-      // Extract categoryIds and subcategoryIds from user data
+      // Extract categoryIds from user data
       const categoryIds = userExpenseData.expenseCategories.map(
         (item) => item.categoryId
       );
-      const subcategoryIds = userExpenseData.expenseCategories.flatMap(
-        (item) => item.subcategoryIds
-      );
 
-      // Fetch only the categories available in the admin database
+      // Fetch corresponding categories from the admin database
       const categories = await AdminExpenseCategoryModel.find({
         _id: { $in: categoryIds },
+        isCategoryActive: true, // Fetch only active categories
       });
 
-      // Map and filter the user expense categories
+      // Map and filter the user's expense categories
       const filteredExpenseCategories = userExpenseData.expenseCategories
         .map((expenseCategory) => {
           const category = categories.find(
-            (cat) =>
-              cat._id.toString() === expenseCategory.categoryId.toString()
+            (adminCategory) =>
+              adminCategory._id.toString() === expenseCategory.categoryId.toString()
           );
 
           if (!category) {
-            // Skip categories not found in the admin database
-            return null;
+            return null; // Skip categories not found in the admin database
           }
 
-          // Filter the subcategories to include only those referenced in the user's subcategoryIds
+          // Filter the subcategories based on user and admin data
           const filteredSubcategories = expenseCategory.subcategoryIds
-            .map((subId) => {
+            .map((userSub) => {
               const subcategory = category.subcategories.find(
-                (sub) => sub._id.toString() === subId.toString()
+                (adminSub) =>
+                  adminSub._id.toString() === userSub.subcategoryId.toString() &&
+                  adminSub.isSubCategoryActive // Only active subcategories
               );
               return subcategory
                 ? { _id: subcategory._id, name: subcategory.name }
-                : null;
+                : null; // Skip if no match or inactive
             })
-            .filter(Boolean); // Remove nulls (missing subcategories)
+            .filter(Boolean); // Remove nulls
 
           return {
             _id: expenseCategory._id,
@@ -158,11 +157,12 @@ export const getUserExpenseCategories =
               _id: category._id,
               name: category.name,
             },
-            subcategoryIds: filteredSubcategories, // Only the subcategories in the user's data
+            subcategoryIds: filteredSubcategories,
           };
         })
-        .filter(Boolean); // Remove nulls (missing categories)
+        .filter(Boolean); // Remove null categories
 
+      // Respond with the filtered data
       res.status(200).json({
         success: true,
         data: {
@@ -178,6 +178,7 @@ export const getUserExpenseCategories =
       });
     }
   };
+
 
 // update route to add new expense category and subcategory in the userdatabase
 /*

@@ -86,6 +86,11 @@ const UserCurrencyAndBudgetSchema = new mongoose.Schema({
         required: true,
         default: true,
       },
+      isDefaultCurrency: {
+        type: Boolean,
+        required: true,
+        default: false,
+      },
     },
   ],
   budget: [
