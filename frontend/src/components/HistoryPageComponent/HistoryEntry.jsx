@@ -33,18 +33,10 @@ export const HistoryEntry = ({
     <div className="mb-4 border rounded-lg overflow-hidden">
       <div className="bg-gray-200 p-4 grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
         <span className="text-gray-600">Date: {entry.date}</span>
-        <span
-          className={`text-gray-600 transition-all duration-500 ${
-            offlineAnimate ? "transform scale-105 opacity-75" : ""
-          }`}
-        >
+        <span className="text-gray-600 transition-all duration-500 ">
           Offline Total: ₹{entry.offlineTotal}
         </span>
-        <span
-          className={`text-gray-600 transition-all duration-500 ${
-            onlineAnimate ? "transform scale-105 opacity-75" : ""
-          }`}
-        >
+        <span className="text-gray-600 transition-all duration-500 ">
           Online Total: ₹{entry.onlineTotal}
         </span>
         <button
