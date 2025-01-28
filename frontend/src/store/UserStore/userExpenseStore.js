@@ -22,7 +22,7 @@ const useUserExpenseStore = create((set) => ({
           startDate,
           endDate
         );
-        // console.log(formattedData, "user expense");
+        console.log(formattedData, "user expense");
         set({
           userExpenses: formattedData,
           loading: false,
@@ -37,6 +37,15 @@ const useUserExpenseStore = create((set) => ({
           error.response?.data?.message ||
           "An error occurred while fetching expenses.",
       });
+    }
+  },
+
+  addUserExpense: async (data) => {
+    try {
+      // console.log("Adding currency and budget", data);
+      await axiosInstance.post(`/expense/addExpense`, data);
+    } catch (error) {
+      console.error("Error adding currency and budget:", error);
     }
   },
 }));

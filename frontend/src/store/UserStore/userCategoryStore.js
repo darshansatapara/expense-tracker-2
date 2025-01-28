@@ -9,7 +9,7 @@ export const userCategoryStore = create((set) => ({
       const response = await axiosInstance.get(
         `/usercategories/expenseCategories/get/${userId}`
       );
-      // console.log(userId, response.data.data);
+      console.log(userId, response.data.data);
       return { data: response.data.data };
     } catch (error) {
       console.error("Error fetching expense categories:", error);
@@ -21,7 +21,7 @@ export const userCategoryStore = create((set) => ({
       const response = await axiosInstance.get(
         `/usercategories/currencyAndBudget/get/${userId}`
       );
-      // console.log(response.data);
+      console.log(response.data);
       return response.data.data;
     } catch (error) {
       console.error("Error fetching currency and budget:", error);
@@ -52,4 +52,6 @@ export const userCategoryStore = create((set) => ({
       set({ isPostingCategory: false });
     }
   },
+
+ 
 }));
