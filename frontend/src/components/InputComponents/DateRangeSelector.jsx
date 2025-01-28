@@ -1,9 +1,11 @@
 import React from "react";
 import { DatePicker } from "antd";
 import "antd/dist/reset.css";
+import dayjs from "dayjs";
 
 const DateRangeSelector = ({ startValue, endValue, onChange }) => {
-  
+  const firstDayOfCurrentMonth = dayjs().startOf("month");
+  const lastDayOfCurrentMonth = dayjs().endOf("month");
   const disabledStartDate = (startValue) => {
     if (!startValue || !endValue) {
       return false;
@@ -20,13 +22,13 @@ const DateRangeSelector = ({ startValue, endValue, onChange }) => {
 
   const handleStartChange = (value) => {
     if (onChange) {
-      onChange([value, endValue]); // Pass updated range to the parent
+      onChange([value || firstDayOfCurrentMonth, endValue]); // Set to the first day of the current month on clear
     }
   };
 
   const handleEndChange = (value) => {
     if (onChange) {
-      onChange([startValue, value]); // Pass updated range to the parent
+      onChange([startValue, value || lastDayOfCurrentMonth]); // Set to the last day of the current month on clear
     }
   };
 

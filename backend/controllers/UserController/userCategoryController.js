@@ -130,7 +130,8 @@ export const getUserExpenseCategories =
         .map((expenseCategory) => {
           const category = categories.find(
             (adminCategory) =>
-              adminCategory._id.toString() === expenseCategory.categoryId.toString()
+              adminCategory._id.toString() ===
+              expenseCategory.categoryId.toString()
           );
 
           if (!category) {
@@ -142,7 +143,8 @@ export const getUserExpenseCategories =
             .map((userSub) => {
               const subcategory = category.subcategories.find(
                 (adminSub) =>
-                  adminSub._id.toString() === userSub.subcategoryId.toString() &&
+                  adminSub._id.toString() ===
+                    userSub.subcategoryId.toString() &&
                   adminSub.isSubCategoryActive // Only active subcategories
               );
               return subcategory
@@ -178,7 +180,6 @@ export const getUserExpenseCategories =
       });
     }
   };
-
 
 // update route to add new expense category and subcategory in the userdatabase
 /*
@@ -783,12 +784,13 @@ export const getUserCurrencyAndBudget =
       const AdminCurrencyCategoryModel =
         AdminCurrencyCategory(adminDbConnection);
 
-      // Fetch the user's currency and budget data
+      // Fetch the user's currency and budget data with full details populated
       const userCurrencyAndBudgetData = await UserCurrencyAndBudget.findOne({
         userId,
       }).populate({
-        path: "currencyCategory",
-        model: AdminCurrencyCategoryModel, // Reference from admin database
+        path: "currencyCategory.currencyId",
+        model: AdminCurrencyCategoryModel,
+        select: "currency name symbol isCurrencyActive", // Include all relevant fields
       });
 
       if (!userCurrencyAndBudgetData) {
@@ -798,11 +800,13 @@ export const getUserCurrencyAndBudget =
         });
       }
 
+      // Return populated data in the response
       res.status(200).json({
         success: true,
         data: userCurrencyAndBudgetData,
       });
     } catch (err) {
+      console.error(err);
       res.status(500).json({
         success: false,
         message: "Server error",
