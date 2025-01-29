@@ -19,9 +19,10 @@ export default function CurrencyBudgetSelection() {
     adminCategoryStore();
 
   const currencyCategories = allCurrencyCategories.currencies;
-  console.log(currencyCategories);
+  // console.log(currencyCategories);
 
   const [selectedCurrency, setSelectedCurrency] = useState([]);
+  const [defaultCurrency, setDefaultCurrency] = useState("");
   const [onlineBudget, setOnlineBudget] = useState("");
   const [offlineBudget, setOfflineBudget] = useState("");
   const [fetchError, setFetchError] = useState(false);
@@ -41,6 +42,13 @@ export default function CurrencyBudgetSelection() {
     fetchData();
   }, [fetchCurrencyCategories]);
 
+  const handleSetDefaultCurrency = (currencyId) => {
+    // console.log("Setting default currency", currencyId);
+    setDefaultCurrency(currencyId);
+  };
+
+  // console.log("Setting default currency", defaultCurrency);
+  // console.log("Setting default currency,", selectedCurrency);
   // Handle form submission
   const handleSubmit = async () => {
     if (selectedCurrency.length === 0) {
@@ -56,6 +64,7 @@ export default function CurrencyBudgetSelection() {
       const budgetData = {
         userId: userId,
         currencyCategory: selectedCurrency,
+        defaultCurrency: defaultCurrency,
         budget: [{ offlineBudget, onlineBudget }],
       };
 
@@ -106,28 +115,59 @@ export default function CurrencyBudgetSelection() {
             )}
 
             {/* Empty Fallback */}
-            {!fetchError && fetchCurrencyCategories.length === 0 && (
+            {!fetchError && !fetchCurrencyCategories.length === 0 && (
               <div className="text-center text-gray-500">
                 No currencies available to display.
               </div>
             )}
           </div>
 
+          {/* Display Selected Currency */}
+          {selectedCurrency.length > 0 && (
+            <div className=" flex mb-6 ">
+              <h3 className="text-lg font-semibold mb-2">Default Currency:</h3>
+              <div className="flex flex-wrap gap-2">
+                <select
+                  className="  px-4 py-2 bg-gray-100 text-black rounded-full cursor-pointer"
+                  onChange={(e) => handleSetDefaultCurrency(e.target.value)}
+                >
+                  <option value="" disabled selected className="">
+                    Select a currency
+                  </option>
+                  {selectedCurrency.map((currencyId) => {
+                    const currency = currencyCategories.find(
+                      (currency) => currency._id === currencyId
+                    );
+                    return (
+                      currency && (
+                        <option key={currency._id} value={currency._id}>
+                          {currency.currency} ({currency.symbol})
+                        </option>
+                      )
+                    );
+                  })}
+                </select>
+              </div>
+            </div>
+          )}
+
           {/* Budget Input */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-2">Set a Monthly Budget</h3>
             <div className="flex gap-4">
               <input
-                inputMode="numeric"
+                type="Number"
                 placeholder="Offline Budget (min 500)"
-                className="w-1/2 p-2 border rounded-md"
+                className="w-1/2 p-2 border rounded-md [&::-webkit-inner-spin-button]:appearance-none"
+                onWheel={(e) => e.target.blur()}
                 value={offlineBudget}
                 onChange={(e) => setOfflineBudget(e.target.value)}
               />
               <input
-                inputMode="numeric"
+                type="number"
                 placeholder="Online Budget (min 500)"
-                className="w-1/2 p-2 border rounded-md"
+                className="w-1/2 p-2 border rounded-md [&::-webkit-inner-spin-button]:appearance-none"
+                onWheel={(e) => e.target.blur()}
                 value={onlineBudget}
                 onChange={(e) => setOnlineBudget(e.target.value)}
               />
