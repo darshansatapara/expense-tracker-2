@@ -698,23 +698,21 @@ export const getUserIncomeCategories =
 /* example input
 {
   "userId": "64b3b2f4d8e11b0012dabc34",
-  "currencyCategory": [
-    "64b3b2f4d8e11b0012dabc35",
-    "64b3b2f4d8e11b0012dabc36"
-  ],
+  "currencyCategory": ["64b3b2f4d8e11b0012dabc35", "64b3b2f4d8e11b0012dabc36"],
   "budget": [
     {
       "offlineBudget": "500",
       "onlineBudget": "1000"
     }
-  ]
+  ],
+  "defaultCurrency": "64b3b2f4d8e11b0012dabc35"
 }
 */
 export const addUserCurrencyAndBudget =
   (userDbConnection) => async (req, res) => {
-    const { userId, currencyCategory, budget } = req.body;
+    const { userId, currencyCategory, budget, defaultCurrency } = req.body;
 
-    if (!userId || !currencyCategory || !budget) {
+    if (!userId || !currencyCategory || !budget || !defaultCurrency) {
       return res.status(400).json({
         success: false,
         message: "Please provide userId, currencyCategory, and budget.",
@@ -739,6 +737,7 @@ export const addUserCurrencyAndBudget =
         // Update currency category and budget
         existingRecord.currencyCategory = transformedCurrencyCategory;
         existingRecord.budget = budget;
+        existingRecord.defaultCurrency = defaultCurrency;
 
         await existingRecord.save();
 
@@ -754,6 +753,7 @@ export const addUserCurrencyAndBudget =
         userId,
         currencyCategory: transformedCurrencyCategory,
         budget,
+        defaultCurrency,
       });
 
       const savedRecord = await newCurrencyAndBudget.save();
@@ -787,11 +787,17 @@ export const getUserCurrencyAndBudget =
       // Fetch the user's currency and budget data with full details populated
       const userCurrencyAndBudgetData = await UserCurrencyAndBudget.findOne({
         userId,
-      }).populate({
-        path: "currencyCategory.currencyId",
-        model: AdminCurrencyCategoryModel,
-        select: "currency name symbol isCurrencyActive", // Include all relevant fields
-      });
+      })
+        .populate({
+          path: "currencyCategory.currencyId",
+          model: AdminCurrencyCategoryModel,
+          select: "currency name symbol isCurrencyActive", // Include all relevant fields
+        })
+        .populate({
+          path: "defaultCurrency",
+          model: AdminCurrencyCategoryModel,
+          select: "currency name symbol", // Include relevant fields for the default currency
+        });
 
       if (!userCurrencyAndBudgetData) {
         return res.status(404).json({
@@ -834,11 +840,11 @@ export const getUserCurrencyAndBudget =
 export const updateUserCurrencyAndBudget =
   (userDbConnection, adminDbConnection) => async (req, res) => {
     const { userId } = req.params;
-    const { newCurrencyCategoryIds, budget } = req.body;
+    const { newCurrencyCategoryIds, budget, defaultCurrency } = req.body;
 
     try {
       // Validate if neither categories nor budget are provided
-      if (!newCurrencyCategoryIds && !budget) {
+      if (!newCurrencyCategoryIds || !budget || !defaultCurrency) {
         return res.status(400).json({
           success: false,
           message:
@@ -924,10 +930,32 @@ export const updateUserCurrencyAndBudget =
         await userData.save();
       }
 
+      // Update default currency
+      if (defaultCurrency) {
+        // Validate that the default currency exists in the admin database
+        const validDefaultCurrency = await AdminCurrencyCategoryModel.findById(
+          defaultCurrency
+        );
+        if (!validDefaultCurrency) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid default currency ID provided.",
+          });
+        }
+
+        // Update the default currency field
+        userData.defaultCurrency = defaultCurrency;
+        await userData.save();
+      }
+
       // Fetch updated data for response
       const updatedData = await UserCurrencyAndBudget.findOne({ userId })
         .populate({
           path: "currencyCategory.currencyId",
+          model: AdminCurrencyCategoryModel,
+        })
+        .populate({
+          path: "defaultCurrency",
           model: AdminCurrencyCategoryModel,
         })
         .exec();
@@ -941,7 +969,8 @@ export const updateUserCurrencyAndBudget =
 
       res.status(200).json({
         success: true,
-        message: "Currency categories and/or budget updated successfully.",
+        message:
+          "Currency categories, default currency, and/or budget updated successfully.",
         data: updatedData,
       });
     } catch (err) {
