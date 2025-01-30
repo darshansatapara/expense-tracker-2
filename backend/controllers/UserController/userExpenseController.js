@@ -115,37 +115,31 @@ export const getUserExpense =
       const formattedStartDate = new Date(
         startDate.split("-").reverse().join("-")
       ); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
-
-      // Add 1 day to the formatted start date
       formattedStartDate.setDate(formattedStartDate.getDate() + 1);
 
-      const formattedEndDate = new Date(endDate.split("-").reverse().join("-")); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
+      const formattedEndDate = new Date(endDate.split("-").reverse().join("-"));
 
-      // Add 1 day to the formatted end date
-      // formattedEndDate.setDate(formattedEndDate.getDate() + 1);
-
-      // console.log("date range ", formattedStartDate, formattedEndDate);
-      // Fetch user expenses and populate the related fields
+      // Fetch user expenses and populate related fields
       const userExpenses = await UserExpenseModel.findOne({ userId })
         .populate({
           path: "expenses.online.currency",
           model: AdminCurrencyCategory(adminDbConnection),
-          select: "symbol", // Select only the symbol for currency
+          select: "_id symbol", // Include _id and symbol
         })
         .populate({
           path: "expenses.offline.currency",
           model: AdminCurrencyCategory(adminDbConnection),
-          select: "symbol", // Select only the symbol for currency
+          select: "_id symbol",
         })
         .populate({
           path: "expenses.online.category",
           model: AdminExpenseCategory(adminDbConnection),
-          select: "name subcategories", // Select only the name for subcategory
+          select: "_id name subcategories", // Include _id, name, and subcategories
         })
         .populate({
           path: "expenses.offline.category",
           model: AdminExpenseCategory(adminDbConnection),
-          select: "name subcategories", // Select only the name for subcategory
+          select: "_id name subcategories",
         });
 
       if (!userExpenses) {
@@ -157,7 +151,7 @@ export const getUserExpense =
 
       const filteredExpenses = [];
 
-      // Filter expenses by the specified date range
+      // Filter expenses by date range
       userExpenses.expenses.forEach((expenseGroup) => {
         const expenseDate = new Date(
           expenseGroup.date.split("-").reverse().join("-")
@@ -173,15 +167,23 @@ export const getUserExpense =
               date: expense.date,
               mode: expense.mode,
               amount: expense.amount,
-              currency: expense.currency ? expense.currency.symbol : "Unknown", // Handle null currency
-              category: expense.category ? expense.category.name : "Unknown", // Handle null category
-              subcategory:
-                expense.category?.subcategories.find(
-                  (sub) =>
-                    sub._id.toString() === expense.subcategory?.toString()
-                )?.name || "Unknown",
-
-              // Handle null subcategory
+              currency: expense.currency?._id
+                ? { _id: expense.currency._id, symbol: expense.currency.symbol }
+                : { _id: null, symbol: "Unknown" },
+              category: expense.category?._id
+                ? { _id: expense.category._id, name: expense.category.name }
+                : { _id: null, name: "Unknown" },
+              subcategory: expense.category?.subcategories.find(
+                (sub) => sub._id.toString() === expense.subcategory?.toString()
+              )
+                ? {
+                    _id: expense.subcategory,
+                    name: expense.category.subcategories.find(
+                      (sub) =>
+                        sub._id.toString() === expense.subcategory?.toString()
+                    )?.name,
+                  }
+                : { _id: null, name: "Unknown" },
               note: expense.note,
               _id: expense._id,
             })),
@@ -189,15 +191,23 @@ export const getUserExpense =
               date: expense.date,
               mode: expense.mode,
               amount: expense.amount,
-              currency: expense.currency ? expense.currency.symbol : "Unknown", // Handle null currency
-              category: expense.category ? expense.category.name : "Unknown", // Handle null category
-              subcategory:
-                expense.category?.subcategories.find(
-                  (sub) =>
-                    sub._id.toString() === expense.subcategory?.toString()
-                )?.name || "Unknown",
-
-              // Handle null subcategory
+              currency: expense.currency?._id
+                ? { _id: expense.currency._id, symbol: expense.currency.symbol }
+                : { _id: null, symbol: "Unknown" },
+              category: expense.category?._id
+                ? { _id: expense.category._id, name: expense.category.name }
+                : { _id: null, name: "Unknown" },
+              subcategory: expense.category?.subcategories.find(
+                (sub) => sub._id.toString() === expense.subcategory?.toString()
+              )
+                ? {
+                    _id: expense.subcategory,
+                    name: expense.category.subcategories.find(
+                      (sub) =>
+                        sub._id.toString() === expense.subcategory?.toString()
+                    )?.name,
+                  }
+                : { _id: null, name: "Unknown" },
               note: expense.note,
               _id: expense._id,
             })),

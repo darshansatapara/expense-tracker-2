@@ -92,7 +92,6 @@ export const addUserIncome = (userDbConnection) => async (req, res) => {
 export const getUserIncome =
   (userDbConnection, adminDbConnection) => async (req, res) => {
     const { userId, startDate, endDate, professionId } = req.params;
-    // console.log(professionId);
 
     try {
       const UserIncomeModel = UserIncome(userDbConnection);
@@ -101,8 +100,6 @@ export const getUserIncome =
       const formattedStartDate = new Date(
         startDate.split("-").reverse().join("-")
       ); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
-
-      // Add 1 day to the formatted start date
       formattedStartDate.setDate(formattedStartDate.getDate() + 1);
 
       const formattedEndDate = new Date(endDate.split("-").reverse().join("-"));
@@ -112,7 +109,6 @@ export const getUserIncome =
         _id: professionId,
       });
 
-      // console.log(professionCategory);
       if (!professionCategory) {
         return res.status(404).json({
           success: false,
@@ -125,12 +121,12 @@ export const getUserIncome =
         .populate({
           path: "incomes.online.currency",
           model: AdminCurrencyCategory(adminDbConnection),
-          select: "symbol", // Select only the symbol for currency
+          select: "_id symbol", // Include _id and symbol
         })
         .populate({
           path: "incomes.offline.currency",
           model: AdminCurrencyCategory(adminDbConnection),
-          select: "symbol", // Select only the symbol for currency
+          select: "_id symbol",
         });
 
       if (!userIncomes) {
@@ -159,11 +155,20 @@ export const getUserIncome =
               date: income.date,
               mode: income.mode,
               amount: income.amount,
-              currency: income.currency ? income.currency.symbol : "Unknown", // Handle null currency
-              category:
-                subcategories.find(
-                  (sub) => sub._id.toString() === income.category?.toString()
-                )?.name || "Unknown", // Match category ID to subcategories
+              currency: income.currency?._id
+                ? { _id: income.currency._id, symbol: income.currency.symbol }
+                : { _id: null, symbol: "Unknown" },
+              category: subcategories.find(
+                (sub) => sub._id.toString() === income.category?.toString()
+              )
+                ? {
+                    _id: income.category,
+                    name: subcategories.find(
+                      (sub) =>
+                        sub._id.toString() === income.category?.toString()
+                    )?.name,
+                  }
+                : { _id: null, name: "Unknown" },
               note: income.note,
               _id: income._id,
             })),
@@ -171,11 +176,20 @@ export const getUserIncome =
               date: income.date,
               mode: income.mode,
               amount: income.amount,
-              currency: income.currency ? income.currency.symbol : "Unknown", // Handle null currency
-              category:
-                subcategories.find(
-                  (sub) => sub._id.toString() === income.category?.toString()
-                )?.name || "Unknown", // Match category ID to subcategories
+              currency: income.currency?._id
+                ? { _id: income.currency._id, symbol: income.currency.symbol }
+                : { _id: null, symbol: "Unknown" },
+              category: subcategories.find(
+                (sub) => sub._id.toString() === income.category?.toString()
+              )
+                ? {
+                    _id: income.category,
+                    name: subcategories.find(
+                      (sub) =>
+                        sub._id.toString() === income.category?.toString()
+                    )?.name,
+                  }
+                : { _id: null, name: "Unknown" },
               note: income.note,
               _id: income._id,
             })),
