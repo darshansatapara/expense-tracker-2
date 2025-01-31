@@ -116,7 +116,7 @@ const HistoryPage = () => {
           )}
 
           {loading
-            ? transactions.map((_, index) => (
+            ? [...Array(30)].map((_, index) => (
                 <HistoryEntry
                   key={index}
                   isExpanded={false} // Prevent expansion during loading

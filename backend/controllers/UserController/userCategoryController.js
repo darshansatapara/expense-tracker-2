@@ -104,7 +104,7 @@ export const getUserExpenseCategories =
       const UserExpenseCategory = UserExpenseCategoryModel(userDbConnection);
       const AdminExpenseCategoryModel = AdminExpenseCategory(adminDbConnection);
 
-      // Find the user's expense categories
+      // Fetch the user's expense categories
       const userExpenseData = await UserExpenseCategory.findOne({ userId });
 
       if (!userExpenseData) {
@@ -114,43 +114,44 @@ export const getUserExpenseCategories =
         });
       }
 
-      // Extract categoryIds and subcategoryIds from user data
+      // Extract categoryIds from user data
       const categoryIds = userExpenseData.expenseCategories.map(
         (item) => item.categoryId
       );
-      const subcategoryIds = userExpenseData.expenseCategories.flatMap(
-        (item) => item.subcategoryIds
-      );
 
-      // Fetch only the categories available in the admin database
+      // Fetch corresponding categories from the admin database
       const categories = await AdminExpenseCategoryModel.find({
         _id: { $in: categoryIds },
+        isCategoryActive: true, // Fetch only active categories
       });
 
-      // Map and filter the user expense categories
+      // Map and filter the user's expense categories
       const filteredExpenseCategories = userExpenseData.expenseCategories
         .map((expenseCategory) => {
           const category = categories.find(
-            (cat) =>
-              cat._id.toString() === expenseCategory.categoryId.toString()
+            (adminCategory) =>
+              adminCategory._id.toString() ===
+              expenseCategory.categoryId.toString()
           );
 
           if (!category) {
-            // Skip categories not found in the admin database
-            return null;
+            return null; // Skip categories not found in the admin database
           }
 
-          // Filter the subcategories to include only those referenced in the user's subcategoryIds
+          // Filter the subcategories based on user and admin data
           const filteredSubcategories = expenseCategory.subcategoryIds
-            .map((subId) => {
+            .map((userSub) => {
               const subcategory = category.subcategories.find(
-                (sub) => sub._id.toString() === subId.toString()
+                (adminSub) =>
+                  adminSub._id.toString() ===
+                    userSub.subcategoryId.toString() &&
+                  adminSub.isSubCategoryActive // Only active subcategories
               );
               return subcategory
                 ? { _id: subcategory._id, name: subcategory.name }
-                : null;
+                : null; // Skip if no match or inactive
             })
-            .filter(Boolean); // Remove nulls (missing subcategories)
+            .filter(Boolean); // Remove nulls
 
           return {
             _id: expenseCategory._id,
@@ -158,11 +159,12 @@ export const getUserExpenseCategories =
               _id: category._id,
               name: category.name,
             },
-            subcategoryIds: filteredSubcategories, // Only the subcategories in the user's data
+            subcategoryIds: filteredSubcategories,
           };
         })
-        .filter(Boolean); // Remove nulls (missing categories)
+        .filter(Boolean); // Remove null categories
 
+      // Respond with the filtered data
       res.status(200).json({
         success: true,
         data: {
@@ -696,23 +698,21 @@ export const getUserIncomeCategories =
 /* example input
 {
   "userId": "64b3b2f4d8e11b0012dabc34",
-  "currencyCategory": [
-    "64b3b2f4d8e11b0012dabc35",
-    "64b3b2f4d8e11b0012dabc36"
-  ],
+  "currencyCategory": ["64b3b2f4d8e11b0012dabc35", "64b3b2f4d8e11b0012dabc36"],
   "budget": [
     {
       "offlineBudget": "500",
       "onlineBudget": "1000"
     }
-  ]
+  ],
+  "defaultCurrency": "64b3b2f4d8e11b0012dabc35"
 }
 */
 export const addUserCurrencyAndBudget =
   (userDbConnection) => async (req, res) => {
-    const { userId, currencyCategory, budget } = req.body;
+    const { userId, currencyCategory, budget, defaultCurrency } = req.body;
 
-    if (!userId || !currencyCategory || !budget) {
+    if (!userId || !currencyCategory || !budget || !defaultCurrency) {
       return res.status(400).json({
         success: false,
         message: "Please provide userId, currencyCategory, and budget.",
@@ -737,6 +737,7 @@ export const addUserCurrencyAndBudget =
         // Update currency category and budget
         existingRecord.currencyCategory = transformedCurrencyCategory;
         existingRecord.budget = budget;
+        existingRecord.defaultCurrency = defaultCurrency;
 
         await existingRecord.save();
 
@@ -752,6 +753,7 @@ export const addUserCurrencyAndBudget =
         userId,
         currencyCategory: transformedCurrencyCategory,
         budget,
+        defaultCurrency,
       });
 
       const savedRecord = await newCurrencyAndBudget.save();
@@ -782,13 +784,20 @@ export const getUserCurrencyAndBudget =
       const AdminCurrencyCategoryModel =
         AdminCurrencyCategory(adminDbConnection);
 
-      // Fetch the user's currency and budget data
+      // Fetch the user's currency and budget data with full details populated
       const userCurrencyAndBudgetData = await UserCurrencyAndBudget.findOne({
         userId,
-      }).populate({
-        path: "currencyCategory",
-        model: AdminCurrencyCategoryModel, // Reference from admin database
-      });
+      })
+        .populate({
+          path: "currencyCategory.currencyId",
+          model: AdminCurrencyCategoryModel,
+          select: "currency name symbol isCurrencyActive", // Include all relevant fields
+        })
+        .populate({
+          path: "defaultCurrency",
+          model: AdminCurrencyCategoryModel,
+          select: "currency name symbol", // Include relevant fields for the default currency
+        });
 
       if (!userCurrencyAndBudgetData) {
         return res.status(404).json({
@@ -797,11 +806,13 @@ export const getUserCurrencyAndBudget =
         });
       }
 
+      // Return populated data in the response
       res.status(200).json({
         success: true,
         data: userCurrencyAndBudgetData,
       });
     } catch (err) {
+      console.error(err);
       res.status(500).json({
         success: false,
         message: "Server error",
@@ -829,11 +840,11 @@ export const getUserCurrencyAndBudget =
 export const updateUserCurrencyAndBudget =
   (userDbConnection, adminDbConnection) => async (req, res) => {
     const { userId } = req.params;
-    const { newCurrencyCategoryIds, budget } = req.body;
+    const { newCurrencyCategoryIds, budget, defaultCurrency } = req.body;
 
     try {
       // Validate if neither categories nor budget are provided
-      if (!newCurrencyCategoryIds && !budget) {
+      if (!newCurrencyCategoryIds || !budget || !defaultCurrency) {
         return res.status(400).json({
           success: false,
           message:
@@ -919,10 +930,32 @@ export const updateUserCurrencyAndBudget =
         await userData.save();
       }
 
+      // Update default currency
+      if (defaultCurrency) {
+        // Validate that the default currency exists in the admin database
+        const validDefaultCurrency = await AdminCurrencyCategoryModel.findById(
+          defaultCurrency
+        );
+        if (!validDefaultCurrency) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid default currency ID provided.",
+          });
+        }
+
+        // Update the default currency field
+        userData.defaultCurrency = defaultCurrency;
+        await userData.save();
+      }
+
       // Fetch updated data for response
       const updatedData = await UserCurrencyAndBudget.findOne({ userId })
         .populate({
           path: "currencyCategory.currencyId",
+          model: AdminCurrencyCategoryModel,
+        })
+        .populate({
+          path: "defaultCurrency",
           model: AdminCurrencyCategoryModel,
         })
         .exec();
@@ -936,7 +969,8 @@ export const updateUserCurrencyAndBudget =
 
       res.status(200).json({
         success: true,
-        message: "Currency categories and/or budget updated successfully.",
+        message:
+          "Currency categories, default currency, and/or budget updated successfully.",
         data: updatedData,
       });
     } catch (err) {

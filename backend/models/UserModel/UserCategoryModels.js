@@ -88,6 +88,11 @@ const UserCurrencyAndBudgetSchema = new mongoose.Schema({
       },
     },
   ],
+  defaultCurrency: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "AdminCurrencyCategory",
+  },
   budget: [
     {
       offlineBudget: { type: String, required: true, default: "0" },
