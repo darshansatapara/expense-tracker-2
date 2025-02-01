@@ -60,6 +60,7 @@ export default function AddIncomeExpenseModel({ option, isVisible, onClose }) {
   };
 
   const handleSubmit = async () => {
+
     if (option === "Expense") {
       await addUserExpense(formData);
     } else {

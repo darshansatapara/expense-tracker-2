@@ -25,15 +25,17 @@ const TableList = ({ today, yesterday, activeTab }) => {
     [...expenseGroup.online, ...expenseGroup.offline].map((transaction) => ({
       ...transaction,
       key: transaction._id,
-      amount: ` ${transaction.currency || ""}  ${parseFloat(
+      amount: `${transaction.currency.symbol || ""}${parseFloat(
         transaction.amount || 0
       ).toFixed(2)}`,
       date: transaction.date || "N/A",
-      category: transaction.category || "N/A",
-      subcategory: transaction.subcategory || (activeTab ? "N/A" : undefined), // Only for Expense
+      category: transaction.category.name || "N/A",
+      subcategory: transaction.subcategory?.name || "N/A", // Only for Expense
       mode: transaction.mode || "N/A",
     }))
   );
+
+  console.log(formattedTransactions);
   // Define columns
   const columns = [
     {

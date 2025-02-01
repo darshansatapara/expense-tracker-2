@@ -47,8 +47,6 @@ export default function CurrencyBudgetSelection() {
     setDefaultCurrency(currencyId);
   };
 
-  // console.log("Setting default currency", defaultCurrency);
-  // console.log("Setting default currency,", selectedCurrency);
   // Handle form submission
   const handleSubmit = async () => {
     if (selectedCurrency.length === 0) {
@@ -124,14 +122,15 @@ export default function CurrencyBudgetSelection() {
 
           {/* Display Selected Currency */}
           {selectedCurrency.length > 0 && (
-            <div className=" flex mb-6 ">
-              <h3 className="text-lg font-semibold mb-2">Default Currency:</h3>
-              <div className="flex flex-wrap gap-2">
+            <div className=" flex mb-6 gap-5 ">
+              <h3 className="text-lg font-semibold mt-2">Default Currency:</h3>
+              <div className="flex ">
                 <select
-                  className="  px-4 py-2 bg-gray-100 text-black rounded-full cursor-pointer"
+                  className="px-4 py-2 bg-gray-100 text-black rounded-full cursor-pointer"
+                  value={defaultCurrency}
                   onChange={(e) => handleSetDefaultCurrency(e.target.value)}
                 >
-                  <option value="" disabled selected className="">
+                  <option value="" disabled>
                     Select a currency
                   </option>
                   {selectedCurrency.map((currencyId) => {
@@ -157,7 +156,7 @@ export default function CurrencyBudgetSelection() {
             <div className="flex gap-4">
               <input
                 type="Number"
-                placeholder="Offline Budget (min 500)"
+                placeholder={`Offline Budget (min 500) `}
                 className="w-1/2 p-2 border rounded-md [&::-webkit-inner-spin-button]:appearance-none"
                 onWheel={(e) => e.target.blur()}
                 value={offlineBudget}

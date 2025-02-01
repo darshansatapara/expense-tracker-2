@@ -1,8 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button, Select } from "antd";
+import ViewAndEditExpense from "./ViewAndEditExpense";
 
 export const TransactionList = ({ transactions, isExpense }) => {
+  console.log("Transaction", transactions);
   const [selectedMode, setSelectedMode] = useState("All");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(""); // To store the selected transaction
+
+  // Modify the handleViewAndEdit function to accept a record (transaction)
+
+  const handleViewAndEdit = (record) => {
+    console.log(record);
+    setSelectedTransaction(record); // Store the selected transaction
+    setIsModalVisible(true); // Open the modal
+  };
+
+  console.log("Transaction", selectedTransaction);
 
   // Filter transactions based on the selected mode
   const filteredTransactions =
@@ -18,8 +32,11 @@ export const TransactionList = ({ transactions, isExpense }) => {
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
-      render: (amount) => (
-        <span>₹{amount ? parseFloat(amount).toFixed(2) : "N/A"}</span>
+      render: (amount, record) => (
+        <span>
+          {record.currency?.symbol || "Unknown"}{" "}
+          {amount ? parseFloat(amount).toFixed(2) : "N/A"}
+        </span>
       ),
     },
     {
@@ -30,11 +47,11 @@ export const TransactionList = ({ transactions, isExpense }) => {
         { text: "Online", value: "Online" },
         { text: "Offline", value: "Offline" },
       ],
-      filterMultiple: false, // Allow single selection
+      filterMultiple: false,
       onFilter: (value, record) =>
         record.mode?.toLowerCase() === value.toLowerCase(),
       filterDropdown: ({ confirm }) => (
-        <div className="flex flex-col items-start p-1  bg-white shadow-md rounded-md">
+        <div className="flex flex-col items-start p-1 bg-white shadow-md rounded-md">
           <Select
             id="mode-filter"
             value={selectedMode}
@@ -56,12 +73,12 @@ export const TransactionList = ({ transactions, isExpense }) => {
         </div>
       ),
     },
-
     {
       title: "Category",
       dataIndex: "category",
       key: "category",
-      render: (category) => <span>{category || "N/A"}</span>,
+      render: (category) =>
+        category?._id ? <span>{category.name}</span> : "N/A",
     },
     ...(isExpense
       ? [
@@ -69,7 +86,8 @@ export const TransactionList = ({ transactions, isExpense }) => {
             title: "Sub-Category",
             dataIndex: "subcategory",
             key: "subcategory",
-            render: (subcategory) => <span>{subcategory || "N/A"}</span>,
+            render: (subcategory) =>
+              subcategory?._id ? <span>{subcategory.name}</span> : "N/A",
           },
         ]
       : []),
@@ -77,7 +95,11 @@ export const TransactionList = ({ transactions, isExpense }) => {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
-        <Button type="link" className="text-blue-500 hover:underline">
+        <Button
+          type="link"
+          className="text-blue-500 hover:underline"
+          onClick={() => handleViewAndEdit(record)}
+        >
           View & Edit
         </Button>
       ),
@@ -85,21 +107,29 @@ export const TransactionList = ({ transactions, isExpense }) => {
   ];
 
   return (
-    <div className="bg-white shadow-md rounded-lg overflow-hidden p-2">
-      <div className="overflow-x-auto">
-        <Table
-          columns={columns}
-          dataSource={filteredTransactions.map((transaction, index) => ({
-            ...transaction,
-            key: index, // Unique key for each row
-          }))}
-          pagination={false}
-          rowClassName={(record, index) =>
-            index % 2 === 0 ? "bg-white" : "bg-gray-50"
-          }
-          className="border-collapse  w-full table-auto"
-        />
+    <>
+      <div className="bg-white shadow-md rounded-lg overflow-hidden p-2">
+        <div className="overflow-x-auto">
+          <Table
+            columns={columns}
+            dataSource={filteredTransactions.map((transaction, index) => ({
+              ...transaction,
+              key: index, // Unique key for each row
+            }))}
+            pagination={false}
+            rowClassName={(record, index) =>
+              index % 2 === 0 ? "bg-white" : "bg-gray-50"
+            }
+            className="border-collapse  w-full table-auto"
+          />
+        </div>
       </div>
-    </div>
+      <ViewAndEditExpense
+        isExpense={isExpense}
+        isVisible={isModalVisible}
+        transaction={selectedTransaction}
+        onClose={() => setIsModalVisible(false)}
+      />
+    </>
   );
 };

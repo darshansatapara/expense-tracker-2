@@ -1,9 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { Spin } from "antd";
+import { userCategoryStore } from "../../store/UserStore/userCategoryStore";
 
 const TotalDataCard = ({ cardData, lable }) => {
   const [loading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(null); // Error state
+  const [defaultCurrencySymbol, setDefaultCurrencySymbol] = useState("");
+  const userId = "679a8b3e3ff0f2bdb0c9780c";
+
+  const { fetchCurrencyAndBudget } = userCategoryStore();
+  useEffect(() => {
+    const fetchDefaultCurrency = async () => {
+      const defaultCurrency = await fetchCurrencyAndBudget(userId);
+
+      setDefaultCurrencySymbol(defaultCurrency.defaultCurrency.symbol);
+    };
+    fetchDefaultCurrency();
+  }, [fetchCurrencyAndBudget, userId]);
+
+  // console.log(defaultCurrencySymbol);
 
   return (
     <div className="bg-gray-100 flex flex-col h-[40vh] justify-center items-center p-4 rounded-md border gap-5">
@@ -19,19 +34,22 @@ const TotalDataCard = ({ cardData, lable }) => {
           <div className="flex md:flex-col text-center gap-3">
             <h3 className="text-lg font-bold text-gray-700">Total Online:</h3>
             <p className="text-xl font-semibold text-blue-600">
-              ₹{cardData.onlineTotal}
+              {defaultCurrencySymbol}
+              {cardData.onlineTotal}
             </p>
           </div>
           <div className="flex md:flex-col text-center gap-3">
             <h3 className="text-lg font-bold text-gray-700">Total Offline:</h3>
             <p className="text-xl font-semibold text-green-600">
-              ₹{cardData.offlineTotal}
+              {defaultCurrencySymbol}
+              {cardData.offlineTotal}
             </p>
           </div>
           <div className="flex md:flex-col text-center gap-3">
             <h3 className="text-lg font-bold text-gray-700">Total {lable}:</h3>
             <p className="text-xl font-semibold text-purple-600">
-              ₹{cardData.bothTotal}
+              {defaultCurrencySymbol}
+              {cardData.bothTotal}
             </p>
           </div>
         </div>

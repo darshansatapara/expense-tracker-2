@@ -47,7 +47,7 @@ export default function ProfileSection() {
     const professionData = async () => {
       const resData = await fetchIncomeCategoriesIsActive();
       // console.log(resData.categories);
-      
+
       setProfession(resData.categories);
     };
 
@@ -197,8 +197,8 @@ export default function ProfileSection() {
               </Option>
               {profession?.map((item) => (
                 <Option key={item._id} value={item._id}>
-                  {item.name}
-                </Option> 
+                  {item?.name}
+                </Option>
               ))}
             </Select>
           </Form.Item>
