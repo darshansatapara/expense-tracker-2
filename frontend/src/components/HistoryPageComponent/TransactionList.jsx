@@ -3,7 +3,7 @@ import { Table, Button, Select } from "antd";
 
 export const TransactionList = ({ transactions, isExpense }) => {
   const [selectedMode, setSelectedMode] = useState("All");
-
+  // console.log("Transaction", transactions)
   // Filter transactions based on the selected mode
   const filteredTransactions =
     selectedMode === "All"
@@ -18,8 +18,11 @@ export const TransactionList = ({ transactions, isExpense }) => {
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
-      render: (amount) => (
-        <span>₹{amount ? parseFloat(amount).toFixed(2) : "N/A"}</span>
+      render: (amount, record) => (
+        <span>
+          {record.currency?.symbol || "Unknown"}
+          {amount ? parseFloat(amount).toFixed(2) : "N/A"}
+        </span>
       ),
     },
     {
@@ -30,11 +33,11 @@ export const TransactionList = ({ transactions, isExpense }) => {
         { text: "Online", value: "Online" },
         { text: "Offline", value: "Offline" },
       ],
-      filterMultiple: false, // Allow single selection
+      filterMultiple: false,
       onFilter: (value, record) =>
         record.mode?.toLowerCase() === value.toLowerCase(),
       filterDropdown: ({ confirm }) => (
-        <div className="flex flex-col items-start p-1  bg-white shadow-md rounded-md">
+        <div className="flex flex-col items-start p-1 bg-white shadow-md rounded-md">
           <Select
             id="mode-filter"
             value={selectedMode}
@@ -56,12 +59,12 @@ export const TransactionList = ({ transactions, isExpense }) => {
         </div>
       ),
     },
-
     {
       title: "Category",
       dataIndex: "category",
       key: "category",
-      render: (category) => <span>{category || "N/A"}</span>,
+      render: (category) =>
+        category?._id ? <span>{category.name}</span> : "N/A",
     },
     ...(isExpense
       ? [
@@ -69,10 +72,12 @@ export const TransactionList = ({ transactions, isExpense }) => {
             title: "Sub-Category",
             dataIndex: "subcategory",
             key: "subcategory",
-            render: (subcategory) => <span>{subcategory || "N/A"}</span>,
+            render: (subcategory) =>
+              subcategory?._id ? <span>{subcategory?.name}</span> : "N/A",
           },
         ]
       : []),
+
     {
       title: "Actions",
       key: "actions",
