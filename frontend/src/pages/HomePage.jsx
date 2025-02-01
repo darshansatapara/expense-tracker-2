@@ -73,13 +73,18 @@ function HomePage() {
 
   const handleOptionClick = (option) => {
     // console.log("handleOptionClick", option);
-    setIsOpen(false);
+    // setIsOpen(false);
     if (option) {
       setOption(option);
     } else {
       console.error("please select the option  ");
     }
     setIsModalVisible(true);
+    setIsOpen(false);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
   };
 
   // Close the dropdown if clicked outside
@@ -162,7 +167,11 @@ function HomePage() {
         </div>
       </div>
 
-      <AddIncomeExpenseModel option={option} isVisible={isModalVisible} />
+      <AddIncomeExpenseModel
+        option={option}
+        isVisible={isModalVisible}
+        onClose={handleCloseModal}
+      />
     </>
   );
 }
