@@ -47,6 +47,26 @@ const useUserIncomeStore = create((set) => ({
       });
     }
   },
+
+  addUserIncome: async (data) => {
+    try {
+      // console.log("Adding currency and budget", data);
+      await axiosInstance.post(`/income/addIncome/${data.userId}`, data);
+    } catch (error) {
+      console.error("Error adding currency and budget:", error);
+    }
+  },
+
+  updateUserIncome: async (data, userId, objectDate) => {
+    try {
+      await axiosInstance.put(
+        `/income/updateIncome/${userId}/${objectDate}`,
+        data
+      );
+    } catch (error) {
+      console.error("Error updating user Expense:", error);
+    }
+  },
 }));
 
 export default useUserIncomeStore;

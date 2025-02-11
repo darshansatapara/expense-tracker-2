@@ -22,6 +22,7 @@ import dayjs from "dayjs";
 export const addUserExpense = (userDbConnection) => async (req, res) => {
   const { userId, date, mode, amount, category, subcategory, currency, note } =
     req.body;
+  console.log(req.body);
 
   if (!userId || !date || !mode || !amount || !category || !currency) {
     return res.status(400).json({

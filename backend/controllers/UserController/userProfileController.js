@@ -83,6 +83,7 @@ export const updateUserProfile = (userDbConnection) => async (req, res) => {
     });
   }
 };
+
 export const getUserById = (userDbConnection) => async (req, res) => {
   const { id } = req.params; // Get user ID from request
 
@@ -107,5 +108,6 @@ export const getUserById = (userDbConnection) => async (req, res) => {
     res.status(500).json({ success: false, message: "Error fetching user", error });
   }
 };
+
 
 

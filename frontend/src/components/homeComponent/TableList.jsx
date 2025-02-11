@@ -2,15 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Table, Spin, Empty } from "antd";
 import "antd/dist/reset.css"; // Ensure Ant Design styles are applied
 import { TabButton } from "../commonComponent/TabButton.jsx";
-
 const TableList = ({ today, yesterday, activeTab }) => {
   const [showData, setShowData] = useState([]);
   const [activeButton, setActiveButton] = useState("Today");
   const [loading, setLoading] = useState(false);
-
   const handleTodayClick = () => setActiveButton("Today");
   const handleYesterdayClick = () => setActiveButton("Yesterday");
-
   // Update data based on the selected button
   useEffect(() => {
     setLoading(true);
@@ -21,25 +18,24 @@ const TableList = ({ today, yesterday, activeTab }) => {
     }
     setLoading(false);
   }, [activeButton, today, yesterday]);
-
   const data = showData?.data || [];
   const total = showData?.totals || {};
-
   // Filtered transactions based on activeTab (isExpense: true for Expense, false for Income)
   const formattedTransactions = data.flatMap((expenseGroup) =>
     [...expenseGroup.online, ...expenseGroup.offline].map((transaction) => ({
       ...transaction,
       key: transaction._id,
-      amount: `${parseFloat(transaction.amount || 0).toFixed(2)} ${
-        transaction.currency || ""
-      }`,
+      amount: `${transaction.currency.symbol || ""}${parseFloat(
+        transaction.amount || 0
+      ).toFixed(2)}`,
       date: transaction.date || "N/A",
-      category: transaction.category || "N/A",
-      subcategory: transaction.subcategory || (activeTab ? "N/A" : undefined), // Only for Expense
+      category: transaction.category.name || "N/A",
+      subcategory: transaction.subcategory?.name || "N/A", // Only for Expense
       mode: transaction.mode || "N/A",
     }))
   );
 
+  console.log(formattedTransactions);
   // Define columns
   const columns = [
     {
@@ -73,7 +69,6 @@ const TableList = ({ today, yesterday, activeTab }) => {
         ]
       : []),
   ];
-
   return (
     <>
       <div className="flex items-center justify-between gap-5 mb-3">
@@ -118,7 +113,6 @@ const TableList = ({ today, yesterday, activeTab }) => {
           </div>
         </div>
       </div>
-
       {/* Table Section */}
       <div className="bg-white shadow-md rounded-lg p-2">
         <div className="overflow-x-auto">
@@ -127,12 +121,11 @@ const TableList = ({ today, yesterday, activeTab }) => {
             columns={columns}
             pagination={false}
             scroll={{ x: 700 }}
-            sticky
             locale={{
               emptyText: loading ? (
-                <Spin className="h-[27.5vh]" size="large" />
+                <Spin className="h-[35vh]" size="large" />
               ) : (
-                <Empty className="h-[27.5vh]" />
+                <Empty className="h-[25vh]" />
               ),
             }}
             rowClassName={(record, index) =>
@@ -146,5 +139,4 @@ const TableList = ({ today, yesterday, activeTab }) => {
     </>
   );
 };
-
 export default TableList;
