@@ -80,7 +80,8 @@ export default function PasswordSection() {
               Set Password
             </Button>
           </form>
-        </div>
+          
+          </div>
       </div>
     </div>
   );
