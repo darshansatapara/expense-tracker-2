@@ -220,4 +220,5 @@ export const getCurrencyRatesByMonthRange =
     }
   };
 
+
 export default storeRates;
