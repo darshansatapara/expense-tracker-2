@@ -84,4 +84,30 @@ export const updateUserProfile = (userDbConnection) => async (req, res) => {
   }
 };
 
+export const getUserById = (userDbConnection) => async (req, res) => {
+  const { id } = req.params; // Get user ID from request
+
+  try {
+    const UserProfileModel = UserProfile(userDbConnection);
+    const user = await UserProfileModel.findById(id).select("profilepic username email mobile_no date_of_birth profession ").populate("profession", "name");
+    console.log(user)
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+     // Format the date_of_birth to only return the date part (without the time)
+     const formattedUser = {
+      ...user.toObject(),
+      date_of_birth: user.date_of_birth.toLocaleDateString("en-GB"), // Format to DD/MM/YYYY
+    };
+
+
+    res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error fetching user", error });
+  }
+};
+
+
 
