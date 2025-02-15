@@ -5,6 +5,7 @@ import ViewAndEditExpense from "./ViewAndEditExpense";
 export const TransactionList = ({ transactions, isExpense }) => {
   console.log("Transaction", transactions);
   const [selectedMode, setSelectedMode] = useState("All");
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(""); // To store the selected transaction
 
@@ -17,6 +18,7 @@ export const TransactionList = ({ transactions, isExpense }) => {
   };
 
   console.log("Transaction", selectedTransaction);
+
 
   // Filter transactions based on the selected mode
   const filteredTransactions =
@@ -34,7 +36,8 @@ export const TransactionList = ({ transactions, isExpense }) => {
       key: "amount",
       render: (amount, record) => (
         <span>
-          {record.currency?.symbol || "Unknown"}{" "}
+          {record.currency?.symbol || "Unknown"}
+          {/* {record.currency?.symbol || "Unknown"} */}
           {amount ? parseFloat(amount).toFixed(2) : "N/A"}
         </span>
       ),
@@ -87,10 +90,12 @@ export const TransactionList = ({ transactions, isExpense }) => {
             dataIndex: "subcategory",
             key: "subcategory",
             render: (subcategory) =>
-              subcategory?._id ? <span>{subcategory.name}</span> : "N/A",
+              subcategory?._id ? <span>{subcategory?.name}</span> : "N/A",
+
           },
         ]
       : []),
+
     {
       title: "Actions",
       key: "actions",

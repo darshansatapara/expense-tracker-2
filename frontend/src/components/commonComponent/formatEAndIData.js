@@ -35,6 +35,8 @@ export function formatData(data, startDate, endDate) {
     }
   }
 
+
+
   // Combine and sort the data
   const combinedData = [...data, ...dateRange];
   combinedData.sort((a, b) => {
@@ -54,7 +56,7 @@ function generateObjectId() {
 
 //**************************************/
 // formate the data according the currentday , yesterday , month with the total of expenses
-
+// for home page ...................
 // Helper function to parse a date string (DD-MM-YYYY) into a Date object
 // Import dayjs and plugins
 
