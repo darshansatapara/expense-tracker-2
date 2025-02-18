@@ -28,6 +28,7 @@ export const userStore = create((set) => ({
     try {
       const res = await axiosInstance.post("/auth/signup", data);
       set({ currentUser: res.data.user }); // Save the user data locally
+
       toast.success("Account created successfully!");
       console.log("user signup successful!");
       return res.data.user; // Return the user data to the caller
@@ -116,6 +117,7 @@ export const userStore = create((set) => ({
       const res = await axiosInstance.post("/auth/signin", data);
       console.log(res);
       set({ currentUser: res.data });
+      console.log(currentUser);
       toast.success("Signed in successfully!");
     } catch (error) {
       console.error("Signin error:", error);

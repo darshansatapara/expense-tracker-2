@@ -20,6 +20,8 @@ import userProfileRoute from "./routes/UserRoutes/userProfileRoutes.js";
 import { CurrencyDailyRateJob } from "./jobs/currencyDailyRateJob.js";
 import currencyRateRoute from "./routes/CommonRoute/currencyDailyRateRoute.js";
 
+import { protect } from "./middlewares/userMiddlewares/authMiddleware.js";
+
 dotenv.config(); // Load environment variables
 
 (async () => {
@@ -43,18 +45,22 @@ dotenv.config(); // Load environment variables
     app.use("/api/auth", userAuthRoute(userDbConnection)); // Pass the user database connection to routes
     app.use(
       "/api/expense",
+      protect,
       userExpenseRoute(userDbConnection, adminDbConnection)
     );
     app.use(
       "/api/income",
+      protect,
       userIncomeRoute(userDbConnection, adminDbConnection)
     );
     app.use(
       "/api/usercategories",
+      protect,
       userCategoryRoute(userDbConnection, adminDbConnection)
     );
     app.use(
       "/api/userprofile",
+      protect,
       userProfileRoute(userDbConnection, adminDbConnection)
     );
 

@@ -3,13 +3,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { adminCategoryStore } from "../../store/AdminStore/adminCategoryStore.js";
 import { CategorySelectorButton } from "../InputComponents/CategorySelectionButton.jsx";
 import SignupLeft from "./SignUpInContent/Signup_Left.jsx";
+import { userStore } from "../../store/UserStore/userAuthStore.js";
 
 export default function CategorySection() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { currentUser } = userStore();
 
-  const { userId } = location.state || {};
-  const userData = { userId };
+  console.log(currentUser);
+
+  const userData = currentUser._id;
   console.log(userData);
 
   const [selectedCategories, setSelectedCategories] = useState([]); // Store selected categories with empty subcategories

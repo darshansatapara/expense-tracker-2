@@ -11,7 +11,7 @@ export default function ProfileSection() {
   const { fetchIncomeCategoriesIsActive } = adminCategoryStore();
   const location = useLocation();
   const navigate = useNavigate();
-  const signup = userStore((state) => state.signup);
+  const { signup } = userStore();
 
   const userData = location.state?.userCredentials || {};
   // console.log(userData);
