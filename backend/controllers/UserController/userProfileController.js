@@ -52,7 +52,7 @@ export const updateUserProfile = (userDbConnection) => async (req, res) => {
     const updatedUser = await UserProfileModel.findByIdAndUpdate(
       id,
       { $set: updateData },
-      { new: true, runValidators: true } // `new` to return updated document, `runValidators` for schema validation
+      { new: true } // `new` to return updated document, `runValidators` for schema validation
     );
 
     if (!updatedUser) {
@@ -88,24 +88,37 @@ export const getUserById = (userDbConnection) => async (req, res) => {
 
   try {
     const UserProfileModel = UserProfile(userDbConnection);
-    const user = await UserProfileModel.findById(id).select("profilepic username email mobile_no date_of_birth profession ").populate("profession", "name");
-    console.log(user)
+    const user = await UserProfileModel.findById(id)
+      .select("profilePic username email mobile_no date_of_birth profession")  // Include only necessary fields
+      .populate("profession", "name"); // Populate profession field with the name
+      console.log(user)
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-     // Format the date_of_birth to only return the date part (without the time)
-     const formattedUser = {
+    // Format the date_of_birth to only return the date part (without the time)
+    const formattedUser = {
       ...user.toObject(),
-      date_of_birth: user.date_of_birth.toLocaleDateString("en-GB"), // Format to DD/MM/YYYY
+      date_of_birth: user.date_of_birth ? user.date_of_birth.toLocaleDateString("en-GB") : "Unknown", // Format or handle if date_of_birth is null
     };
 
+    // Remove the _id field from the response
+    delete formattedUser._id;
 
-    res.status(200).json({ success: true, data: user });
+    // Send the response with the formatted user data
+    res.status(200).json({
+      success: true,
+      data: formattedUser, // Send the formatted user object
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Error fetching user", error });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching user",
+      error: error.message, // Provide error message for better debugging
+    });
   }
 };
+
 
 

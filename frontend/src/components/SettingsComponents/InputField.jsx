@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { FaCheck, FaPen } from "react-icons/fa";
 
-const InputField = ({ label, value, onChange, placeholder }) => {
+const InputField = ({ label, value, onChange, placeholder, onSave }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState(value);
 
   const handleSave = () => {
     setIsEditing(false);
     if (onChange) onChange(inputValue);
+    if (onSave) onSave(inputValue);
   };
 
   return (
