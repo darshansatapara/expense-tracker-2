@@ -1,3 +1,4 @@
+import { userExpenseAmountCurrencyConverter } from "../../middlewares/userExpenseAmountCurrencyConverter.js";
 import {
   AdminCurrencyCategory,
   AdminExpenseCategory,
@@ -5,7 +6,6 @@ import {
 import CurrencyDailyRateModel from "../../models/CommonModel/CurrencyDailyRatesModel.js";
 import { UserCurrencyAndBudgetModel } from "../../models/UserModel/UserCategoryModels.js";
 import UserExpense from "../../models/UserModel/UserExpenseDataModel.js";
-import dayjs from "dayjs";
 
 //add the user expense
 /*
@@ -105,48 +105,66 @@ export const addUserExpense = (userDbConnection) => async (req, res) => {
   }
 };
 
+
+
 export const getUserExpense =
   (userDbConnection, adminDbConnection) => async (req, res) => {
     const { userId, startDate, endDate } = req.params;
 
     try {
+      // Initialize models with the given database connections
       const UserExpenseModel = UserExpense(userDbConnection);
       const UserCurrencyAndBudget =
         UserCurrencyAndBudgetModel(userDbConnection);
-      const CurrencyRateModel = CurrencyDailyRateModel(adminDbConnection);
-      // const AdminCurrencyCategoryModel =
-      //   AdminCurrencyCategory(adminDbConnection);
+      const AdminCurrencyCategoryModel =
+        AdminCurrencyCategory(adminDbConnection);
       const AdminExpenseCategoryModel = AdminExpenseCategory(adminDbConnection);
 
-      // Format start and end dates
+      // Parse the dates (DD-MM-YYYY → YYYY-MM-DD)
       const formattedStartDate = new Date(
         startDate.split("-").reverse().join("-")
       );
-      formattedStartDate.setDate(formattedStartDate.getDate() + 1);
       const formattedEndDate = new Date(endDate.split("-").reverse().join("-"));
 
-      // Fetch user expenses
+      // Fetch user's default currency
+      const userCurrencyData = await UserCurrencyAndBudget.findOne({
+        userId,
+      }).populate({
+        path: "defaultCurrency",
+        model: AdminCurrencyCategoryModel,
+        select: "symbol",
+      });
 
+      if (!userCurrencyData) {
+        return res.status(404).json({
+          success: false,
+          message: "User currency data not found.",
+        });
+      }
+
+      const defaultCurrencyId = userCurrencyData.defaultCurrency?._id;
+
+      // Fetch user expenses with populated currency and category details
       const userExpenses = await UserExpenseModel.findOne({ userId })
         .populate({
           path: "expenses.online.currency",
-          model: AdminCurrencyCategory(adminDbConnection),
-          select: "_id symbol", // Include _id and symbol
+          model: AdminCurrencyCategoryModel,
+          select: "symbol",
         })
         .populate({
           path: "expenses.offline.currency",
-          model: AdminCurrencyCategory(adminDbConnection),
-          select: "_id symbol",
+          model: AdminCurrencyCategoryModel,
+          select: "symbol",
         })
         .populate({
           path: "expenses.online.category",
           model: AdminExpenseCategoryModel,
-          select: "_id name subcategories",
+          select: "name subcategories",
         })
         .populate({
           path: "expenses.offline.category",
           model: AdminExpenseCategoryModel,
-          select: "_id name subcategories",
+          select: "name subcategories",
         });
 
       if (!userExpenses) {
@@ -156,41 +174,9 @@ export const getUserExpense =
         });
       }
 
-      // Get user's default currency
-      const userCurrencyData = await UserCurrencyAndBudget.findOne({
-        userId,
-      }).populate("defaultCurrency", "_id symbol");
-      if (!userCurrencyData) {
-        return res.status(404).json({
-          success: false,
-          message: "User default currency not found.",
-        });
-      }
-      const defaultCurrency = userCurrencyData.defaultCurrency;
-
-      // Function to get exchange rate for a given date
-      const getExchangeRate = async (date, currencyId) => {
-        const [day, month, year] = date.split("-");
-        const rateData = await CurrencyRateModel.findOne({ year }).select(
-          "months"
-        );
-        if (!rateData) return null;
-
-        const monthData = rateData.months.find(
-          (m) => m.startMonth === month || m.endMonth === month
-        );
-        if (!monthData) return null;
-
-        const dayData = monthData.days.find((d) => d.date === date);
-        if (!dayData) return null;
-
-        const currencyRate = dayData.rates.find(
-          (r) => r.currency.toString() === currencyId.toString()
-        );
-        return currencyRate ? parseFloat(currencyRate.value) : null;
-      };
-
       const filteredExpenses = [];
+
+      // Filter expenses by date and calculate exchange rates
       for (const expenseGroup of userExpenses.expenses) {
         const expenseDate = new Date(
           expenseGroup.date.split("-").reverse().join("-")
@@ -200,44 +186,58 @@ export const getUserExpense =
           expenseDate >= formattedStartDate &&
           expenseDate <= formattedEndDate
         ) {
-          const convertedExpenses = await Promise.all(
-            expenseGroup.online.map(async (expense) => {
-              const exchangeRate = await getExchangeRate(
-                expense.date,
-                expense.currency?._id
-              );
-              const convertedAmount = exchangeRate
-                ? (parseFloat(expense.amount) * exchangeRate).toFixed(2)
-                : null;
-              return {
-                ...expense._doc,
-                convertedAmount,
-                defaultCurrencySymbol: defaultCurrency.symbol,
-              };
-            })
-          );
-
-          const convertedOfflineExpenses = await Promise.all(
-            expenseGroup.offline.map(async (expense) => {
-              const exchangeRate = await getExchangeRate(
-                expense.date,
-                expense.currency?._id
-              );
-              const convertedAmount = exchangeRate
-                ? (parseFloat(expense.amount) * exchangeRate).toFixed(2)
-                : null;
-              return {
-                ...expense._doc,
-                convertedAmount,
-                defaultCurrencySymbol: defaultCurrency.symbol,
-              };
-            })
-          );
-
           filteredExpenses.push({
             date: expenseGroup.date,
-            online: convertedExpenses,
-            offline: convertedOfflineExpenses,
+            online: await Promise.all(
+              expenseGroup.online.map(async (expense) => ({
+                date: expense.date,
+                mode: expense.mode,
+                amount: expense.amount,
+                currency: expense.currency
+                  ? expense.currency.symbol
+                  : "Unknown",
+                category: expense.category ? expense.category.name : "Unknown",
+                subcategory:
+                  expense.category?.subcategories.find(
+                    (sub) =>
+                      sub._id.toString() === expense.subcategory?.toString()
+                  )?.name || "Unknown",
+                convertedAmount: await userExpenseAmountCurrencyConverter(
+                  adminDbConnection,
+                  expense.date,
+                  expense.amount,
+                  expense.currency?._id,
+                  defaultCurrencyId
+                ),
+                note: expense.note,
+                _id: expense._id,
+              }))
+            ),
+            offline: await Promise.all(
+              expenseGroup.offline.map(async (expense) => ({
+                date: expense.date,
+                mode: expense.mode,
+                amount: expense.amount,
+                currency: expense.currency
+                  ? expense.currency.symbol
+                  : "Unknown",
+                category: expense.category ? expense.category.name : "Unknown",
+                subcategory:
+                  expense.category?.subcategories.find(
+                    (sub) =>
+                      sub._id.toString() === expense.subcategory?.toString()
+                  )?.name || "Unknown",
+                convertedAmount: await userExpenseAmountCurrencyConverter(
+                  adminDbConnection,
+                  expense.date,
+                  expense.amount,
+                  expense.currency?._id,
+                  defaultCurrencyId
+                ),
+                note: expense.note,
+                _id: expense._id,
+              }))
+            ),
           });
         }
       }
@@ -264,121 +264,6 @@ export const getUserExpense =
     }
   };
 
-export const getWeeklyUserExpense =
-  (userDbConnection, adminDbConnection) => async (req, res) => {
-    const { userId, startDate, endDate } = req.params;
-
-    try {
-      // Initialize the UserExpense model for the userDbConnection
-      const UserExpenseModel = UserExpense(userDbConnection);
-
-      // Parse start and end dates
-      const formattedStartDate = new Date(
-        startDate.split("-").reverse().join("-")
-      ); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
-      const formattedEndDate = new Date(endDate.split("-").reverse().join("-")); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
-
-      // Fetch user expenses and populate the related fields
-      const userExpenses = await UserExpenseModel.findOne({ userId })
-        .populate({
-          path: "expenses.online.currency",
-          model: AdminCurrencyCategory(adminDbConnection),
-          select: "symbol", // Select only the symbol for currency
-        })
-        .populate({
-          path: "expenses.offline.currency",
-          model: AdminCurrencyCategory(adminDbConnection),
-          select: "symbol", // Select only the symbol for currency
-        })
-        .populate({
-          path: "expenses.online.category",
-          model: AdminExpenseCategory(adminDbConnection),
-          select: "name subcategories", // Select only the name for subcategory
-        })
-        .populate({
-          path: "expenses.offline.category",
-          model: AdminExpenseCategory(adminDbConnection),
-          select: "name subcategories", // Select only the name for subcategory
-        });
-
-      if (!userExpenses) {
-        return res.status(404).json({
-          success: false,
-          message: "No expenses found for this user.",
-        });
-      }
-
-      const filteredExpenses = [];
-
-      // Filter expenses by the specified date range
-      userExpenses.expenses.forEach((expenseGroup) => {
-        const expenseDate = new Date(
-          expenseGroup.date.split("-").reverse().join("-")
-        );
-
-        if (
-          expenseDate >= formattedStartDate &&
-          expenseDate <= formattedEndDate
-        ) {
-          filteredExpenses.push({
-            date: expenseGroup.date,
-            online: expenseGroup.online.map((expense) => ({
-              date: expense.date,
-              mode: expense.mode,
-              amount: expense.amount,
-              currency: expense.currency ? expense.currency.symbol : "Unknown", // Handle null currency
-              category: expense.category ? expense.category.name : "Unknown", // Handle null category
-              subcategory:
-                expense.category?.subcategories.find(
-                  (sub) =>
-                    sub._id.toString() === expense.subcategory?.toString()
-                )?.name || "Unknown",
-
-              // Handle null subcategory
-              note: expense.note,
-              _id: expense._id,
-            })),
-            offline: expenseGroup.offline.map((expense) => ({
-              date: expense.date,
-              mode: expense.mode,
-              amount: expense.amount,
-              currency: expense.currency ? expense.currency.symbol : "Unknown", // Handle null currency
-              category: expense.category ? expense.category.name : "Unknown", // Handle null category
-              subcategory:
-                expense.category?.subcategories.find(
-                  (sub) =>
-                    sub._id.toString() === expense.subcategory?.toString()
-                )?.name || "Unknown",
-
-              // Handle null subcategory
-              note: expense.note,
-              _id: expense._id,
-            })),
-          });
-        }
-      });
-
-      if (!filteredExpenses.length) {
-        return res.status(404).json({
-          success: false,
-          message: "No expenses found for the specified date range.",
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        message: "Expenses retrieved successfully.",
-        expenses: filteredExpenses,
-      });
-    } catch (error) {
-      console.error("Error fetching expenses:", error);
-      res.status(500).json({
-        success: false,
-        message: "Error fetching expenses.",
-        error: error.message,
-      });
-    }
-  };
 // Update expense details
 /**{
   "date": "05-01-2025",          // New Date
