@@ -46,11 +46,15 @@ export default function ProfileSection() {
   useEffect(() => {
     const professionData = async () => {
       const resData = await fetchIncomeCategoriesIsActive();
+      // console.log(resData.categories);
+
       setProfession(resData.categories);
     };
 
     professionData();
   }, [fetchIncomeCategoriesIsActive]);
+
+  // console.log(profession);
 
   const handleFinish = async (values) => {
     setLoading(true);
@@ -191,9 +195,9 @@ export default function ProfileSection() {
               <Option value="" disabled hidden virtual>
                 Select an option
               </Option>
-              {profession.map((item, index) => (
-                <Option key={index} value={item._id}>
-                  {item.name}
+              {profession?.map((item) => (
+                <Option key={item._id} value={item._id}>
+                  {item?.name}
                 </Option>
               ))}
             </Select>

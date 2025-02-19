@@ -17,6 +17,8 @@ import otpRoute from "./routes/CommonRoute/otpRoutes.js";
 import adminCategoryRoutes from "./routes/AdminRoutes/adminCategoryRoutes.js";
 import userCategoryRoute from "./routes/UserRoutes/userCategoryRoutes.js";
 import userProfileRoute from "./routes/UserRoutes/userProfileRoutes.js";
+import { CurrencyDailyRateJob } from "./jobs/currencyDailyRateJob.js";
+import currencyRateRoute from "./routes/CommonRoute/currencyDailyRateRoute.js";
 
 dotenv.config(); // Load environment variables
 
@@ -61,6 +63,12 @@ dotenv.config(); // Load environment variables
       "/api/admincategories",
       adminCategoryRoutes(adminDbConnection, userDbConnection)
     );
+
+    //currency rate routes (if any)****************************************************************
+    // Register currencyRateRoute with the app
+    app.use("/api/currencyrate", currencyRateRoute(adminDbConnection));
+    // Schedule the currency update job
+    CurrencyDailyRateJob(adminDbConnection);
 
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {

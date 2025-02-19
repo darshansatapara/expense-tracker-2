@@ -14,7 +14,7 @@ const useUserExpenseStore = create((set) => ({
       const response = await axiosInstance.get(
         `/expense/getExpenses/${userId}/${startDate}/${endDate}` // Adjust the endpoint as needed
       );
-      // console.log(response.data.expenses);
+      console.log(response.data.expenses);
       if (response.data.success) {
         // Format the data using the utility function
         const formattedData = formatData(
@@ -37,6 +37,26 @@ const useUserExpenseStore = create((set) => ({
           error.response?.data?.message ||
           "An error occurred while fetching expenses.",
       });
+    }
+  },
+
+  addUserExpense: async (data) => {
+    try {
+      // console.log("Adding currency and budget", data);
+      await axiosInstance.post(`/expense/addExpense`, data);
+    } catch (error) {
+      console.error("Error adding currency and budget:", error);
+    }
+  },
+
+  updateUserExpense: async (data, userId, objectDate) => {
+    try {
+      await axiosInstance.put(
+        `/expense/updateExpense/${userId}/${objectDate}`,
+        data
+      );
+    } catch (error) {
+      console.error("Error updating expense:", error);
     }
   },
 }));
