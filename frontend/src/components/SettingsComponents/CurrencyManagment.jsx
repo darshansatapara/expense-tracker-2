@@ -5,10 +5,7 @@ import { userStore } from "../../store/UserStore/userAuthStore.js";
 function CurrencyManagment() {
   const { fetchCurrencyAndBudget } = userCategoryStore();
   const { currentUser } = userStore();
-  console.log(currentUser);
-  useEffect(() => {
-    fetchCurrencyAndBudget(currentUser._id);
-  });
+ 
   return <div>CurrencyManagment</div>;
 }
 

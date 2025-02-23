@@ -105,8 +105,6 @@ export const addUserExpense = (userDbConnection) => async (req, res) => {
   }
 };
 
-
-
 export const getUserExpense =
   (userDbConnection, adminDbConnection) => async (req, res) => {
     const { userId, startDate, endDate } = req.params;
@@ -193,15 +191,27 @@ export const getUserExpense =
                 date: expense.date,
                 mode: expense.mode,
                 amount: expense.amount,
-                currency: expense.currency
-                  ? expense.currency.symbol
-                  : "Unknown",
-                category: expense.category ? expense.category.name : "Unknown",
-                subcategory:
-                  expense.category?.subcategories.find(
-                    (sub) =>
-                      sub._id.toString() === expense.subcategory?.toString()
-                  )?.name || "Unknown",
+                currency: expense.currency?._id
+                  ? {
+                      _id: expense.currency._id,
+                      symbol: expense.currency.symbol,
+                    }
+                  : { _id: null, symbol: "Unknown" },
+                category: expense.category?._id
+                  ? { _id: expense.category._id, name: expense.category.name }
+                  : { _id: null, name: "Unknown" },
+                subcategory: expense.category?.subcategories.find(
+                  (sub) =>
+                    sub._id.toString() === expense.subcategory?.toString()
+                )
+                  ? {
+                      _id: expense.subcategory,
+                      name: expense.category.subcategories.find(
+                        (sub) =>
+                          sub._id.toString() === expense.subcategory?.toString()
+                      )?.name,
+                    }
+                  : { _id: null, name: "Unknown" },
                 convertedAmount: await userExpenseAmountCurrencyConverter(
                   adminDbConnection,
                   expense.date,
@@ -218,15 +228,28 @@ export const getUserExpense =
                 date: expense.date,
                 mode: expense.mode,
                 amount: expense.amount,
-                currency: expense.currency
-                  ? expense.currency.symbol
-                  : "Unknown",
-                category: expense.category ? expense.category.name : "Unknown",
-                subcategory:
-                  expense.category?.subcategories.find(
-                    (sub) =>
-                      sub._id.toString() === expense.subcategory?.toString()
-                  )?.name || "Unknown",
+                currency: expense.currency?._id
+                  ? {
+                      _id: expense.currency._id,
+                      symbol: expense.currency.symbol,
+                    }
+                  : { _id: null, symbol: "Unknown" },
+                category: expense.category?._id
+                  ? { _id: expense.category._id, name: expense.category.name }
+                  : { _id: null, name: "Unknown" },
+                subcategory: expense.category?.subcategories.find(
+                  (sub) =>
+                    sub._id.toString() === expense.subcategory?.toString()
+                )
+                  ? {
+                      _id: expense.subcategory,
+                      name: expense.category.subcategories.find(
+                        (sub) =>
+                          sub._id.toString() === expense.subcategory?.toString()
+                      )?.name,
+                    }
+                  : { _id: null, name: "Unknown" },
+
                 convertedAmount: await userExpenseAmountCurrencyConverter(
                   adminDbConnection,
                   expense.date,

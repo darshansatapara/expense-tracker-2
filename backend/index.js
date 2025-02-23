@@ -45,22 +45,22 @@ dotenv.config(); // Load environment variables
     app.use("/api/auth", userAuthRoute(userDbConnection)); // Pass the user database connection to routes
     app.use(
       "/api/expense",
-      protect,
+      // protect,
       userExpenseRoute(userDbConnection, adminDbConnection)
     );
     app.use(
       "/api/income",
-      protect,
+      // protect,
       userIncomeRoute(userDbConnection, adminDbConnection)
     );
     app.use(
       "/api/usercategories",
-      protect,
+      // protect,
       userCategoryRoute(userDbConnection, adminDbConnection)
     );
     app.use(
       "/api/userprofile",
-      protect,
+      // protect,
       userProfileRoute(userDbConnection, adminDbConnection)
     );
 

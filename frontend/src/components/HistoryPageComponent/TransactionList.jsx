@@ -19,7 +19,6 @@ export const TransactionList = ({ transactions, isExpense }) => {
 
   console.log("Transaction", selectedTransaction);
 
-
   // Filter transactions based on the selected mode
   const filteredTransactions =
     selectedMode === "All"
@@ -91,7 +90,6 @@ export const TransactionList = ({ transactions, isExpense }) => {
             key: "subcategory",
             render: (subcategory) =>
               subcategory?._id ? <span>{subcategory?.name}</span> : "N/A",
-
           },
         ]
       : []),
