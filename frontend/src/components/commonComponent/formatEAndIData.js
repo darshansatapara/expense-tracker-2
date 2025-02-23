@@ -35,8 +35,6 @@ export function formatData(data, startDate, endDate) {
     }
   }
 
-
-
   // Combine and sort the data
   const combinedData = [...data, ...dateRange];
   combinedData.sort((a, b) => {
@@ -91,10 +89,10 @@ export function filterDataByDateRange(data) {
   const calculateTotals = (expenses) => {
     const offlineTotal = expenses
       .flatMap((item) => item.offline || [])
-      .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
+      .reduce((sum, exp) => sum + parseFloat(exp.convertedAmount || 0), 0);
     const onlineTotal = expenses
       .flatMap((item) => item.online || [])
-      .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
+      .reduce((sum, exp) => sum + parseFloat(exp.convertedAmount || 0), 0);
 
     return {
       offlineTotal,
@@ -113,6 +111,8 @@ export function filterDataByDateRange(data) {
   const currentWeekData = data.filter((item) =>
     filterByDateRange(item.date, startOfWeek, endOfWeek)
   );
+
+  console.log("currentweekdata", currentWeekData);
   const currentMonthData = data.filter((item) =>
     filterByDateRange(item.date, startOfMonth, endOfMonth)
   );

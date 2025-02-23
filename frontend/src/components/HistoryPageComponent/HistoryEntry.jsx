@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { TransactionList } from "./TransactionList";
+import { userCategoryStore } from "../../store/UserStore/userCategoryStore";
 
 export const HistoryEntry = ({
   entry,
@@ -9,6 +10,18 @@ export const HistoryEntry = ({
   isExpense,
   loading, // New loading prop
 }) => {
+  const [defaultCurrencySymbol, setDefaultCurrencySymbol] = useState("");
+  const userId = "677bc096bd8c6f677ef507d3";
+  const { fetchCurrencyAndBudget } = userCategoryStore();
+  useEffect(() => {
+    const fetchDefaultCurrency = async () => {
+      const defaultCurrency = await fetchCurrencyAndBudget(userId);
+
+      setDefaultCurrencySymbol(defaultCurrency.defaultCurrency.symbol);
+    };
+    fetchDefaultCurrency();
+  }, [fetchCurrencyAndBudget, userId]);
+
   if (loading) {
     return (
       <div className="mb-4 border rounded-lg overflow-hidden animate-pulse">
@@ -34,10 +47,12 @@ export const HistoryEntry = ({
       <div className="bg-gray-200 p-4 grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
         <span className="text-gray-600">Date: {entry.date}</span>
         <span className="text-gray-600 transition-all duration-500 ">
-          Offline Total: ₹{entry.offlineTotal}
+          Offline Total: {defaultCurrencySymbol}
+          {entry.offlineTotal.toFixed(2)}
         </span>
         <span className="text-gray-600 transition-all duration-500 ">
-          Online Total: ₹{entry.onlineTotal}
+          Online Total: {defaultCurrencySymbol}
+          {entry.onlineTotal.toFixed(2)}
         </span>
         <button
           onClick={toggleExpand}

@@ -6,7 +6,7 @@ const TotalDataCard = ({ cardData, lable }) => {
   const [loading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(null); // Error state
   const [defaultCurrencySymbol, setDefaultCurrencySymbol] = useState("");
-  const userId = "679a8b3e3ff0f2bdb0c9780c";
+  const userId = "677bc096bd8c6f677ef507d3";
 
   const { fetchCurrencyAndBudget } = userCategoryStore();
   useEffect(() => {
@@ -18,7 +18,7 @@ const TotalDataCard = ({ cardData, lable }) => {
     fetchDefaultCurrency();
   }, [fetchCurrencyAndBudget, userId]);
 
-  // console.log(defaultCurrencySymbol);
+  console.log(defaultCurrencySymbol);
 
   return (
     <div className="bg-gray-100 flex flex-col h-[40vh] justify-center items-center p-4 rounded-md border gap-5">

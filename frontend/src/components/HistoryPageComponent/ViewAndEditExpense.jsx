@@ -81,7 +81,7 @@ export default function ViewAndEditExpense({
           ? matchedCategory.categoryId._id
           : ""
         : matchedCategory
-        ? matchedCategory[0]._id
+        ? matchedCategory[0]?._id
         : "",
       subcategory: matchedSubcategory ? matchedSubcategory._id : "",
       currency: matchedCurrency ? matchedCurrency.currencyId._id : "",

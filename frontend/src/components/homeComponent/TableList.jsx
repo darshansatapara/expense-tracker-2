@@ -2,12 +2,27 @@ import React, { useState, useEffect } from "react";
 import { Table, Spin, Empty } from "antd";
 import "antd/dist/reset.css"; // Ensure Ant Design styles are applied
 import { TabButton } from "../commonComponent/TabButton.jsx";
+import { userCategoryStore } from "../../store/UserStore/userCategoryStore.js";
 const TableList = ({ today, yesterday, activeTab }) => {
   const [showData, setShowData] = useState([]);
   const [activeButton, setActiveButton] = useState("Today");
   const [loading, setLoading] = useState(false);
   const handleTodayClick = () => setActiveButton("Today");
   const handleYesterdayClick = () => setActiveButton("Yesterday");
+  const [defaultCurrencySymbol, setDefaultCurrencySymbol] = useState("");
+  const userId = "677bc096bd8c6f677ef507d3";
+
+  const { fetchCurrencyAndBudget } = userCategoryStore();
+
+  useEffect(() => {
+    const fetchDefaultCurrency = async () => {
+      const defaultCurrency = await fetchCurrencyAndBudget(userId);
+
+      setDefaultCurrencySymbol(defaultCurrency.defaultCurrency.symbol);
+    };
+    fetchDefaultCurrency();
+  }, [fetchCurrencyAndBudget, userId]);
+
   // Update data based on the selected button
   useEffect(() => {
     setLoading(true);
@@ -20,6 +35,7 @@ const TableList = ({ today, yesterday, activeTab }) => {
   }, [activeButton, today, yesterday]);
   const data = showData?.data || [];
   const total = showData?.totals || {};
+
   // Filtered transactions based on activeTab (isExpense: true for Expense, false for Income)
   const formattedTransactions = data.flatMap((expenseGroup) =>
     [...expenseGroup.online, ...expenseGroup.offline].map((transaction) => ({
@@ -92,13 +108,15 @@ const TableList = ({ today, yesterday, activeTab }) => {
               <h3 className="text-md font-bold text-gray-700">
                 Total Online:{" "}
                 <span className="text-green-500 font-semibold">
-                  ₹{total.onlineTotal || 0}
+                  {defaultCurrencySymbol}
+                  {total.onlineTotal || 0}
                 </span>
               </h3>
               <h3 className="text-md font-bold text-gray-700">
                 Total Offline:{" "}
                 <span className="text-green-500 font-semibold">
-                  ₹{total.offlineTotal || 0}
+                  {defaultCurrencySymbol}
+                  {total.offlineTotal || 0}
                 </span>
               </h3>
             </div>
@@ -107,7 +125,8 @@ const TableList = ({ today, yesterday, activeTab }) => {
             <h3 className="text-md font-bold text-gray-700">
               Total:{" "}
               <span className="text-green-500 font-semibold">
-                ₹{total.bothTotal || 0}
+                {defaultCurrencySymbol}
+                {total.bothTotal || 0}
               </span>
             </h3>
           </div>
