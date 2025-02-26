@@ -3,7 +3,7 @@ import InputField from "./InputField";
 import useUserProfileStore from "../../store/UserStore/userProfileStore";
 
 const PersonalDetails = () => {
-  const { userProfile, isLoading, error, fetchUserProfile,updateUserProfile } = useUserProfileStore((state) => state);
+  const { userProfile, isLoading, error, fetchUserProfile } = useUserProfileStore((state) => state);
   const [editedProfile, setEditedProfile] = useState({});
 
   useEffect(() => {
@@ -22,15 +22,15 @@ const PersonalDetails = () => {
     setEditedProfile((prev) => ({ ...prev, [key]: value }));
   };
    // Function to save updated profile data
-   const handleSaveProfile = async () => {
-    const userId = "679a8b3e3ff0f2bdb0c9780c";  // Replace with actual user ID
-    try {
-      await updateUserProfile(userId, editedProfile);
-      alert("Profile updated successfully!");
-    } catch (error) {
-      alert("Error updating profile: " + error.message);
-    }
-  };
+  //  const handleSaveProfile = async () => {
+  //   const userId = "679a8b3e3ff0f2bdb0c9780c";  // Replace with actual user ID
+  //   try {
+  //     await updateUserProfile(userId, editedProfile);
+  //     alert("Profile updated successfully!");
+  //   } catch (error) {
+  //     alert("Error updating profile: " + error.message);
+  //   }
+  // };
   
 
   if (isLoading) return <div>Loading...</div>;
@@ -72,7 +72,7 @@ const PersonalDetails = () => {
                 value={value || ""}
                 placeholder={`Enter your ${key.replace(/([A-Z])/g, " $1").toLowerCase()}`}
                 onChange={(val) => handleChange(key, val)}
-                onSave={handleSaveProfile} 
+             
               />
             )
           )}
