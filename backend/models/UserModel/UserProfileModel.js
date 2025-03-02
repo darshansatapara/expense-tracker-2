@@ -28,6 +28,7 @@ const userProfileSchema = new mongoose.Schema({
   profession: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
+    ref: "AdminIncomeCategory",
   },
   profile_complated: {
     type: Boolean,
