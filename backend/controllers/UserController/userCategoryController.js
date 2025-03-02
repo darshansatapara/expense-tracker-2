@@ -842,9 +842,11 @@ export const updateUserCurrencyAndBudget =
     const { userId } = req.params;
     const { newCurrencyCategoryIds, budget, defaultCurrency } = req.body;
 
+    console.log(userId, newCurrencyCategoryIds);
+
     try {
       // Validate if neither categories nor budget are provided
-      if (!newCurrencyCategoryIds || !budget || !defaultCurrency) {
+      if (!newCurrencyCategoryIds && !budget && !defaultCurrency) {
         return res.status(400).json({
           success: false,
           message:
@@ -997,6 +999,8 @@ export const deleteUserCurrencyCategory =
   (userDbConnection) => async (req, res) => {
     const { userId } = req.params;
     const { deleteCurrencyCategoryIds } = req.body;
+
+    console.log(userId, deleteCurrencyCategoryIds);
 
     // Validate input
     if (

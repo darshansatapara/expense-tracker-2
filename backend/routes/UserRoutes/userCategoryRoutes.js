@@ -87,7 +87,7 @@ const userCategoryRoute = (userDbConnection, adminDbConnection) => {
 
   //delete currency category
   router.delete(
-    "/currencyCategory/deleteCureencyCategory/:userId",
+    "/currencyCategory/deleteCurrencyCategory/:userId",
     deleteUserCurrencyCategory(userDbConnection)
   );
 
