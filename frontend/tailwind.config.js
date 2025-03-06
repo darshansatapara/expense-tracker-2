@@ -24,7 +24,8 @@ export default {
         "dark-text": "#fff",
       },
       screens:{
-        'sm-plus': {'max':'1139px'}
+        'sm-plus': {'max': '1139px'}, // Custom max-width breakpoint for 'sm-plus'
+        'xs':  {'max': '201px'}, // Custom breakpoint for 'xs' at 168px
       },
       backdropBlur: {
         md: '12px', // or another value for the blur effect

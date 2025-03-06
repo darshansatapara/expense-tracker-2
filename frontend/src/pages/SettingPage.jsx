@@ -4,7 +4,7 @@ import Settings from "../components/SettingsComponents/SettingComponent";
 import ContactUs from "../components/SettingsComponents/Contactus";
 import PersonalDetails from "../components/SettingsComponents/PersonalDetails";
 import ThemeSettings from "../components/SettingsComponents/Theme";
-import CategoryManagement from "../components/SettingsComponents/CategoryManagment";
+import CategoryManagement from "../components/SettingsComponents/CategoryManagment/CategoryManagment";
 import SubcategoryManagement from "../components/SettingsComponents/SubCategoryManagment";
 import CurrencyManagement from "../components/SettingsComponents/CurrencyManagment";
 import BudgetManagement from "../components/SettingsComponents/BudgetManagment";

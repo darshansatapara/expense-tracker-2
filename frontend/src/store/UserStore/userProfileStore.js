@@ -15,10 +15,10 @@ const useUserProfileStore = create((set) => ({
       console.log("Full Response:", response);  // Log full response
       console.log("Response Data:", response.data);  // Log only the data part
   
-      if (!response.data || Object.keys(response.data).length === 0) {
-        console.error("Empty resp'
-          onse data received");
-      }
+      // if (!response.data || Object.keys(response.data).length === 0) {
+      //   console.error("Empty resp'
+      //     onse data received");
+      // }
   
       const userProfile = response.data;
       set({ userProfile, isLoading: false });
