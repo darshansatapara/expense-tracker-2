@@ -1,9 +1,11 @@
+import { userExpenseAmountCurrencyConverter } from "../../middlewares/userExpenseAmountCurrencyConverter.js";
 import {
   AdminCurrencyCategory,
   AdminExpenseCategory,
 } from "../../models/AdminModel/AdminCategoryModels.js";
+import CurrencyDailyRateModel from "../../models/CommonModel/CurrencyDailyRatesModel.js";
+import { UserCurrencyAndBudgetModel } from "../../models/UserModel/UserCategoryModels.js";
 import UserExpense from "../../models/UserModel/UserExpenseDataModel.js";
-import dayjs from "dayjs";
 
 //add the user expense
 /*
@@ -103,43 +105,64 @@ export const addUserExpense = (userDbConnection) => async (req, res) => {
   }
 };
 
-// Get expenses for a user within a date range
 export const getUserExpense =
   (userDbConnection, adminDbConnection) => async (req, res) => {
     const { userId, startDate, endDate } = req.params;
 
     try {
-      // Initialize the UserExpense model for the userDbConnection
+      // Initialize models with the given database connections
       const UserExpenseModel = UserExpense(userDbConnection);
+      const UserCurrencyAndBudget =
+        UserCurrencyAndBudgetModel(userDbConnection);
+      const AdminCurrencyCategoryModel =
+        AdminCurrencyCategory(adminDbConnection);
+      const AdminExpenseCategoryModel = AdminExpenseCategory(adminDbConnection);
 
+      // Parse the dates (DD-MM-YYYY → YYYY-MM-DD)
       const formattedStartDate = new Date(
         startDate.split("-").reverse().join("-")
-      ); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
-      formattedStartDate.setDate(formattedStartDate.getDate() + 1);
-
+      );
       const formattedEndDate = new Date(endDate.split("-").reverse().join("-"));
 
-      // Fetch user expenses and populate related fields
+      // Fetch user's default currency
+      const userCurrencyData = await UserCurrencyAndBudget.findOne({
+        userId,
+      }).populate({
+        path: "defaultCurrency",
+        model: AdminCurrencyCategoryModel,
+        select: "symbol",
+      });
+
+      if (!userCurrencyData) {
+        return res.status(404).json({
+          success: false,
+          message: "User currency data not found.",
+        });
+      }
+
+      const defaultCurrencyId = userCurrencyData.defaultCurrency?._id;
+
+      // Fetch user expenses with populated currency and category details
       const userExpenses = await UserExpenseModel.findOne({ userId })
         .populate({
           path: "expenses.online.currency",
-          model: AdminCurrencyCategory(adminDbConnection),
-          select: "_id symbol", // Include _id and symbol
+          model: AdminCurrencyCategoryModel,
+          select: "symbol",
         })
         .populate({
           path: "expenses.offline.currency",
-          model: AdminCurrencyCategory(adminDbConnection),
-          select: "_id symbol",
+          model: AdminCurrencyCategoryModel,
+          select: "symbol",
         })
         .populate({
           path: "expenses.online.category",
-          model: AdminExpenseCategory(adminDbConnection),
-          select: "_id name subcategories", // Include _id, name, and subcategories
+          model: AdminExpenseCategoryModel,
+          select: "name subcategories",
         })
         .populate({
           path: "expenses.offline.category",
-          model: AdminExpenseCategory(adminDbConnection),
-          select: "_id name subcategories",
+          model: AdminExpenseCategoryModel,
+          select: "name subcategories",
         });
 
       if (!userExpenses) {
@@ -151,8 +174,8 @@ export const getUserExpense =
 
       const filteredExpenses = [];
 
-      // Filter expenses by date range
-      userExpenses.expenses.forEach((expenseGroup) => {
+      // Filter expenses by date and calculate exchange rates
+      for (const expenseGroup of userExpenses.expenses) {
         const expenseDate = new Date(
           expenseGroup.date.split("-").reverse().join("-")
         );
@@ -163,57 +186,84 @@ export const getUserExpense =
         ) {
           filteredExpenses.push({
             date: expenseGroup.date,
-            online: expenseGroup.online.map((expense) => ({
-              date: expense.date,
-              mode: expense.mode,
-              amount: expense.amount,
-              currency: expense.currency?._id
-                ? { _id: expense.currency._id, symbol: expense.currency.symbol }
-                : { _id: null, symbol: "Unknown" },
-              category: expense.category?._id
-                ? { _id: expense.category._id, name: expense.category.name }
-                : { _id: null, name: "Unknown" },
-              subcategory: expense.category?.subcategories.find(
-                (sub) => sub._id.toString() === expense.subcategory?.toString()
-              )
-                ? {
-                    _id: expense.subcategory,
-                    name: expense.category.subcategories.find(
-                      (sub) =>
-                        sub._id.toString() === expense.subcategory?.toString()
-                    )?.name,
-                  }
-                : { _id: null, name: "Unknown" },
-              note: expense.note,
-              _id: expense._id,
-            })),
-            offline: expenseGroup.offline.map((expense) => ({
-              date: expense.date,
-              mode: expense.mode,
-              amount: expense.amount,
-              currency: expense.currency?._id
-                ? { _id: expense.currency._id, symbol: expense.currency.symbol }
-                : { _id: null, symbol: "Unknown" },
-              category: expense.category?._id
-                ? { _id: expense.category._id, name: expense.category.name }
-                : { _id: null, name: "Unknown" },
-              subcategory: expense.category?.subcategories.find(
-                (sub) => sub._id.toString() === expense.subcategory?.toString()
-              )
-                ? {
-                    _id: expense.subcategory,
-                    name: expense.category.subcategories.find(
-                      (sub) =>
-                        sub._id.toString() === expense.subcategory?.toString()
-                    )?.name,
-                  }
-                : { _id: null, name: "Unknown" },
-              note: expense.note,
-              _id: expense._id,
-            })),
+            online: await Promise.all(
+              expenseGroup.online.map(async (expense) => ({
+                date: expense.date,
+                mode: expense.mode,
+                amount: expense.amount,
+                currency: expense.currency?._id
+                  ? {
+                      _id: expense.currency._id,
+                      symbol: expense.currency.symbol,
+                    }
+                  : { _id: null, symbol: "Unknown" },
+                category: expense.category?._id
+                  ? { _id: expense.category._id, name: expense.category.name }
+                  : { _id: null, name: "Unknown" },
+                subcategory: expense.category?.subcategories.find(
+                  (sub) =>
+                    sub._id.toString() === expense.subcategory?.toString()
+                )
+                  ? {
+                      _id: expense.subcategory,
+                      name: expense.category.subcategories.find(
+                        (sub) =>
+                          sub._id.toString() === expense.subcategory?.toString()
+                      )?.name,
+                    }
+                  : { _id: null, name: "Unknown" },
+                convertedAmount: await userExpenseAmountCurrencyConverter(
+                  adminDbConnection,
+                  expense.date,
+                  expense.amount,
+                  expense.currency?._id,
+                  defaultCurrencyId
+                ),
+                note: expense.note,
+                _id: expense._id,
+              }))
+            ),
+            offline: await Promise.all(
+              expenseGroup.offline.map(async (expense) => ({
+                date: expense.date,
+                mode: expense.mode,
+                amount: expense.amount,
+                currency: expense.currency?._id
+                  ? {
+                      _id: expense.currency._id,
+                      symbol: expense.currency.symbol,
+                    }
+                  : { _id: null, symbol: "Unknown" },
+                category: expense.category?._id
+                  ? { _id: expense.category._id, name: expense.category.name }
+                  : { _id: null, name: "Unknown" },
+                subcategory: expense.category?.subcategories.find(
+                  (sub) =>
+                    sub._id.toString() === expense.subcategory?.toString()
+                )
+                  ? {
+                      _id: expense.subcategory,
+                      name: expense.category.subcategories.find(
+                        (sub) =>
+                          sub._id.toString() === expense.subcategory?.toString()
+                      )?.name,
+                    }
+                  : { _id: null, name: "Unknown" },
+
+                convertedAmount: await userExpenseAmountCurrencyConverter(
+                  adminDbConnection,
+                  expense.date,
+                  expense.amount,
+                  expense.currency?._id,
+                  defaultCurrencyId
+                ),
+                note: expense.note,
+                _id: expense._id,
+              }))
+            ),
           });
         }
-      });
+      }
 
       if (!filteredExpenses.length) {
         return res.status(404).json({
@@ -237,121 +287,6 @@ export const getUserExpense =
     }
   };
 
-export const getWeeklyUserExpense =
-  (userDbConnection, adminDbConnection) => async (req, res) => {
-    const { userId, startDate, endDate } = req.params;
-
-    try {
-      // Initialize the UserExpense model for the userDbConnection
-      const UserExpenseModel = UserExpense(userDbConnection);
-
-      // Parse start and end dates
-      const formattedStartDate = new Date(
-        startDate.split("-").reverse().join("-")
-      ); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
-      const formattedEndDate = new Date(endDate.split("-").reverse().join("-")); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
-
-      // Fetch user expenses and populate the related fields
-      const userExpenses = await UserExpenseModel.findOne({ userId })
-        .populate({
-          path: "expenses.online.currency",
-          model: AdminCurrencyCategory(adminDbConnection),
-          select: "symbol", // Select only the symbol for currency
-        })
-        .populate({
-          path: "expenses.offline.currency",
-          model: AdminCurrencyCategory(adminDbConnection),
-          select: "symbol", // Select only the symbol for currency
-        })
-        .populate({
-          path: "expenses.online.category",
-          model: AdminExpenseCategory(adminDbConnection),
-          select: "name subcategories", // Select only the name for subcategory
-        })
-        .populate({
-          path: "expenses.offline.category",
-          model: AdminExpenseCategory(adminDbConnection),
-          select: "name subcategories", // Select only the name for subcategory
-        });
-
-      if (!userExpenses) {
-        return res.status(404).json({
-          success: false,
-          message: "No expenses found for this user.",
-        });
-      }
-
-      const filteredExpenses = [];
-
-      // Filter expenses by the specified date range
-      userExpenses.expenses.forEach((expenseGroup) => {
-        const expenseDate = new Date(
-          expenseGroup.date.split("-").reverse().join("-")
-        );
-
-        if (
-          expenseDate >= formattedStartDate &&
-          expenseDate <= formattedEndDate
-        ) {
-          filteredExpenses.push({
-            date: expenseGroup.date,
-            online: expenseGroup.online.map((expense) => ({
-              date: expense.date,
-              mode: expense.mode,
-              amount: expense.amount,
-              currency: expense.currency ? expense.currency.symbol : "Unknown", // Handle null currency
-              category: expense.category ? expense.category.name : "Unknown", // Handle null category
-              subcategory:
-                expense.category?.subcategories.find(
-                  (sub) =>
-                    sub._id.toString() === expense.subcategory?.toString()
-                )?.name || "Unknown",
-
-              // Handle null subcategory
-              note: expense.note,
-              _id: expense._id,
-            })),
-            offline: expenseGroup.offline.map((expense) => ({
-              date: expense.date,
-              mode: expense.mode,
-              amount: expense.amount,
-              currency: expense.currency ? expense.currency.symbol : "Unknown", // Handle null currency
-              category: expense.category ? expense.category.name : "Unknown", // Handle null category
-              subcategory:
-                expense.category?.subcategories.find(
-                  (sub) =>
-                    sub._id.toString() === expense.subcategory?.toString()
-                )?.name || "Unknown",
-
-              // Handle null subcategory
-              note: expense.note,
-              _id: expense._id,
-            })),
-          });
-        }
-      });
-
-      if (!filteredExpenses.length) {
-        return res.status(404).json({
-          success: false,
-          message: "No expenses found for the specified date range.",
-        });
-      }
-
-      res.status(200).json({
-        success: true,
-        message: "Expenses retrieved successfully.",
-        expenses: filteredExpenses,
-      });
-    } catch (error) {
-      console.error("Error fetching expenses:", error);
-      res.status(500).json({
-        success: false,
-        message: "Error fetching expenses.",
-        error: error.message,
-      });
-    }
-  };
 // Update expense details
 /**{
   "date": "05-01-2025",          // New Date

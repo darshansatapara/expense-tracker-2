@@ -17,7 +17,7 @@ function HomePage() {
   const profession = "6774e0884930e249cf39daa0";
 
   const [option, setOption] = useState("");
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible]  = useState(false);
   const [filteredExpense, setFilteredExpense] = useState(null);
   const [filteredIncome, setfilteredIncome] = useState(null);
   const [activeTab, setActiveTab] = useState("Expense");

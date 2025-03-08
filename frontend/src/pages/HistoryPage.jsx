@@ -38,11 +38,11 @@ const HistoryPage = () => {
           stateExpenses.map((entry) => ({
             ...entry,
             offlineTotal: entry.offline.reduce(
-              (sum, t) => sum + parseFloat(t.amount),
+              (sum, t) => sum + parseFloat(t.convertedAmount),
               0
             ),
             onlineTotal: entry.online.reduce(
-              (sum, t) => sum + parseFloat(t.amount),
+              (sum, t) => sum + parseFloat(t.convertedAmount),
               0
             ),
             transactions: [...entry.offline, ...entry.online],
@@ -55,11 +55,11 @@ const HistoryPage = () => {
           stateIncomes.map((entry) => ({
             ...entry,
             offlineTotal: entry.offline.reduce(
-              (sum, t) => sum + parseFloat(t.amount),
+              (sum, t) => sum + parseFloat(t.convertedAmount),
               0
             ),
             onlineTotal: entry.online.reduce(
-              (sum, t) => sum + parseFloat(t.amount),
+              (sum, t) => sum + parseFloat(t.convertedAmount),
               0
             ),
             transactions: [...entry.offline, ...entry.online],

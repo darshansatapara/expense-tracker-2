@@ -54,7 +54,7 @@ function generateObjectId() {
 
 //**************************************/
 // formate the data according the currentday , yesterday , month with the total of expenses
-
+// for home page ...................
 // Helper function to parse a date string (DD-MM-YYYY) into a Date object
 // Import dayjs and plugins
 
@@ -89,10 +89,10 @@ export function filterDataByDateRange(data) {
   const calculateTotals = (expenses) => {
     const offlineTotal = expenses
       .flatMap((item) => item.offline || [])
-      .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
+      .reduce((sum, exp) => sum + parseFloat(exp.convertedAmount || 0), 0);
     const onlineTotal = expenses
       .flatMap((item) => item.online || [])
-      .reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
+      .reduce((sum, exp) => sum + parseFloat(exp.convertedAmount || 0), 0);
 
     return {
       offlineTotal,
@@ -111,6 +111,8 @@ export function filterDataByDateRange(data) {
   const currentWeekData = data.filter((item) =>
     filterByDateRange(item.date, startOfWeek, endOfWeek)
   );
+
+  console.log("currentweekdata", currentWeekData);
   const currentMonthData = data.filter((item) =>
     filterByDateRange(item.date, startOfMonth, endOfMonth)
   );

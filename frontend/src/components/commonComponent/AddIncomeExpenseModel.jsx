@@ -60,7 +60,6 @@ export default function AddIncomeExpenseModel({ option, isVisible, onClose }) {
   };
 
   const handleSubmit = async () => {
-
     if (option === "Expense") {
       await addUserExpense(formData);
     } else {
@@ -127,7 +126,7 @@ export default function AddIncomeExpenseModel({ option, isVisible, onClose }) {
                   </Option>
                 ))
               : categoryData.map((category) =>
-                  category.subcategories.map((subcategory) => (
+                  category.subcategories?.map((subcategory) => (
                     <Option key={subcategory._id} value={subcategory._id}>
                       {subcategory.name}
                     </Option>

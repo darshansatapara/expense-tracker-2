@@ -5,6 +5,9 @@ import {
 } from "../../models/AdminModel/AdminCategoryModels.js";
 import UserIncome from "../../models/UserModel/UserIncomeDataModel.js";
 import isBetween from "dayjs"; // Import the plugin
+import { userExpenseAmountCurrencyConverter } from "../../middlewares/userExpenseAmountCurrencyConverter.js";
+import { UserCurrencyAndBudgetModel } from "../../models/UserModel/UserCategoryModels.js";
+
 dayjs.extend(isBetween);
 // Controller for adding income
 export const addUserIncome = (userDbConnection) => async (req, res) => {
@@ -89,6 +92,136 @@ export const addUserIncome = (userDbConnection) => async (req, res) => {
 };
 
 // Controller for get incomes as per date range
+// export const getUserIncome =
+//   (userDbConnection, adminDbConnection) => async (req, res) => {
+//     const { userId, startDate, endDate, professionId } = req.params;
+
+//     try {
+//       const UserIncomeModel = UserIncome(userDbConnection);
+//       const AdminIncomeCategoryModel = AdminIncomeCategory(adminDbConnection);
+
+//       const formattedStartDate = new Date(
+//         startDate.split("-").reverse().join("-")
+//       ); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
+//       formattedStartDate.setDate(formattedStartDate.getDate() + 1);
+
+//       const formattedEndDate = new Date(endDate.split("-").reverse().join("-"));
+
+//       // Step 1: Find the AdminIncomeCategory for the given profession
+//       const professionCategory = await AdminIncomeCategoryModel.findOne({
+//         _id: professionId,
+//       });
+
+//       if (!professionCategory) {
+//         return res.status(404).json({
+//           success: false,
+//           message: `No active category found for profession: ${professionId}`,
+//         });
+//       }
+
+//       // Step 2: Fetch user incomes
+//       const userIncomes = await UserIncomeModel.findOne({ userId })
+//         .populate({
+//           path: "incomes.online.currency",
+//           model: AdminCurrencyCategory(adminDbConnection),
+//           select: "_id symbol", // Include _id and symbol
+//         })
+//         .populate({
+//           path: "incomes.offline.currency",
+//           model: AdminCurrencyCategory(adminDbConnection),
+//           select: "_id symbol",
+//         });
+
+//       if (!userIncomes) {
+//         return res.status(404).json({
+//           success: false,
+//           message: "No incomes found for this user.",
+//         });
+//       }
+
+//       const filteredIncomes = [];
+//       const subcategories = professionCategory.subcategories;
+
+//       // Step 3: Filter incomes by date and map category names
+//       userIncomes.incomes.forEach((incomeGroup) => {
+//         const incomeDate = new Date(
+//           incomeGroup.date.split("-").reverse().join("-")
+//         );
+
+//         if (
+//           incomeDate >= formattedStartDate &&
+//           incomeDate <= formattedEndDate
+//         ) {
+//           filteredIncomes.push({
+//             date: incomeGroup.date,
+//             online: incomeGroup.online.map((income) => ({
+//               date: income.date,
+//               mode: income.mode,
+//               amount: income.amount,
+//               currency: income.currency?._id
+//                 ? { _id: income.currency._id, symbol: income.currency.symbol }
+//                 : { _id: null, symbol: "Unknown" },
+//               category: subcategories.find(
+//                 (sub) => sub._id.toString() === income.category?.toString()
+//               )
+//                 ? {
+//                     _id: income.category,
+//                     name: subcategories.find(
+//                       (sub) =>
+//                         sub._id.toString() === income.category?.toString()
+//                     )?.name,
+//                   }
+//                 : { _id: null, name: "Unknown" },
+//               note: income.note,
+//               _id: income._id,
+//             })),
+//             offline: incomeGroup.offline.map((income) => ({
+//               date: income.date,
+//               mode: income.mode,
+//               amount: income.amount,
+//               currency: income.currency?._id
+//                 ? { _id: income.currency._id, symbol: income.currency.symbol }
+//                 : { _id: null, symbol: "Unknown" },
+//               category: subcategories.find(
+//                 (sub) => sub._id.toString() === income.category?.toString()
+//               )
+//                 ? {
+//                     _id: income.category,
+//                     name: subcategories.find(
+//                       (sub) =>
+//                         sub._id.toString() === income.category?.toString()
+//                     )?.name,
+//                   }
+//                 : { _id: null, name: "Unknown" },
+//               note: income.note,
+//               _id: income._id,
+//             })),
+//           });
+//         }
+//       });
+
+//       if (!filteredIncomes.length) {
+//         return res.status(404).json({
+//           success: false,
+//           message: "No incomes found for the specified date range.",
+//         });
+//       }
+
+//       res.status(200).json({
+//         success: true,
+//         message: "Incomes retrieved successfully.",
+//         incomes: filteredIncomes,
+//       });
+//     } catch (error) {
+//       console.error("Error fetching incomes:", error);
+//       res.status(500).json({
+//         success: false,
+//         message: "Error fetching incomes.",
+//         error: error.message,
+//       });
+//     }
+//   };
+
 export const getUserIncome =
   (userDbConnection, adminDbConnection) => async (req, res) => {
     const { userId, startDate, endDate, professionId } = req.params;
@@ -96,7 +229,10 @@ export const getUserIncome =
     try {
       const UserIncomeModel = UserIncome(userDbConnection);
       const AdminIncomeCategoryModel = AdminIncomeCategory(adminDbConnection);
-
+      const AdminCurrencyCategoryModel =
+        AdminCurrencyCategory(adminDbConnection);
+      const UserCurrencyAndBudget =
+        UserCurrencyAndBudgetModel(userDbConnection);
       const formattedStartDate = new Date(
         startDate.split("-").reverse().join("-")
       ); // Convert "DD-MM-YYYY" to "YYYY-MM-DD"
@@ -116,12 +252,30 @@ export const getUserIncome =
         });
       }
 
+      // Fetch user's default currency
+      const userCurrencyData = await UserCurrencyAndBudget.findOne({
+        userId,
+      }).populate({
+        path: "defaultCurrency",
+        model: AdminCurrencyCategoryModel,
+        select: "symbol",
+      });
+
+      if (!userCurrencyData) {
+        return res.status(404).json({
+          success: false,
+          message: "User currency data not found.",
+        });
+      }
+
+      const defaultCurrencyId = userCurrencyData.defaultCurrency?._id;
+
       // Step 2: Fetch user incomes
       const userIncomes = await UserIncomeModel.findOne({ userId })
         .populate({
           path: "incomes.online.currency",
           model: AdminCurrencyCategory(adminDbConnection),
-          select: "_id symbol", // Include _id and symbol
+          select: "_id symbol",
         })
         .populate({
           path: "incomes.offline.currency",
@@ -139,8 +293,8 @@ export const getUserIncome =
       const filteredIncomes = [];
       const subcategories = professionCategory.subcategories;
 
-      // Step 3: Filter incomes by date and map category names
-      userIncomes.incomes.forEach((incomeGroup) => {
+      // Step 3: Filter incomes by date, convert currency, and map category names
+      for (const incomeGroup of userIncomes.incomes) {
         const incomeDate = new Date(
           incomeGroup.date.split("-").reverse().join("-")
         );
@@ -151,51 +305,105 @@ export const getUserIncome =
         ) {
           filteredIncomes.push({
             date: incomeGroup.date,
-            online: incomeGroup.online.map((income) => ({
-              date: income.date,
-              mode: income.mode,
-              amount: income.amount,
-              currency: income.currency?._id
-                ? { _id: income.currency._id, symbol: income.currency.symbol }
-                : { _id: null, symbol: "Unknown" },
-              category: subcategories.find(
-                (sub) => sub._id.toString() === income.category?.toString()
-              )
-                ? {
-                    _id: income.category,
-                    name: subcategories.find(
-                      (sub) =>
-                        sub._id.toString() === income.category?.toString()
-                    )?.name,
-                  }
-                : { _id: null, name: "Unknown" },
-              note: income.note,
-              _id: income._id,
-            })),
-            offline: incomeGroup.offline.map((income) => ({
-              date: income.date,
-              mode: income.mode,
-              amount: income.amount,
-              currency: income.currency?._id
-                ? { _id: income.currency._id, symbol: income.currency.symbol }
-                : { _id: null, symbol: "Unknown" },
-              category: subcategories.find(
-                (sub) => sub._id.toString() === income.category?.toString()
-              )
-                ? {
-                    _id: income.category,
-                    name: subcategories.find(
-                      (sub) =>
-                        sub._id.toString() === income.category?.toString()
-                    )?.name,
-                  }
-                : { _id: null, name: "Unknown" },
-              note: income.note,
-              _id: income._id,
-            })),
+            online: await Promise.all(
+              incomeGroup.online.map(async (income) => {
+                let convertedAmount = "Unavailable";
+
+                if (
+                  income.currency &&
+                  defaultCurrencyId &&
+                  income.currency._id.toString() !==
+                    defaultCurrencyId.toString()
+                ) {
+                  convertedAmount = await userExpenseAmountCurrencyConverter(
+                    adminDbConnection,
+                    income.date,
+                    income.amount,
+                    income.currency._id,
+                    defaultCurrencyId
+                  );
+                } else {
+                  convertedAmount = parseFloat(income.amount).toFixed(2);
+                }
+
+                return {
+                  date: income.date,
+                  mode: income.mode,
+                  amount: income.amount,
+                  currency: income.currency
+                    ? {
+                        _id: income.currency._id,
+                        symbol: income.currency.symbol,
+                      }
+                    : { _id: null, symbol: "Unknown" },
+                  category: subcategories.find(
+                    (sub) => sub._id.toString() === income.category?.toString()
+                  )
+                    ? {
+                        _id: income.category,
+                        name: subcategories.find(
+                          (sub) =>
+                            sub._id.toString() === income.category?.toString()
+                        )?.name,
+                      }
+                    : { _id: null, name: "Unknown" },
+                  convertedAmount,
+                  note: income.note,
+                  _id: income._id,
+                };
+              })
+            ),
+            offline: await Promise.all(
+              incomeGroup.offline.map(async (income) => {
+                let convertedAmount = "Unavailable";
+
+                if (
+                  income.currency &&
+                  defaultCurrencyId &&
+                  income.currency._id.toString() !==
+                    defaultCurrencyId.toString()
+                ) {
+                  convertedAmount = await userExpenseAmountCurrencyConverter(
+                    adminDbConnection,
+                    income.date,
+                    income.amount,
+                    income.currency._id,
+                    defaultCurrencyId
+                  );
+                } else {
+                  convertedAmount = parseFloat(income.amount).toFixed(2);
+                }
+
+                return {
+                  date: income.date,
+                  mode: income.mode,
+                  amount: income.amount,
+                  currency: income.currency
+                    ? {
+                        _id: income.currency._id,
+                        symbol: income.currency.symbol,
+                      }
+                    : { _id: null, symbol: "Unknown" },
+                  category: subcategories.find(
+                    (sub) => sub._id.toString() === income.category?.toString()
+                  )
+                    ? {
+                        _id: income.category,
+                        name: subcategories.find(
+                          (sub) =>
+                            sub._id.toString() === income.category?.toString()
+                        )?.name,
+                      }
+                    : { _id: null, name: "Unknown" },
+                  convertedAmount,
+                  note: income.note,
+                  _id: income._id,
+                };
+              })
+            ),
           });
         }
-      });
+      }
 
       if (!filteredIncomes.length) {
         return res.status(404).json({

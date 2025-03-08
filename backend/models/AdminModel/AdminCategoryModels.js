@@ -31,7 +31,6 @@ const AdminExpenseCategorySchema = new mongoose.Schema({
   ],
 });
 
-
 // copy Admin Income Category Schema
 const AdminIncomeCategorySchema = new mongoose.Schema({
   name: {
@@ -104,12 +103,6 @@ export const AdminIncomeCategory = (adminDbConnection) => {
 };
 
 export const AdminCurrencyCategory = (adminDbConnection) => {
-  // Check if the model is already registered to prevent errors
-  if (adminDbConnection.models.AdminCurrencyCategory) {
-    return adminDbConnection.models.AdminCurrencyCategory;
-  }
-
-  // If not, create and register the model with the provided database connection
   return adminDbConnection.model(
     "AdminCurrencyCategory",
     AdminCurrencyCategorySchema

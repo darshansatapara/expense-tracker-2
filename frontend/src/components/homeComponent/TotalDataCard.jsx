@@ -6,7 +6,7 @@ const TotalDataCard = ({ cardData, lable }) => {
   const [loading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(null); // Error state
   const [defaultCurrencySymbol, setDefaultCurrencySymbol] = useState("");
-  const userId = "679a8b3e3ff0f2bdb0c9780c";
+  const userId = "677bc096bd8c6f677ef507d3";
 
   const { fetchCurrencyAndBudget } = userCategoryStore();
   useEffect(() => {
@@ -16,9 +16,9 @@ const TotalDataCard = ({ cardData, lable }) => {
       setDefaultCurrencySymbol(defaultCurrency.defaultCurrency.symbol);
     };
     fetchDefaultCurrency();
-  }, [fetchCurrencyAndBudget, userId]);
+  }, [fetchCurrencyAndBudget, userId]); 
 
-  // console.log(defaultCurrencySymbol);
+  console.log(defaultCurrencySymbol);
 
   return (
     <div className="bg-gray-100 flex flex-col h-[40vh] justify-center items-center p-4 rounded-md border gap-5">
@@ -35,21 +35,21 @@ const TotalDataCard = ({ cardData, lable }) => {
             <h3 className="text-lg font-bold text-gray-700">Total Online:</h3>
             <p className="text-xl font-semibold text-blue-600">
               {defaultCurrencySymbol}
-              {cardData.onlineTotal}
+              {(cardData?.onlineTotal ?? 0).toFixed(2)}
             </p>
           </div>
           <div className="flex md:flex-col text-center gap-3">
             <h3 className="text-lg font-bold text-gray-700">Total Offline:</h3>
             <p className="text-xl font-semibold text-green-600">
               {defaultCurrencySymbol}
-              {cardData.offlineTotal}
+              {(cardData?.offlineTotal ?? 0).toFixed(2)}
             </p>
           </div>
           <div className="flex md:flex-col text-center gap-3">
             <h3 className="text-lg font-bold text-gray-700">Total {lable}:</h3>
             <p className="text-xl font-semibold text-purple-600">
               {defaultCurrencySymbol}
-              {cardData.bothTotal}
+              {(cardData?.bothTotal ?? 0).toFixed(2)}
             </p>
           </div>
         </div>

@@ -52,4 +52,40 @@ export const userCategoryStore = create((set) => ({
       set({ isPostingCategory: false });
     }
   },
+
+  // Add currency and budget
+  updateCurrencyAndBudget: async (userId, payload) => {
+    set({ isPostingCategory: true });
+    try {
+      console.log("Adding currency and budget", userId);
+      const res = await axiosInstance.put(
+        `/usercategories/currencyAndBudget/updateCurrency/${userId}`,
+        payload
+      );
+
+      if (res.success) {
+        console.log(res.data);
+      }
+    } catch (error) {
+      console.error("Error adding currency and budget:", error);
+    } finally {
+      set({ isPostingCategory: false });
+    }
+  },
+
+  deleteCurrencyAndBudget: async (userId, payload) => {
+    try {
+      console.log(payload, userId);
+      const res = await axiosInstance.delete(
+        `/usercategories/currencyCategory/deleteCurrencyCategory/${userId}`,
+        { data: payload } // Wrap payload in a config object under 'data'
+      );
+
+      if (res.success) {
+        console.log(res.data);
+      }
+    } catch (error) {
+      console.error("Error deleting currency and budget:", error);
+    }
+  },
 }));

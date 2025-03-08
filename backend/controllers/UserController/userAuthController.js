@@ -69,7 +69,6 @@ export const signUp = (userDbConnection) => async (req, res, next) => {
 
     // Save the user details to the user database
     const savedUser = await newUser.save();
-    console.log("user saved");
 
     // Save user credentials to the user database
     const UserCredentialModel = UserCredential(userDbConnection); // Get model for this connection
@@ -80,24 +79,29 @@ export const signUp = (userDbConnection) => async (req, res, next) => {
     });
 
     await userCredential.save();
-    console.log("user credential saved");
+    console.log("user credential saved", savedUser);
 
-    // Generate JWT Token
-    generateToken(savedUser._id, res);
+    if (savedUser) {
+      // Generate JWT Token
+      generateToken(savedUser._id, res);
+      // console.log("generated toked", generateToken());
 
-    // Send response
-    res.status(201).json({
-      success: true,
-      message: "User registered successfully.",
-      user: {
-        _id: savedUser._id,
-        username: savedUser.username,
-        email: savedUser.email,
-        mobile_no: savedUser.mobile_no,
-        date_of_birth: savedUser.date_of_birth,
-        profession: savedUser.profession,
-      },
-    });
+      // Send response
+      res.status(201).json({
+        success: true,
+        message: "User registered successfully.",
+        user: {
+          _id: savedUser._id,
+          username: savedUser.username,
+          email: savedUser.email,
+          mobile_no: savedUser.mobile_no,
+          date_of_birth: savedUser.date_of_birth,
+          profession: savedUser.profession,
+        },
+      });
+    } else {
+      res.status(400).json({ message: "invalid user data" });
+    }
   } catch (err) {
     // Handle duplicate errors more precisely
     if (err.code === 11000) {
