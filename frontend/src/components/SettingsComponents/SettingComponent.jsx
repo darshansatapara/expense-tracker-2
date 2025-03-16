@@ -5,7 +5,7 @@ import {
   FaUserAlt,
   FaPalette,
   FaFolderOpen,
-  FaClipboardList,
+  // FaClipboardList,
   FaDollarSign,
   FaChartPie,
   FaEnvelope,
@@ -13,7 +13,7 @@ import {
   FaShieldAlt,
 } from "react-icons/fa";
 
-const Settings_Lower = () => {
+const Settings = () => {
   const navigate = useNavigate();
 
   const options = [
@@ -33,14 +33,14 @@ const Settings_Lower = () => {
       label: "Category Management",
       path: "/settings/category-management",
       icon: <FaFolderOpen />,
-      description: "Manage categories of data",
+      description: "Manage categories & SubCategories of data",
     },
-    {
-      label: "Subcategory Management",
-      path: "/settings/subcategory-management",
-      icon: <FaClipboardList />,
-      description: "Manage subcategories",
-    },
+    // {
+    //   label: "Subcategory Management",
+    //   path: "/settings/subcategory-management",
+    //   icon: <FaClipboardList />,
+    //   description: "Manage subcategories",
+    // },
     {
       label: "Currency Management",
       path: "/settings/currency-management",
@@ -119,4 +119,4 @@ const Settings_Lower = () => {
   );
 };
 
-export default Settings_Lower;
+export default Settings;
