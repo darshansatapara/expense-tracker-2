@@ -1,4 +1,5 @@
 import UserProfile from "../../models/UserModel/UserProfileModel.js";
+import { AdminIncomeCategory } from "../../models/AdminModel/AdminCategoryModels.js";
 
 // Import necessary modules
 export const updateUserProfile = (userDbConnection) => async (req, res) => {
@@ -52,7 +53,7 @@ export const updateUserProfile = (userDbConnection) => async (req, res) => {
     const updatedUser = await UserProfileModel.findByIdAndUpdate(
       id,
       { $set: updateData },
-      { new: true, runValidators: true } // `new` to return updated document, `runValidators` for schema validation
+      { new: true } // `new` to return updated document, `runValidators` for schema validation
     );
 
     if (!updatedUser) {
@@ -84,30 +85,67 @@ export const updateUserProfile = (userDbConnection) => async (req, res) => {
   }
 };
 
-export const getUserById = (userDbConnection) => async (req, res) => {
-  const { id } = req.params; // Get user ID from request
+export const getUserById = (userDbConnection, adminDbConnection) => async (req, res) => {
+  const id =  req.params.id; // Replace with req.params.id in production
 
   try {
+    console.log('Fetching user with ID:', id);
+
+    // User profile model from userDbConnection
     const UserProfileModel = UserProfile(userDbConnection);
-    const user = await UserProfileModel.findById(id).select("profilepic username email mobile_no date_of_birth profession ").populate("profession", "name");
-    console.log(user)
+
+    // AdminIncomeCategory model from adminDbConnection
+    const AdminIncomeCategoryModel = AdminIncomeCategory(adminDbConnection);
+
+    // Log to verify if AdminIncomeCategoryModel is properly defined
+    console.log(AdminIncomeCategoryModel);
+
+    if (!AdminIncomeCategoryModel) {
+      return res.status(500).json({
+        success: false,
+        message: "AdminIncomeCategory model is undefined",
+      });
+    }
+
+    const user = await UserProfileModel.findById(id)
+      .select("profilePic username email mobile_no date_of_birth profession profile_complated category_completed")
+      .populate({
+        path: "profession", // Reference field in UserProfileModel
+        model: AdminIncomeCategoryModel, // Pass the model directly here
+        select: "_id name",
+       // Selecting only _id and name from AdminIncomeCategory
+        // options: { lean: true },
+      });
 
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-     // Format the date_of_birth to only return the date part (without the time)
-     const formattedUser = {
+    // Format the date_of_birth to only return the date part (without the time)
+    const formattedUser = {
       ...user.toObject(),
-      date_of_birth: user.date_of_birth.toLocaleDateString("en-GB"), // Format to DD/MM/YYYY
+      date_of_birth: user.date_of_birth ? user.date_of_birth.toLocaleDateString("en-GB") : "Unknown",
     };
 
+    // Remove the _id field from the response
+    delete formattedUser._id;
 
-    res.status(200).json({ success: true, data: user });
+    res.status(200).json({
+      success: true,
+      data: formattedUser,
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Error fetching user", error });
+    console.error("Error fetching user:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching user",
+      error: error.message,
+    });
   }
 };
+
+
+
 
 
 
