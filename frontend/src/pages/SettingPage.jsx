@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
-import Settings from "../components/SettingsComponents/SettingComponent";
-import ContactUs from "../components/SettingsComponents/Contactus";
-import PersonalDetails from "../components/SettingsComponents/PersonalDetails";
-import ThemeSettings from "../components/SettingsComponents/Theme";
-import CategoryManagement from "../components/SettingsComponents/CategoryManagment";
-import SubcategoryManagement from "../components/SettingsComponents/SubCategoryManagment";
-import CurrencyManagement from "../components/SettingsComponents/CurrencyManagment";
-import BudgetManagement from "../components/SettingsComponents/BudgetManagment";
-import HelpSupport from "../components/SettingsComponents/HelpandSupport";
-import PrivacyPolicy from "../components/SettingsComponents/PrivacyAndPolicy";
+import Settings from "../components/SettingsComponents/SettingComponent.jsx";
+import ContactUs from "../components/SettingsComponents/Contactus.jsx";
+import PersonalDetails from "../components/SettingsComponents/PersonalDetails.jsx";
+import ThemeSettings from "../components/SettingsComponents/Theme.jsx";
+import CategoryManagement from "../components/SettingsComponents/CategoryManagment/CategoryManagment";
+// import SubcategoryManagement from "../components/SettingsComponents/SubCategoryManagment.jsx";
+import CurrencyManagement from "../components/SettingsComponents/CurrencyManagment.jsx";
+import BudgetManagement from "../components/SettingsComponents/BudgetManagment.jsx";
+import HelpSupport from "../components/SettingsComponents/HelpandSupport.jsx";
+import PrivacyPolicy from "../components/SettingsComponents/PrivacyAndPolicy.jsx";
 
 const SettingsPage = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -46,7 +46,7 @@ const SettingsPage = () => {
             <Route path="personal-details" element={<PersonalDetails />} />
             <Route path="theme-settings" element={<ThemeSettings />} />
             <Route path="category-management" element={<CategoryManagement />} />
-            <Route path="subcategory-management" element={<SubcategoryManagement />} />
+            {/* <Route path="subcategory-management" element={<SubcategoryManagement />} /> */}
             <Route path="currency-management" element={<CurrencyManagement />} />
             <Route path="budget-management" element={<BudgetManagement />} />
             <Route path="help-support" element={<HelpSupport />} />

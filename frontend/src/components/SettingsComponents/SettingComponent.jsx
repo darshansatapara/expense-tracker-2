@@ -5,7 +5,7 @@ import {
   FaUserAlt,
   FaPalette,
   FaFolderOpen,
-  FaClipboardList,
+  // FaClipboardList,
   FaDollarSign,
   FaChartPie,
   FaEnvelope,
@@ -13,7 +13,7 @@ import {
   FaShieldAlt,
 } from "react-icons/fa";
 
-const Settings_Lower = () => {
+const Settings = () => {
   const navigate = useNavigate();
 
   const options = [
@@ -33,14 +33,14 @@ const Settings_Lower = () => {
       label: "Category Management",
       path: "/settings/category-management",
       icon: <FaFolderOpen />,
-      description: "Manage categories of data",
+      description: "Manage categories & SubCategories of data",
     },
-    {
-      label: "Subcategory Management",
-      path: "/settings/subcategory-management",
-      icon: <FaClipboardList />,
-      description: "Manage subcategories",
-    },
+    // {
+    //   label: "Subcategory Management",
+    //   path: "/settings/subcategory-management",
+    //   icon: <FaClipboardList />,
+    //   description: "Manage subcategories",
+    // },
     {
       label: "Currency Management",
       path: "/settings/currency-management",
@@ -92,12 +92,12 @@ const Settings_Lower = () => {
         {options.map((option, index) => (
           <div
             key={index}
-            className="flex space-x-4 lg:flex-row lg:items-center space-4  lg:justify-start py-3 px-7 rounded-lg shadow-sm hover:shadow-md bg-gradient-to-r from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 cursor-pointer transition-all duration-300 mb-4 lg:justify-start "
+            className="flex space-x-4 lg:flex-row lg:items-center space-4  lg:justify-start py-3 px-7 rounded-lg shadow-sm hover:shadow-md bg-gradient-to-r from-gray-50 to-gray-100 hover:from-blue-50 hover:to-blue-100 cursor-pointer transition-all duration-300 mb-4  "
             onClick={() => navigate(option.path)}
           >
              <div className="flex items-center space-x-4 flex-1">
         <div className="text-blue-500 text-3xl lg:text-5xl">{option.icon}</div>
-        <div className="flex flex-col ml-5 items-center justify-center ml-5">
+        <div className="flex flex-col  items-center justify-center ml-5">
           <span className="text-gray-700 text-sm md:text-sm lg:text-lg lg:text-center font-bold ">
             {option.label}
           </span>
@@ -119,4 +119,4 @@ const Settings_Lower = () => {
   );
 };
 
-export default Settings_Lower;
+export default Settings;

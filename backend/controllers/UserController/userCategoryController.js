@@ -220,30 +220,18 @@ export const updateUserExpenseCategories =
       let userExpenseData = await UserExpenseCategory.findOne({ userId });
 
       if (!userExpenseData) {
-        // Create a new record if user data does not exist
         userExpenseData = new UserExpenseCategory({
           userId,
           expenseCategories: [],
         });
       }
 
-      // Map of existing categories for quick lookup
-      const existingCategoriesMap = Object.fromEntries(
-        userExpenseData.expenseCategories.map((cat) => [
-          cat.categoryId.toString(),
-          cat,
-        ])
-      );
-
-      // Validate and process newExpenseCategory
+      // Validate and replace expenseCategories
+      const validatedCategories = [];
       for (const newCategory of newExpenseCategory) {
         const { categoryId, subcategoryIds } = newCategory;
 
-        // Validate category in admin database
-        const adminCategory = await AdminExpenseCategoryModel.findById(
-          categoryId
-        );
-
+        const adminCategory = await AdminExpenseCategoryModel.findById(categoryId);
         if (!adminCategory) {
           return res.status(404).json({
             success: false,
@@ -251,11 +239,9 @@ export const updateUserExpenseCategories =
           });
         }
 
-        // Validate subcategories in admin database
         const validSubcategories = adminCategory.subcategories.filter((sub) =>
           subcategoryIds.includes(sub._id.toString())
         );
-
         if (validSubcategories.length !== subcategoryIds.length) {
           return res.status(400).json({
             success: false,
@@ -263,37 +249,19 @@ export const updateUserExpenseCategories =
           });
         }
 
-        // Add or update category and subcategories
-        if (existingCategoriesMap[categoryId]) {
-          // Update subcategories and activate the category
-          const existingCategory = existingCategoriesMap[categoryId];
-          existingCategory.isCategoryActive = true;
-          const updatedSubcategories = [
-            ...new Set([
-              ...existingCategory.subcategoryIds.map((sub) =>
-                sub.subcategoryId.toString()
-              ),
-              ...validSubcategories.map((sub) => sub._id.toString()),
-            ]),
-          ].map((id) => ({
-            subcategoryId: id,
+        validatedCategories.push({
+          categoryId,
+          isCategoryActive: true,
+          subcategoryIds: validSubcategories.map((sub) => ({
+            subcategoryId: sub._id.toString(),
             isSubcategoryActive: true,
-          }));
-          existingCategory.subcategoryIds = updatedSubcategories;
-        } else {
-          // Add new category
-          userExpenseData.expenseCategories.push({
-            categoryId,
-            isCategoryActive: true,
-            subcategoryIds: validSubcategories.map((sub) => ({
-              subcategoryId: sub._id.toString(),
-              isSubcategoryActive: true,
-            })),
-          });
-        }
+          })),
+        });
       }
 
-      // Save the updated user expense categories
+      // Replace the entire expenseCategories array
+      userExpenseData.expenseCategories = validatedCategories;
+
       const updatedUserExpenseData = await userExpenseData.save();
 
       res.status(200).json({
