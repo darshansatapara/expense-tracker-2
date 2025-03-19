@@ -99,72 +99,70 @@ updateUserCategories: async (userId, newExpenseCategory) => {
   //   }
   // },
   
-  /**
-   * Add an expense category.
-   */
-  addExpenseCategory: async (data) => {
-    set({ isPostingCategory: true });
-    try {
-      await axiosInstance.post(`/usercategories/addExpenseCategory`, data);
-    } catch (error) {
-      console.error("Error adding expense category:", error);
-    } finally {
-      set({ isPostingCategory: false });
-    }
-  },
+// Add an expense category
+addExpenseCategory: async (data) => {
+  set({ isPostingCategory: true });
+  // console.log(data);
+  try {
+    await axiosInstance.post(`/usercategories/addExpenseCategory`, data);
+  } catch (error) {
+    console.error("Error adding expense category:", error);
+  } finally {
+    set({ isPostingCategory: false });
+  }
+},
 
-  /**
-   * Fetch currency and budget.
-   */
-  fetchCurrencyAndBudget: async (userId) => {
-    try {
-      const response = await axiosInstance.get(
-        `/usercategories/currencyAndBudget/get/${userId}`
-      );
-      return response.data.data;
-    } catch (error) {
-      console.error("Error fetching currency and budget:", error);
-    }
-  },
+ // Add currency and budget
+ addCurrencyAndBudget: async (data) => {
+  set({ isPostingCategory: true });
+  try {
+    // console.log("Adding currency and budget", data);
+    await axiosInstance.post(`/usercategories/addCurrencyAndBudget`, data);
+  } catch (error) {
+    console.error("Error adding currency and budget:", error);
+  } finally {
+    set({ isPostingCategory: false });
+  }
+},
 
   /**
    * Update currency and budget.
    */
-  updateCurrencyAndBudget: async (userId, payload) => {
-    set({ isPostingCategory: true });
-    try {
-      console.log("Updating currency and budget", userId);
-      const res = await axiosInstance.put(
-        `/usercategories/currencyAndBudget/updateCurrency/${userId}`,
-        payload
-      );
+  // updateCurrencyAndBudget: async (userId, payload) => {
+  //   set({ isPostingCategory: true });
+  //   try {
+  //     console.log("Updating currency and budget", userId);
+  //     const res = await axiosInstance.put(
+  //       `/usercategories/currencyAndBudget/updateCurrency/${userId}`,
+  //       payload
+  //     );
 
-      if (res.success) {
-        console.log(res.data);
-      }
-    } catch (error) {
-      console.error("Error updating currency and budget:", error);
-    } finally {
-      set({ isPostingCategory: false });
-    }
-  },
+  //     if (res.success) {
+  //       console.log(res.data);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating currency and budget:", error);
+  //   } finally {
+  //     set({ isPostingCategory: false });
+  //   }
+  // },
 
   /**
    * Delete currency and budget.
    */
-  deleteCurrencyAndBudget: async (userId, payload) => {
-    try {
-      console.log("Deleting currency and budget", payload, userId);
-      const res = await axiosInstance.delete(
-        `/usercategories/currencyCategory/deleteCurrencyCategory/${userId}`,
-        { data: payload } // Wrap payload in 'data'
-      );
+  // deleteCurrencyAndBudget: async (userId, payload) => {
+  //   try {
+  //     console.log("Deleting currency and budget", payload, userId);
+  //     const res = await axiosInstance.delete(
+  //       `/usercategories/currencyCategory/deleteCurrencyCategory/${userId}`,
+  //       { data: payload } // Wrap payload in 'data'
+  //     );
 
-      if (res.success) {
-        console.log(res.data);
-      }
-    } catch (error) {
-      console.error("Error deleting currency and budget:", error);
-    }
-  },
+  //     if (res.success) {
+  //       console.log(res.data);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error deleting currency and budget:", error);
+  //   }
+  // },
 }));
