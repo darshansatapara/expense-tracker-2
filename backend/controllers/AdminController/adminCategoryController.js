@@ -623,6 +623,27 @@ export const getAllAdminIncomeCategoriesIsActive =
     }
   };
 
+// get all profession which are active
+export const getAllAdminProfessionIsActive =
+  (adminDbConnection) => async (req, res) => {
+    try {
+      const AdminIncomeCategoryModel = AdminIncomeCategory(adminDbConnection);
+      const categories = await AdminIncomeCategoryModel.find(
+        { isCategoryActive: true }, // Fetch only active categories
+        { name: 1, _id: 1 } // Project only name, _id, and subcategories
+      ).lean();
+
+      const filteredCategories = categories.map((category) => ({
+        _id: category._id,
+        name: category.name,
+      }));
+
+      res.status(200).json({ success: true, profession: filteredCategories });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  };
+
 //********************currency**************************//
 // Get all Admin Currency Categories
 export const getAllAdminCurrencyCategories =
