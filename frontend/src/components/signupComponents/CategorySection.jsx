@@ -11,8 +11,8 @@ export default function CategorySection() {
 
   console.log(currentUser);
 
-  const userData = currentUser._id;
-  console.log(userData);
+  const userId = "67da8c9a65e7ceb648882c2d";
+  // console.log(userData);
 
   const [selectedCategories, setSelectedCategories] = useState([]); // Store selected categories with empty subcategories
   const [fetchError, setFetchError] = useState(false);
