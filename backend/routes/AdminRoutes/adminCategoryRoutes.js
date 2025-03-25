@@ -6,6 +6,7 @@ import {
   getAllAdminExpenseCategoriesIsActive,
   getAllAdminIncomeCategories,
   getAllAdminIncomeCategoriesIsActive,
+  getAllAdminProfessionIsActive,
   restoreCurrencyCategories,
   restoreExpenseCategories,
   restoreExpenseSubcategories,
@@ -74,6 +75,10 @@ const adminCategoryRoutes = (adminDbConnection, userDbConnection) => {
   router.get(
     "/allincomeCategoryIsActive",
     getAllAdminIncomeCategoriesIsActive(adminDbConnection)
+  );
+  router.get(
+    "/allProfessionIsActive",
+    getAllAdminProfessionIsActive(adminDbConnection)
   );
 
   //*****************************************currency route****************************************************/

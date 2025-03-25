@@ -18,7 +18,10 @@ const userProfileRoute = (userDbConnection, adminDbConnection) => {
   );
 
   // Route to get all user profiles
-  router.get("/usersById/:id", getUserById(userDbConnection));
+  router.get(
+    "/usersById/:id",
+    getUserById(userDbConnection)
+  );
 
   return router;
 };

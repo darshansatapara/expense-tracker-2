@@ -1,17 +1,63 @@
 import { create } from "zustand";
 import { axiosInstance } from "../../utils/axios.js";
-import { updateExpenseCategoriesAndSubcategories } from "../../../../backend/controllers/AdminController/adminCategoryController.js";
 
-export const userCategoryStore = create((set, get) => ({
-  userCategories: [],
+export const userCategoryStore = create((set) => ({
   isPostingCategory: false,
 
-  //  fetech user category
+  /**
+   * Fetch user categories.
+   */
   fetchUserCategories: async (userId) => {
     try {
-      const userRes = await axiosInstance.get(
+      const response = await axiosInstance.get(
         `/usercategories/expenseCategories/get/${userId}`
       );
+      // console.log(userId, response.data.data);
+      return { data: response.data.data };
+    } catch (error) {
+      console.error("Error fetching expense categories:", error);
+    }
+  },
+
+// Fetch all currency and budget
+  fetchCurrencyAndBudget: async (userId) => {
+    try {
+      const response = await axiosInstance.get(
+        `/usercategories/currencyAndBudget/get/${userId}`
+      );
+      // console.log(response.data);
+      return response.data.data;
+    } catch (error) {
+      console.error("Error fetching currency and budget:", error);
+    }
+  },
+  // Add an expense category
+  addExpenseCategory: async (data) => {
+    set({ isPostingCategory: true });
+    // console.log(data);
+    try {
+      await axiosInstance.post(`/usercategories/addExpenseCategory`, data);
+    } catch (error) {
+      console.error("Error adding expense category:", error);
+    } finally {
+      set({ isPostingCategory: false });
+    }
+  },
+
+  // Add currency and budget
+  addCurrencyAndBudget: async (data) => {
+    set({ isPostingCategory: true });
+    try {
+      // console.log("Adding currency and budget", data);
+      await axiosInstance.post(`/usercategories/addCurrencyAndBudget`, data);
+    } catch (error) {
+      console.error("Error adding currency and budget:", error);
+    } finally {
+      set({ isPostingCategory: false });
+    }
+  },
+}));
+
       console.log("User categories response:", userRes.data);
       return userRes;
     } catch (error) {
@@ -73,53 +119,98 @@ export const userCategoryStore = create((set, get) => ({
     }
   },
 
-  fetchUserExpenseCategories: async (userId) => {
-    try {
-      const response = await axiosInstance.get(
-        `/usercategories/expenseCategories/get/${userId}`
-      );
-      // console.log(userId, response.data.data);
-      return { data: response.data.data };
-    } catch (error) {
-      console.error("Error fetching expense categories:", error);
-    }
-  },
 
-  fetchCurrencyAndBudget: async (userId) => {
-    try {
-      const response = await axiosInstance.get(
-        `/usercategories/currencyAndBudget/get/${userId}`
-      );
-      // console.log(response.data);
-      return response.data.data;
-    } catch (error) {
-      console.error("Error fetching currency and budget:", error);
-    }
-  },
 
-  // Add an expense category
-  addExpenseCategory: async (data) => {
-    set({ isPostingCategory: true });
-    // console.log(data);
-    try {
-      await axiosInstance.post(`/usercategories/addExpenseCategory`, data);
-    } catch (error) {
-      console.error("Error adding expense category:", error);
-    } finally {
-      set({ isPostingCategory: false });
-    }
-  },
 
-  // Add currency and budget
-  addCurrencyAndBudget: async (data) => {
-    set({ isPostingCategory: true });
-    try {
-      // console.log("Adding currency and budget", data);
-      await axiosInstance.post(`/usercategories/addCurrencyAndBudget`, data);
-    } catch (error) {
-      console.error("Error adding currency and budget:", error);
-    } finally {
-      set({ isPostingCategory: false });
-    }
-  },
+
+
+  /**
+   * Update user categories & subcategories.
+   */
+  // updateExpenseCategories: async (userId, newExpenseCategory) => {
+  //   if (!userId || !Array.isArray(newExpenseCategory)) {
+  //     console.error("Invalid parameters: userId and newExpenseCategory are required.");
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await axiosInstance.put(
+  //       `/usercategories/expenseCategories/update/${userId}`, // API endpoint with userId
+  //       console.log(response)
+  //       {
+  //         newExpenseCategory, // Send the new expense categories in the request body
+  //       }
+  //     );
+  //     console.log("Categories updated successfully:", response.data);
+  //   } catch (error) {
+  //     console.error("Error updating category:", error);
+  //   }
+  // },
+  
+// Add an expense category
+addExpenseCategory: async (data) => {
+  set({ isPostingCategory: true });
+  // console.log(data);
+  try {
+    await axiosInstance.post(`/usercategories/addExpenseCategory`, data);
+  } catch (error) {
+    console.error("Error adding expense category:", error);
+  } finally {
+    set({ isPostingCategory: false });
+  }
+},
+
+ // Add currency and budget
+ addCurrencyAndBudget: async (data) => {
+  set({ isPostingCategory: true });
+  try {
+    // console.log("Adding currency and budget", data);
+    await axiosInstance.post(`/usercategories/addCurrencyAndBudget`, data);
+  } catch (error) {
+    console.error("Error adding currency and budget:", error);
+  } finally {
+    set({ isPostingCategory: false });
+  }
+},
+
+  /**
+   * Update currency and budget.
+   */
+  // updateCurrencyAndBudget: async (userId, payload) => {
+  //   set({ isPostingCategory: true });
+  //   try {
+  //     console.log("Updating currency and budget", userId);
+  //     const res = await axiosInstance.put(
+  //       `/usercategories/currencyAndBudget/updateCurrency/${userId}`,
+  //       payload
+  //     );
+
+  //     if (res.success) {
+  //       console.log(res.data);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating currency and budget:", error);
+  //   } finally {
+  //     set({ isPostingCategory: false });
+  //   }
+  // },
+
+  /**
+   * Delete currency and budget.
+   */
+  // deleteCurrencyAndBudget: async (userId, payload) => {
+  //   try {
+  //     console.log("Deleting currency and budget", payload, userId);
+  //     const res = await axiosInstance.delete(
+  //       `/usercategories/currencyCategory/deleteCurrencyCategory/${userId}`,
+  //       { data: payload } // Wrap payload in 'data'
+  //     );
+
+  //     if (res.success) {
+  //       console.log(res.data);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error deleting currency and budget:", error);
+  //   }
+  // },
 }));
