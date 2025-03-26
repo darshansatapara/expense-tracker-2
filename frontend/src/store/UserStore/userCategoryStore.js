@@ -1,8 +1,77 @@
 import { create } from "zustand";
 import { axiosInstance } from "../../utils/axios.js";
+import { updateExpenseCategoriesAndSubcategories } from "../../../../backend/controllers/AdminController/adminCategoryController.js";
 
-export const userCategoryStore = create((set) => ({
+export const userCategoryStore = create((set, get) => ({
+  userCategories: [],
   isPostingCategory: false,
+
+  //  fetech user category
+  fetchUserCategories: async (userId) => {
+    try {
+      const userRes = await axiosInstance.get(
+        `/usercategories/expenseCategories/get/${userId}`
+      );
+      console.log("User categories response:", userRes.data);
+      return userRes;
+    } catch (error) {
+      console.error("Error fetching user categories:", error);
+    }
+  },
+
+  //  update categories
+  updateUserCategories: async (userId, newExpenseCategory) => {
+    if (!userId || !Array.isArray(newExpenseCategory)) {
+      console.error(
+        "Invalid parameters: userId and newExpenseCategory are required."
+      );
+      return false;
+    }
+
+    // Validate and fix category structure
+    const updatedCategories = newExpenseCategory
+      .map((category) => {
+        if (!category.categoryId || !Array.isArray(category.subcategoryIds)) {
+          console.error("Invalid category structure:", category);
+          return null; // Mark invalid categories
+        }
+
+        return {
+          categoryId:
+            typeof category.categoryId === "object"
+              ? category.categoryId._id
+              : category.categoryId,
+          subcategoryIds: category.subcategoryIds.map((sub) =>
+            typeof sub === "object" ? sub.id || sub._id : sub
+          ),
+        };
+      })
+      .filter((category) => category !== null); // Remove invalid categories
+
+    if (updatedCategories.length === 0) {
+      console.error("No valid categories to update.");
+      return false;
+    }
+
+    console.log("Updating categories for user:", userId);
+    console.log("New categories:", updatedCategories);
+
+    try {
+      const response = await axiosInstance.put(
+        `/usercategories/expenseCategory/updateExpenseCategory/${userId}`,
+        { newExpenseCategory: updatedCategories }
+      );
+
+      console.log("Categories updated successfully:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating category:", error);
+      if (error.response) {
+        console.error("Server Response:", error.response.data);
+      }
+      return false; // Indicate failure
+    }
+  },
 
   fetchUserExpenseCategories: async (userId) => {
     try {
@@ -16,7 +85,6 @@ export const userCategoryStore = create((set) => ({
     }
   },
 
-// Fetch all currency and budget
   fetchCurrencyAndBudget: async (userId) => {
     try {
       const response = await axiosInstance.get(
@@ -28,6 +96,7 @@ export const userCategoryStore = create((set) => ({
       console.error("Error fetching currency and budget:", error);
     }
   },
+
   // Add an expense category
   addExpenseCategory: async (data) => {
     set({ isPostingCategory: true });
@@ -54,66 +123,3 @@ export const userCategoryStore = create((set) => ({
     }
   },
 }));
-
-      console.log("User categories response:", userRes.data);
-      return userRes;
-    } catch (error) {
-      console.error("Error fetching user categories:", error);
-    }
-  },
-  
-  
-//  update
-updateUserCategories: async (userId, newExpenseCategory) => {
-  if (!userId || !Array.isArray(newExpenseCategory)) {
-    console.error("Invalid parameters: userId and newExpenseCategory are required.");
-    return false;
-  }
-
-  // Validate and fix category structure
-  const updatedCategories = newExpenseCategory
-    .map(category => {
-      if (!category.categoryId || !Array.isArray(category.subcategoryIds)) {
-        console.error("Invalid category structure:", category);
-        return null; // Mark invalid categories
-      }
-
-      return {
-        categoryId: typeof category.categoryId === "object" ? category.categoryId._id : category.categoryId,
-        subcategoryIds: category.subcategoryIds.map(sub =>
-          typeof sub === "object" ? sub.id || sub._id : sub
-        ),
-      };
-    })
-    .filter(category => category !== null); // Remove invalid categories
-
-  if (updatedCategories.length === 0) {
-    console.error("No valid categories to update.");
-    return false;
-  }
-
-  console.log("Updating categories for user:", userId);
-  console.log("New categories:", updatedCategories);
-
-  try {
-    const response = await axiosInstance.put(
-      `/usercategories/expenseCategory/updateExpenseCategory/${userId}`,
-      { newExpenseCategory: updatedCategories }
-    );
-
-    console.log("Categories updated successfully:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("Error updating category:", error);
-    if (error.response) {
-      console.error("Server Response:", error.response.data);
-    }
-    return false; // Indicate failure
-  }
-},
-
-
-
-
-
-
