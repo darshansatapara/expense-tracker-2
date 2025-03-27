@@ -122,4 +122,19 @@ export const userCategoryStore = create((set, get) => ({
       set({ isPostingCategory: false });
     }
   },
+    
+  //  update currency and budget
+  updateCurrencyAndBudget: async (userId, budget) => {
+    try {
+      const response = await axiosInstance.put(
+        `/usercategories/currencyAndBudget/updateCurrency/${userId}`,
+        { budget: [budget] } // Wrap budget in an array
+      );
+      // console.log(response)
+      return response.data;
+    } catch (error) {
+      console.error("Error updating currency and budget:", error);
+      throw error; // Re-throw to handle in frontend
+    }
+  },
 }));

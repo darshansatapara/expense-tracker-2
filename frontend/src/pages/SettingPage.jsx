@@ -4,10 +4,10 @@ import Settings from "../components/SettingsComponents/SettingComponent.jsx";
 import ContactUs from "../components/SettingsComponents/Contactus.jsx";
 import PersonalDetails from "../components/SettingsComponents/PersonalDetails.jsx";
 import ThemeSettings from "../components/SettingsComponents/Theme.jsx";
-import CategoryManagement from "../components/SettingsComponents/CategoryManagment/CategoryManagment";
+import CategoryManagement from "../components/SettingsComponents/CategoryManagment.jsx";
 // import SubcategoryManagement from "../components/SettingsComponents/SubCategoryManagment.jsx";
-import CurrencyManagement from "../components/SettingsComponents/CurrencyManagment.jsx";
-import BudgetManagement from "../components/SettingsComponents/BudgetManagment.jsx";
+import CurrencyManagement from "../components/SettingsComponents/CurrencyBudgetManagment.jsx";
+// import BudgetManagement from "../components/SettingsComponents/BudgetManagment.jsx";
 import HelpSupport from "../components/SettingsComponents/HelpandSupport.jsx";
 import PrivacyPolicy from "../components/SettingsComponents/PrivacyAndPolicy.jsx";
 
@@ -47,8 +47,8 @@ const SettingsPage = () => {
             <Route path="theme-settings" element={<ThemeSettings />} />
             <Route path="category-management" element={<CategoryManagement />} />
             {/* <Route path="subcategory-management" element={<SubcategoryManagement />} /> */}
-            <Route path="currency-management" element={<CurrencyManagement />} />
-            <Route path="budget-management" element={<BudgetManagement />} />
+            <Route path="currency-budget-management" element={<CurrencyManagement />} />
+            {/* <Route path="budget-management" element={<BudgetManagement />} /> */}
             <Route path="help-support" element={<HelpSupport />} />
             <Route path="privacy-policy" element={<PrivacyPolicy />} />
           </Routes>
