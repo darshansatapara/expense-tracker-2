@@ -105,7 +105,7 @@ export default function PersonalDetails() {
       <div className="flex flex-col items-center mb-8">
         <div className="relative">
           <img
-            src={userProfile?.profilePic}
+            src={userProfile?.profilePic || "https://via.placeholder.com/100"}
             alt="Profile"
             className="w-24 h-24 rounded-full object-cover bg-blue-100"
             onClick={handleImageClick}
