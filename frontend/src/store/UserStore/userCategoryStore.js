@@ -122,7 +122,7 @@ export const userCategoryStore = create((set, get) => ({
       set({ isPostingCategory: false });
     }
   },
-
+    
   //  update currency and budget
   updateCurrencyAndBudget: async (userId, budget) => {
     try {
