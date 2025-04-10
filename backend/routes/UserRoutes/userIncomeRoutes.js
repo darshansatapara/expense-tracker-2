@@ -2,6 +2,7 @@ import express from "express";
 import {
   addUserIncome,
   deleteUserIncome,
+  getIncomeAnalysis,
   getUserIncome,
   updateUserIncome,
 } from "../../controllers/UserController/userIncomeController.js";
@@ -19,6 +20,10 @@ const userIncomeRoute = (userDbConnection, adminDbConnection) => {
   router.get(
     "/getIncomes/:userId/:startDate/:endDate/:professionId",
     getUserIncome(userDbConnection, adminDbConnection)
+  );
+  router.get(
+    "/getIncomesAnalysis/:userId/:startDate/:endDate/:professionId",
+    getIncomeAnalysis(userDbConnection, adminDbConnection)
   );
   // update the user perticular income
   router.put(

@@ -695,3 +695,180 @@ export const deleteUserIncome = (userDbConnection) => async (req, res) => {
     res.status(500).json({ message: "Error deleting income", error });
   }
 };
+
+
+
+
+// income analysis
+
+export const getIncomeAnalysis = (userDbConnection, adminDbConnection) => async (req, res) => {
+  const { userId, startDate, endDate, professionId } = req.params;
+
+  try {
+    // Initialize models
+    const UserIncomeModel = UserIncome(userDbConnection);
+    const UserCurrencyAndBudget = UserCurrencyAndBudgetModel(userDbConnection);
+    const AdminCurrencyCategoryModel = AdminCurrencyCategory(adminDbConnection);
+    const AdminIncomeCategoryModel = AdminIncomeCategory(adminDbConnection);
+
+    // Parse dates
+    const formattedStartDate = new Date(startDate.split("-").reverse().join("-"));
+    const formattedEndDate = new Date(endDate.split("-").reverse().join("-"));
+
+    // Get user's default currency
+    const userCurrencyData = await UserCurrencyAndBudget.findOne({ userId })
+      .populate({
+        path: "defaultCurrency",
+        model: AdminCurrencyCategoryModel,
+        select: "symbol name",
+      });
+
+    if (!userCurrencyData) {
+      return res.status(404).json({
+        success: false,
+        message: "User currency data not found",
+      });
+    }
+
+    const defaultCurrencyId = userCurrencyData.defaultCurrency?._id;
+    const defaultCurrencySymbol = userCurrencyData.defaultCurrency?.symbol;
+
+    // Fetch profession category for subcategory mapping
+    const professionCategory = await AdminIncomeCategoryModel.findOne({
+      _id: professionId,
+    });
+
+    if (!professionCategory) {
+      return res.status(404).json({
+        success: false,
+        message: `No active category found for profession: ${professionId}`,
+      });
+    }
+
+    // Fetch all incomes for the user
+    const userIncomes = await UserIncomeModel.findOne({ userId })
+      .populate({
+        path: "incomes.online.currency",
+        model: AdminCurrencyCategoryModel,
+        select: "symbol name",
+      })
+      .populate({
+        path: "incomes.offline.currency",
+        model: AdminCurrencyCategoryModel,
+        select: "symbol name",
+      });
+
+    if (!userIncomes) {
+      return res.status(404).json({
+        success: false,
+        message: "No incomes found for this user",
+      });
+    }
+
+    // Filter incomes by date range and calculate totals
+    let totalIncomeInDefaultCurrency = 0;
+    const currencyBreakdown = {};
+    const categoryBreakdown = {};
+    const subcategories = professionCategory.subcategories;
+
+    const filteredIncomes = userIncomes.incomes.filter(inc => {
+      const incomeDate = new Date(inc.date.split("-").reverse().join("-"));
+      return incomeDate >= formattedStartDate && incomeDate <= formattedEndDate;
+    });
+
+    // Process all incomes
+    for (const incomeGroup of filteredIncomes) {
+      const allIncomes = [...incomeGroup.online, ...incomeGroup.offline];
+
+      for (const income of allIncomes) {
+        // Convert amount to default currency
+        const convertedAmount = await userExpenseAmountCurrencyConverter(
+          adminDbConnection,
+          income.date,
+          income.amount,
+          income.currency?._id,
+          defaultCurrencyId
+        );
+
+        totalIncomeInDefaultCurrency += parseFloat(convertedAmount);
+
+        // Currency breakdown
+        const currencyKey = `${income.currency?.name} (${income.currency?.symbol})`;
+        if (!currencyBreakdown[currencyKey]) {
+          currencyBreakdown[currencyKey] = {
+            total: 0,
+            count: 0,
+            symbol: income.currency?.symbol,
+          };
+        }
+        currencyBreakdown[currencyKey].total += parseFloat(convertedAmount);
+        currencyBreakdown[currencyKey].count += 1;
+
+        // Category breakdown (using subcategories as categories)
+        const category = subcategories.find(
+          sub => sub._id.toString() === income.category?.toString()
+        );
+        const categoryName = category?.name || "Uncategorized";
+        
+        if (!categoryBreakdown[categoryName]) {
+          categoryBreakdown[categoryName] = {
+            total: 0,
+            count: 0,
+          };
+        }
+        categoryBreakdown[categoryName].total += parseFloat(convertedAmount);
+        categoryBreakdown[categoryName].count += 1;
+      }
+    }
+
+    // Calculate percentages and format results
+    const currencyAnalysis = Object.entries(currencyBreakdown).map(([name, data]) => ({
+      currency: name,
+      total: data.total.toFixed(2),
+      usageCount: data.count,
+      percentage: totalIncomeInDefaultCurrency > 0 
+        ? ((data.total / totalIncomeInDefaultCurrency) * 100).toFixed(2)
+        : 0,
+      symbol: data.symbol,
+    }));
+
+    const categoryAnalysis = Object.entries(categoryBreakdown).map(([name, data], index) => ({
+      index: index + 1,
+      category: name,
+      total: data.total.toFixed(2),
+      usageCount: data.count,
+      percentage: totalIncomeInDefaultCurrency > 0 
+        ? ((data.total / totalIncomeInDefaultCurrency) * 100).toFixed(2)
+        : 0,
+    }));
+
+    // Prepare response
+    const analysisResult = {
+      totalIncome: {
+        amount: totalIncomeInDefaultCurrency.toFixed(2),
+        currency: defaultCurrencySymbol,
+      },
+      currencyBreakdown: currencyAnalysis,
+      categoryBreakdown: categoryAnalysis,
+      dateRange: {
+        startDate,
+        endDate,
+      },
+      professionId,
+    };
+
+    res.status(200).json({
+      success: true,
+      message: "Income analysis generated successfully",
+      data: analysisResult,
+    });
+
+  } catch (error) {
+    console.error("Error generating income analysis:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error generating income analysis",
+      error: error.message,
+    });
+  }
+};
