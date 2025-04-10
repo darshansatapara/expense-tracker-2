@@ -12,7 +12,7 @@ const API_URL = "https://api.currencybeacon.com/v1/historical";
 const fetchCurrencyRates = async (date) => {
   try {
     const formattedDate = date.split("-").reverse().join("-"); // Convert DD-MM-YYYY to YYYY-MM-DD
-    console.log(`🔄 Fetching currency rates for ${date}...`);
+    // console.log(`🔄 Fetching currency rates for ${date}...`);
 
     const response = await axios.get(
       `${API_URL}?api_key=${CURRENCYBEACON_API_KEY}&date=${formattedDate}`

@@ -163,7 +163,7 @@ export default function ViewAndEditExpense({
                   </Option>
                 ))
               : categoryData.flatMap((category) =>
-                  category.subcategories.map((sub) => (
+                  category?.subcategories?.map((sub) => (
                     <Option key={sub._id} value={sub._id}>
                       {sub.name}
                     </Option>
