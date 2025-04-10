@@ -1,8 +1,9 @@
 import React from 'react'
+import Analysis from '../components/AnalysisPageComponent/Analysis'
 
 function AnalysisPage() {
   return (
-    <div>AnalysisPage</div>
+    <Analysis />
   )
 }
 

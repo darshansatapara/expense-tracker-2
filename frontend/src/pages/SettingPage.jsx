@@ -3,7 +3,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Settings from "../components/SettingsComponents/SettingComponent.jsx";
 import ContactUs from "../components/SettingsComponents/Contactus.jsx";
 import PersonalDetails from "../components/SettingsComponents/PersonalDetails.jsx";
-import ThemeSettings from "../components/SettingsComponents/Theme.jsx";
+// import ThemeSettings from "../components/SettingsComponents/Theme.jsx";
 import CategoryManagement from "../components/SettingsComponents/CategoryManagment.jsx";
 // import SubcategoryManagement from "../components/SettingsComponents/SubCategoryManagment.jsx";
 import CurrencyManagement from "../components/SettingsComponents/CurrencyBudgetManagment.jsx";
@@ -44,7 +44,7 @@ const SettingsPage = () => {
           <Routes>
             <Route path="contact-us" element={<ContactUs />} />
             <Route path="personal-details" element={<PersonalDetails />} />
-            <Route path="theme-settings" element={<ThemeSettings />} />
+            {/* <Route path="theme-settings" element={<ThemeSettings />} /> */}
             <Route path="category-management" element={<CategoryManagement />} />
             {/* <Route path="subcategory-management" element={<SubcategoryManagement />} /> */}
             <Route path="currency-budget-management" element={<CurrencyManagement />} />
