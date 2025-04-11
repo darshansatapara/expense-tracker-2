@@ -149,9 +149,8 @@ function CurrencyManagement() {
       key: "isCurrencyActive",
       render: (isActive) => (
         <span
-          className={`px-2 py-1 rounded-full text-xs font-semibold ${
-            isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-2 py-1 rounded-full text-xs font-semibold ${isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {isActive ? "Active" : "Inactive"}
         </span>
@@ -162,7 +161,7 @@ function CurrencyManagement() {
       key: "isDefault",
       render: (_, record) =>
         currency.defaultCurrency &&
-        currency.defaultCurrency._id === record.currencyId._id ? (
+          currency.defaultCurrency._id === record.currencyId._id ? (
           <span className="text-blue-600 font-semibold">Yes</span>
         ) : (
           "No"

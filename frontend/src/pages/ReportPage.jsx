@@ -53,8 +53,8 @@ const ReportPage = () => {
   }, [year, fetchReportData, userId, professionId]);
 
   // Calculate totals
-  const totalIncome = (incomeAnalysis?.totalIncome?.amount || "0.00");
-  const totalExpenses = (expenseAnalysis?.totalExpense?.amount || "0.00");
+  const totalIncome = incomeAnalysis?.totalIncome?.amount || "0.00";
+  const totalExpenses = expenseAnalysis?.totalExpense?.amount || "0.00";
   const netBalance = (parseFloat(totalIncome) - parseFloat(totalExpenses)).toFixed(2);
   const currency = monthlyExpenses[0]?.currency || "₹";
 
@@ -87,17 +87,22 @@ const ReportPage = () => {
     ],
   };
 
-  const currencyPieData = {
-    labels: [
-      ...(incomeAnalysis?.currencyBreakdown.map((c) => c.currency) || []),
-      ...(expenseAnalysis?.currencyBreakdown.map((c) => c.currency) || []),
-    ],
+  // Separate Currency Pie Charts
+  const incomeCurrencyPieData = {
+    labels: incomeAnalysis?.currencyBreakdown.map((c) => c.currency) || [],
     datasets: [
       {
-        data: [
-          ...(incomeAnalysis?.currencyBreakdown.map((c) => c.percentage) || []),
-          ...(expenseAnalysis?.currencyBreakdown.map((c) => c.percentage) || []),
-        ],
+        data: incomeAnalysis?.currencyBreakdown.map((c) => c.percentage) || [],
+        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
+      },
+    ],
+  };
+
+  const expenseCurrencyPieData = {
+    labels: expenseAnalysis?.currencyBreakdown.map((c) => c.currency) || [],
+    datasets: [
+      {
+        data: expenseAnalysis?.currencyBreakdown.map((c) => c.percentage) || [],
         backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
       },
     ],
@@ -127,7 +132,7 @@ const ReportPage = () => {
     const pageWidth = 210;
     const pageHeight = 297;
     const margin = 10;
-    const headerHeight = 25; // Reserve 25mm for header
+    const headerHeight = 25;
     let yPosition = headerHeight + margin;
 
     const addSection = async (elementId, title) => {
@@ -156,18 +161,14 @@ const ReportPage = () => {
       const pageCount = pdf.internal.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
         pdf.setPage(i);
-
-        // Header
-        pdf.setFillColor(240, 248, 255); // Light blue background
+        pdf.setFillColor(240, 248, 255);
         pdf.rect(0, 0, pageWidth, headerHeight, "F");
         pdf.setFontSize(18);
-        pdf.setTextColor(0, 102, 204); // Blue text
+        pdf.setTextColor(0, 102, 204);
         pdf.text("Expense Tracker Report", margin, 15);
         pdf.setFontSize(10);
-        pdf.setTextColor(100); // Grey text
+        pdf.setTextColor(100);
         pdf.text(`Generated on ${new Date().toLocaleDateString()}`, margin, 22);
-
-        // Footer
         pdf.setFontSize(10);
         pdf.setTextColor(150);
         pdf.text(`Page ${i} of ${pageCount}`, pageWidth - margin, pageHeight - 5, { align: "right" });
@@ -179,14 +180,15 @@ const ReportPage = () => {
     await addSection("monthly-table-section", "Monthly Summary");
     await addSection("income-section", "Income Categories");
     await addSection("expense-section", "Expense Categories");
-    await addSection("currency-section", "Currency Usage");
+    await addSection("income-currency-section", "Income Currency Usage");
+    await addSection("expense-currency-section", "Expense Currency Usage");
     await addSection("insights-section", "Additional Insights");
 
     addHeaderFooter();
     pdf.save(`Financial_Report_${year}.pdf`);
   };
 
-  // Excel Export (unchanged from previous single-sheet version)
+  // Updated Excel Export
   const exportToExcel = () => {
     const wb = XLSX.utils.book_new();
     const wsData = [];
@@ -245,16 +247,32 @@ const ReportPage = () => {
     });
     wsData.push([]);
 
-    wsData.push(["Currency Usage", "", "", "", ""]);
+    // Separate Income Currency Usage
+    wsData.push(["Income Currency Usage", "", "", "", ""]);
     wsData.push(["Currency", "Total Amount", "Percentage", "Transaction Count"]);
-    [...(incomeAnalysis?.currencyBreakdown || []), ...(expenseAnalysis?.currencyBreakdown || [])].forEach((c) => {
+    incomeAnalysis?.currencyBreakdown.forEach((c) => {
       wsData.push([c.currency, c.total, c.percentage, c.usageCount]);
     });
     wsData.push([]);
 
-    wsData.push(["Currency Pie Chart Data", "", "", ""]);
+    wsData.push(["Income Currency Pie Chart Data", "", "", ""]);
     wsData.push(["Currency", "Percentage"]);
-    [...(incomeAnalysis?.currencyBreakdown || []), ...(expenseAnalysis?.currencyBreakdown || [])].forEach((c) => {
+    incomeAnalysis?.currencyBreakdown.forEach((c) => {
+      wsData.push([c.currency, c.percentage]);
+    });
+    wsData.push([]);
+
+    // Separate Expense Currency Usage
+    wsData.push(["Expense Currency Usage", "", "", "", ""]);
+    wsData.push(["Currency", "Total Amount", "Percentage", "Transaction Count"]);
+    expenseAnalysis?.currencyBreakdown.forEach((c) => {
+      wsData.push([c.currency, c.total, c.percentage, c.usageCount]);
+    });
+    wsData.push([]);
+
+    wsData.push(["Expense Currency Pie Chart Data", "", "", ""]);
+    wsData.push(["Currency", "Percentage"]);
+    expenseAnalysis?.currencyBreakdown.forEach((c) => {
       wsData.push([c.currency, c.percentage]);
     });
     wsData.push([]);
@@ -268,8 +286,8 @@ const ReportPage = () => {
 
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     wsData.forEach((row, rowIndex) => {
-      if (row.length === 5 && rowIndex > 0 && (row[0] === "Month #" || row[0] === "Index" || row[0] === "Currency" || row[0] === "Insight")) {
-        for (let col = 0; col < 5; col++) {
+      if (row.length >= 2 && rowIndex > 0 && (row[0] === "Month #" || row[0] === "Index" || row[0] === "Currency" || row[0] === "Insight")) {
+        for (let col = 0; col < Math.min(row.length, 5); col++) {
           const cell = XLSX.utils.encode_cell({ r: rowIndex, c: col });
           ws[cell].s = { font: { bold: true }, fill: { fgColor: { rgb: "D3D3D3" } } };
         }
@@ -430,7 +448,7 @@ const ReportPage = () => {
           </div>
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <section id="income-section" className="bg-white rounded-lg shadow-md p-4 md:p-6">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Income Categories</h2>
             <div className="h-64 sm:h-72 mb-6">
@@ -444,28 +462,30 @@ const ReportPage = () => {
               />
             </div>
             <div className="overflow-x-auto">
-              <table className="min-w-full bg-white">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Index</th>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total ({currency})</th>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Percentage</th>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {incomeAnalysis?.categoryBreakdown.map((c) => (
-                    <tr key={c.index} className="hover:bg-gray-50">
-                      <td className="py-2 px-3 text-sm text-gray-500">{c.index}</td>
-                      <td className="py-2 px-3 text-sm text-gray-800">{c.category}</td>
-                      <td className="py-2 px-3 text-sm text-gray-800">{c.total}</td>
-                      <td className="py-2 px-3 text-sm text-gray-800">{c.percentage}%</td>
-                      <td className="py-2 px-3 text-sm text-gray-800">{c.usageCount}</td>
+              <div className="h-[25vh] overflow-x-auto overflow-y-auto">
+                <table className="min-w-full bg-white">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Index</th>
+                      <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                      <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total ({currency})</th>
+                      <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Percentage</th>
+                      <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {incomeAnalysis?.categoryBreakdown.map((c) => (
+                      <tr key={c.index} className="hover:bg-gray-50">
+                        <td className="py-2 px-3 text-sm text-gray-500">{c.index}</td>
+                        <td className="py-2 px-3 text-sm text-gray-800">{c.category}</td>
+                        <td className="py-2 px-3 text-sm text-gray-800">{c.total}</td>
+                        <td className="py-2 px-3 text-sm text-gray-800">{c.percentage}%</td>
+                        <td className="py-2 px-3 text-sm text-gray-800">{c.usageCount}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </section>
 
@@ -482,21 +502,65 @@ const ReportPage = () => {
               />
             </div>
             <div className="overflow-x-auto">
+              <div className="h-[25vh] overflow-x-auto overflow-y-auto">
+                <table className="min-w-full bg-white">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Index</th>
+                      <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                      <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total ({currency})</th>
+                      <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Percentage</th>
+                      <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {expenseAnalysis?.categoryBreakdown.map((c) => (
+                      <tr key={c.index} className="hover:bg-gray-50">
+                        <td className="py-2 px-3 text-sm text-gray-500">{c.index}</td>
+                        <td className="py-2 px-3 text-sm text-gray-800">{c.category}</td>
+                        <td className="py-2 px-3 text-sm text-gray-800">{c.total}</td>
+                        <td className="py-2 px-3 text-sm text-gray-800">{c.percentage}%</td>
+                        <td className="py-2 px-3 text-sm text-gray-800">{c.usageCount}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/*Currency Usage Section */}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <section id="income-currency-section" className="bg-white rounded-lg shadow-md p-4 md:p-6">
+
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Income Currency Usage</h2>
+            <div className="h-64 md:h-72 mb-6">
+              <Pie
+                data={incomeCurrencyPieData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { position: "right", labels: { boxWidth: 12 } } },
+                }}
+              />
+            </div>
+
+            <div className="h-[25vh] overflow-x-auto overflow-y-auto">
               <table className="min-w-full bg-white">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Index</th>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total ({currency})</th>
+                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Currency</th>
+                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount ({currency})</th>
                     <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Percentage</th>
-                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction Count</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {expenseAnalysis?.categoryBreakdown.map((c) => (
-                    <tr key={c.index} className="hover:bg-gray-50">
-                      <td className="py-2 px-3 text-sm text-gray-500">{c.index}</td>
-                      <td className="py-2 px-3 text-sm text-gray-800">{c.category}</td>
+                  {incomeAnalysis?.currencyBreakdown.map((c, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="py-2 px-3 text-sm text-gray-800">{c.currency}</td>
                       <td className="py-2 px-3 text-sm text-gray-800">{c.total}</td>
                       <td className="py-2 px-3 text-sm text-gray-800">{c.percentage}%</td>
                       <td className="py-2 px-3 text-sm text-gray-800">{c.usageCount}</td>
@@ -505,47 +569,52 @@ const ReportPage = () => {
                 </tbody>
               </table>
             </div>
+
+
           </section>
+
+          <section id="expense-currency-section" className="bg-white rounded-lg shadow-md p-4 md:p-6">
+
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Expense Currency Usage</h2>
+            <div className="h-64 md:h-72 mb-6">
+              <Pie
+                data={expenseCurrencyPieData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { position: "right", labels: { boxWidth: 12 } } },
+                }}
+              />
+            </div>
+
+            <div className="h-[25vh] overflow-x-auto overflow-y-auto">
+              <table className="min-w-full bg-white">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Currency</th>
+                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount ({currency})</th>
+                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Percentage</th>
+                    <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction Count</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {expenseAnalysis?.currencyBreakdown.map((c, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="py-2 px-3 text-sm text-gray-800">{c.currency}</td>
+                      <td className="py-2 px-3 text-sm text-gray-800">{c.total}</td>
+                      <td className="py-2 px-3 text-sm text-gray-800">{c.percentage}%</td>
+                      <td className="py-2 px-3 text-sm text-gray-800">{c.usageCount}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+
+          </section>
+
         </div>
 
-        <section id="currency-section" className="bg-white rounded-lg shadow-md p-4 md:p-6 mt-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Currency Usage</h2>
-          <div className="h-64 md:h-72 mb-6">
-            <Pie
-              data={currencyPieData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: "right", labels: { boxWidth: 12 } } },
-              }}
-            />
-          </div>
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Currency</th>
-                  <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount ({currency})</th>
-                  <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Percentage</th>
-                  <th className="py-2 px-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction Count</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {[
-                  ...(incomeAnalysis?.currencyBreakdown || []),
-                  ...(expenseAnalysis?.currencyBreakdown || []),
-                ].map((c, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="py-2 px-3 text-sm text-gray-800">{c.currency}</td>
-                    <td className="py-2 px-3 text-sm text-gray-800">{c.total}</td>
-                    <td className="py-2 px-3 text-sm text-gray-800">{c.percentage}%</td>
-                    <td className="py-2 px-3 text-sm text-gray-800">{c.usageCount}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
 
         <section id="insights-section" className="mt-8">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Additional Insights</h2>
