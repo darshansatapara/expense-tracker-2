@@ -1,8 +1,6 @@
-// src/components/commonComponent/DataTable.jsx
 import React from "react";
 
 const DataTable = ({ data, headers }) => {
-  // Ensure data is an array and handle empty or invalid data
   const safeData = Array.isArray(data) ? data : [];
 
   return (
@@ -18,12 +16,17 @@ const DataTable = ({ data, headers }) => {
           </tr>
         </thead>
         <tbody>
-          {safeData.map((item, index) => (
-            <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-              <td className="border p-2 text-gray-600">{item.date || "N/A"}</td>
-              <td className="border p-2 text-gray-600">
-                {typeof item.total === "number" ? `₹${item.total.toLocaleString()}` : "₹0"}
-              </td>
+          {safeData.map((item, rowIndex) => (
+            <tr key={rowIndex} className={rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+              {headers.map((header, colIndex) => {
+                // Convert header to lowercase to match key (e.g., "Total" -> "total")
+                const key = header.toLowerCase();
+                return (
+                  <td key={colIndex} className="border p-2 text-gray-600">
+                    {item[key] ?? "N/A"}
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>
