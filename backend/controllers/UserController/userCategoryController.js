@@ -231,7 +231,9 @@ export const updateUserExpenseCategories =
       for (const newCategory of newExpenseCategory) {
         const { categoryId, subcategoryIds } = newCategory;
 
-        const adminCategory = await AdminExpenseCategoryModel.findById(categoryId);
+        const adminCategory = await AdminExpenseCategoryModel.findById(
+          categoryId
+        );
         if (!adminCategory) {
           return res.status(404).json({
             success: false,
@@ -966,14 +968,14 @@ export const updateUserCurrencyAndBudget =
 export const deleteUserCurrencyCategory =
   (userDbConnection) => async (req, res) => {
     const { userId } = req.params;
-    const { deleteCurrencyCategoryIds } = req.body;
+    const {  deleteCurrencyCategoryIds } = req.body;
 
-    console.log(userId, deleteCurrencyCategoryIds);
+    console.log(userId,"sdchavsdjch", deleteCurrencyCategoryIds);
 
     // Validate input
     if (
-      !userId ||
-      !Array.isArray(deleteCurrencyCategoryIds) ||
+      !userId &&
+      !Array.isArray(deleteCurrencyCategoryIds) &&
       deleteCurrencyCategoryIds.length === 0
     ) {
       return res.status(400).json({

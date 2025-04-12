@@ -3,7 +3,7 @@ import TableList from "./TableList";
 import TotalDataCard from "./TotalDataCard";
 
 export default function IncomeAndExpenseHome({ activeTab, filteredData }) {
-  // console.log(activeTab, filteredData);
+  // console.log(activeTab);
   const [weeklyTotal, setweeklyTotal] = useState(0);
   const [monthlyTotal, setMonthlyTotal] = useState(0);
 
@@ -31,14 +31,22 @@ export default function IncomeAndExpenseHome({ activeTab, filteredData }) {
         {/* Graph Container 1: Expense */}
         <div className="w-full h-full lg:w-[49%] border-2 border-indigo-500 rounded-lg p-1">
           {/* // weekly expense or income card  */}
-          <TotalDataCard cardData={weeklyTotal} lable="Weekly" />
+          <TotalDataCard
+            cardData={weeklyTotal}
+            lable="Weekly"
+            activeTab={activeTab}
+          />
         </div>
 
         {/* Graph Container 2: Income */}
         <div className="w-full lg:w-[49%]  border-2 border-indigo-500 rounded-lg p-1">
           {/* // monthly expense or income card  */}
 
-          <TotalDataCard cardData={monthlyTotal} lable="Monthly" />
+          <TotalDataCard
+            cardData={monthlyTotal}
+            lable="Monthly"
+            activeTab={activeTab}
+          />
         </div>
       </div>
 

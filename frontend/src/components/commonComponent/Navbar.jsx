@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   HomeOutlined,
   BarChartOutlined,
@@ -9,11 +9,11 @@ import {
   MenuOutlined,
 } from "@ant-design/icons";
 import { BellPlus, LogOut, ShieldQuestion } from "lucide-react";
-import NotificationModal from "../NotificationComponents/Notification";  // Import the new modal component
+import NotificationModal from "../NotificationComponents/Notification"; // Import the new modal component
 
 const Navbar = ({ toggleSidebar }) => {
   const location = useLocation();
-
+  const navigate = useNavigate();
   const pathMap = {
     "/": {
       name: "Home",
@@ -97,7 +97,7 @@ const Navbar = ({ toggleSidebar }) => {
         <div className="flex items-center space-x-4">
           <button
             className="relative hover:cursor-pointer"
-            onClick={() => setShowNotification(true)}  // Show modal on click
+            onClick={() => setShowNotification(true)} // Show modal on click
           >
             <BellPlus />
             {notifications.length > 0 && (
@@ -105,7 +105,12 @@ const Navbar = ({ toggleSidebar }) => {
             )}
           </button>
           {/* Logout Button Hidden on Small Screens */}
-          <div className="hidden lg:flex hover:cursor-pointer rounded-md h-8 w-8 items-center justify-center">
+          <div
+            className="hidden lg:flex hover:cursor-pointer rounded-md h-8 w-8 items-center justify-center"
+            onClick={() => {
+              navigate("/signin");
+            }}
+          >
             <LogOut />
           </div>
           {/* Hamburger Menu for Small Screens */}
@@ -120,9 +125,9 @@ const Navbar = ({ toggleSidebar }) => {
 
       {/* Notification Modal Box */}
       <NotificationModal
-        showModal={showNotification}  // Pass modal visibility
-        notifications={notifications}  // Pass notifications data
-        onClose={() => setShowNotification(false)}  // Pass close handler
+        showModal={showNotification} // Pass modal visibility
+        notifications={notifications} // Pass notifications data
+        onClose={() => setShowNotification(false)} // Pass close handler
       />
     </div>
   );
