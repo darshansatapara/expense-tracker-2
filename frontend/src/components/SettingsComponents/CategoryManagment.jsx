@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { adminCategoryStore } from "../../../store/AdminStore/adminCategoryStore.js";
-import { userCategoryStore } from "../../../store/UserStore/userCategoryStore.js";
+import { adminCategoryStore } from "../../store/AdminStore/adminCategoryStore.js";
+import { userCategoryStore } from "../../store/UserStore/userCategoryStore.js";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 
 const CategoryManagement = () => {

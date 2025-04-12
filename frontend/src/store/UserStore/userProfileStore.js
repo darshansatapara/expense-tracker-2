@@ -14,8 +14,8 @@ const useUserProfileStore = create((set) => ({
       const response = await axiosInstance.get(
         `/userprofile/usersById/${userId}`
       );
-      console.log("Full Response:", response); // Log full response
-      console.log("Response Data:", response.data); // Log only the data part
+      // console.log("Full Response:", response); // Log full response
+      // console.log("Response Data:", response.data); // Log only the data part
 
       // if (!response.data || Object.keys(response.data).length === 0) {
       //   console.error("Empty resp'

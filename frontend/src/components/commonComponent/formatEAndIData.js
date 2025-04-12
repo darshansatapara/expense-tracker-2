@@ -112,7 +112,7 @@ export function filterDataByDateRange(data) {
     filterByDateRange(item.date, startOfWeek, endOfWeek)
   );
 
-  console.log("currentweekdata", currentWeekData);
+  // console.log("currentweekdata", currentWeekData);
   const currentMonthData = data.filter((item) =>
     filterByDateRange(item.date, startOfMonth, endOfMonth)
   );

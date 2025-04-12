@@ -19,7 +19,7 @@ import userCategoryRoute from "./routes/UserRoutes/userCategoryRoutes.js";
 import userProfileRoute from "./routes/UserRoutes/userProfileRoutes.js";
 import { CurrencyDailyRateJob } from "./jobs/currencyDailyRateJob.js";
 import currencyRateRoute from "./routes/CommonRoute/currencyDailyRateRoute.js";
-
+import reportRoute from "./routes/CommonRoute/reportRoutes.js";
 import { protect } from "./middlewares/userMiddlewares/authMiddleware.js";
 
 dotenv.config(); // Load environment variables
@@ -75,6 +75,9 @@ dotenv.config(); // Load environment variables
     app.use("/api/currencyrate", currencyRateRoute(adminDbConnection));
     // Schedule the currency update job
     CurrencyDailyRateJob(adminDbConnection);
+
+    //report routes (if any)****************************************************************
+    app.use("/api/report", reportRoute(userDbConnection, adminDbConnection));
 
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {

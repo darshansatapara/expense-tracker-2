@@ -6,11 +6,12 @@ import {
   FaPalette,
   FaFolderOpen,
   // FaClipboardList,
-  FaDollarSign,
+  // FaDollarSign,
   FaChartPie,
   FaEnvelope,
   FaQuestionCircle,
   FaShieldAlt,
+  FaCoins 
 } from "react-icons/fa";
 
 const Settings = () => {
@@ -42,17 +43,17 @@ const Settings = () => {
     //   description: "Manage subcategories",
     // },
     {
-      label: "Currency Management",
-      path: "/settings/currency-management",
-      icon: <FaDollarSign />,
-      description: "Set up your currencies",
+      label: "Currency & Budget Management",
+      path: "/settings/currency-budget-management",
+      icon: < FaCoins  />,
+      description: "Set up your currencies and Budget",
     },
-    {
-      label: "Budget Management",
-      path: "/settings/budget-management",
-      icon: <FaChartPie />,
-      description: "Track and manage your budget",
-    },
+    // {
+    //   label: "Budget Management",
+    //   path: "/settings/budget-management",
+    //   icon: <FaChartPie />,
+    //   description: "Track and manage your budget",
+    // },
     {
       label: "Contact Us",
       path: "/settings/contact-us",

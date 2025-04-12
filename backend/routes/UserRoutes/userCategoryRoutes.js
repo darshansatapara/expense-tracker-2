@@ -94,4 +94,4 @@ const userCategoryRoute = (userDbConnection, adminDbConnection) => {
   return router;
 };
 
-export default userCategoryRoute; 
+export default userCategoryRoute;

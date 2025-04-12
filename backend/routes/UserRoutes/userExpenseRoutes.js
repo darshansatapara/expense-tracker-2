@@ -2,6 +2,8 @@ import express from "express";
 import {
   addUserExpense,
   deleteUserExpense,
+  getExpenseAnalysis,
+  getMonthlyExpenseTotals,
   getUserExpense,
   updateUserExpense,
 } from "../../controllers/UserController/userExpenseController.js";
@@ -17,6 +19,14 @@ const userExpenseRoute = (userDbConnection, adminDbConnection) => {
   router.get(
     "/getExpenses/:userId/:startDate/:endDate",
     getUserExpense(userDbConnection, adminDbConnection)
+  );
+  router.get(
+    "/getExpensesAnalysis/:userId/:startDate/:endDate",
+    getExpenseAnalysis(userDbConnection, adminDbConnection)
+  );
+  router.get(
+    "/getMonthlyExpenseTotals/:userId/:year",
+    getMonthlyExpenseTotals(userDbConnection, adminDbConnection)
   );
 
   router.put(

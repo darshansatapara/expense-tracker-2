@@ -4,6 +4,8 @@ import { formatData } from "../../components/commonComponent/formatEAndIData.js"
 
 const useUserExpenseStore = create((set) => ({
   userExpenses: [],
+expenseAnalysis: null,
+monthlyExpenseTotals: [],
 
   // as per date range
   // Fetch user expenses based on userId, startDate, and endDate
@@ -57,6 +59,63 @@ const useUserExpenseStore = create((set) => ({
       );
     } catch (error) {
       console.error("Error updating expense:", error);
+    }
+  },
+
+  // expense analysis
+    // Fetch user expense analysis data based on userId, startDate, and endDate
+    fetchExpenseAnalysis: async (userId, startDate, endDate) => {
+      set({ loading: true, error: null });
+      try {
+        const response = await axiosInstance.get(
+          `/expense/getExpensesAnalysis/${userId}/${startDate}/${endDate}`
+        );
+        console.log(response.data)
+  
+        if (response.data.success) {
+          set({
+            expenseAnalysis: response.data.data,
+            loading: false,
+            error: null,
+          });
+        }
+      } catch (error) {
+        set({
+          expenseAnalysis: null,
+          loading: false,
+          error:
+            error.response?.data?.message ||
+            "An error occurred while fetching expense analysis.",
+        });
+      }
+    },
+  
+     // monthly expense total
+  getMonthlyExpenseTotals: async (userId, year) => {
+    // console.log("Function called ✅");
+    set({ loading: true, error: null });
+    try {
+      const response = await axiosInstance.get(
+        `/expense/getMonthlyExpenseTotals/${userId}/${year}`
+      );
+      console.log("API success:", response.data); // Second checkpoint
+
+      if (response.data.success) {
+        // You can optionally format the data here
+        set({
+          monthlyExpenseTotals: response.data.data.monthlyTotals,
+          loading: false,
+          error: null,
+        });
+      }
+    } catch (error) {
+      set({
+        monthlyExpenseTotals: [],
+        loading: false,
+        error:
+          error.response?.data?.message ||
+          "An error occurred while fetching monthly expense totals.",
+      });
     }
   },
 }));

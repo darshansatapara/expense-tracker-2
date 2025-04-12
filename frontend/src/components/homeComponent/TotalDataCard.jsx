@@ -19,7 +19,7 @@ const TotalDataCard = ({ cardData, lable, activeTab }) => {
     fetchDefaultCurrency();
   }, [fetchCurrencyAndBudget, userId]);
 
-  console.log(defaultCurrencySymbol);
+  // console.log(defaultCurrencySymbol);
 
   return (
     <div className="bg-gray-100 flex flex-col h-[40vh] justify-center items-center p-4 rounded-md border gap-5">

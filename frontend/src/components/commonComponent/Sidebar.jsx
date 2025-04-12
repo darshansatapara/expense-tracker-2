@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import useUserProfileStore from "../../store/UserStore/userProfileStore.js";
 import {
   HomeOutlined,
   BarChartOutlined,
@@ -10,6 +11,8 @@ import {
 } from "@ant-design/icons";
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
+ 
+
   const handleClickOutside = (e) => {
     if (e.target.id === "sidebar-overlay") toggleSidebar();
   };
@@ -47,19 +50,38 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 };
 
 const SidebarContent = ({ toggleSidebar, isSmallScreen }) => {
+  const { fetchUserProfile } = useUserProfileStore();
+  const [userProfile, setUserProfile] = useState(null);
+
+  const userId = "67932feef0d689eeeaddcf86"; // Your user ID
+
+  
+  useEffect(() => {
+    const getUserProfile = async () => {
+      try {
+        const response = await fetchUserProfile(userId);
+        // console.log(response)
+        setUserProfile(response.data);
+      } catch (err) {
+        console.error("Failed to fetch user profile:", err);
+      }
+    };
+
+    getUserProfile();
+  }, [userId, fetchUserProfile]);
   return (
     <div className="grid h-screen">
       {/* Top Section */}
       <div className="flex flex-col items-center py-6 bg-white mt-12 lg:mt-10 md:mt-10">
         <div className="flex rounded-full items-center justify-center border-2 border-indigo-400">
           <img
-            src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+            src={userProfile?.profilePic || "https://via.placeholder.com/100"}
             alt="User"
             className="rounded-full h-20 w-20"
           />
         </div>
         <span className="mt-4 text-lg font-semibold text-gray-700">
-          User Name
+        {userProfile?.username || "Username"}
         </span>
       </div>
 
