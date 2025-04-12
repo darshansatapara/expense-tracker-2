@@ -122,19 +122,40 @@ export const userCategoryStore = create((set, get) => ({
       set({ isPostingCategory: false });
     }
   },
-    
-  //  update currency and budget
-  updateCurrencyAndBudget: async (userId, budget) => {
+
+  updateCurrencyAndBudget: async (userId, payload) => {
+    set({ isPostingCategory: true });
     try {
-      const response = await axiosInstance.put(
+      console.log("Adding currency and budget", userId);
+      const res = await axiosInstance.put(
         `/usercategories/currencyAndBudget/updateCurrency/${userId}`,
-        { budget: [budget] } // Wrap budget in an array
+        payload
       );
-      // console.log(response)
-      return response.data;
+
+      if (res.success) {
+        console.log(res.data);
+      }
     } catch (error) {
-      console.error("Error updating currency and budget:", error);
-      throw error; // Re-throw to handle in frontend
+      console.error("Error adding currency and budget:", error);
+    } finally {
+      set({ isPostingCategory: false });
+    }
+  },
+
+  //delete currency and budget
+  deleteCurrencyAndBudget: async (userId, payload) => {
+    try {
+      console.log(payload, userId);
+      const res = await axiosInstance.delete(
+        `/usercategories/currencyCategory/deleteCurrencyCategory/${userId}`,
+        { data: payload } // Wrap payload in a config object under 'data'
+      );
+
+      if (res.success) {
+        console.log(res.data);
+      }
+    } catch (error) {
+      console.error("Error deleting currency and budget:", error);
     }
   },
 }));

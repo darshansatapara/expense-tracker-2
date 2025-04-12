@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Spin } from "antd";
 import { userCategoryStore } from "../../store/UserStore/userCategoryStore";
 
-const TotalDataCard = ({ cardData, lable }) => {
+const TotalDataCard = ({ cardData, lable, activeTab }) => {
+  console.log(activeTab);
   const [loading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(null); // Error state
   const [defaultCurrencySymbol, setDefaultCurrencySymbol] = useState("");
@@ -16,14 +17,14 @@ const TotalDataCard = ({ cardData, lable }) => {
       setDefaultCurrencySymbol(defaultCurrency.defaultCurrency.symbol);
     };
     fetchDefaultCurrency();
-  }, [fetchCurrencyAndBudget, userId]); 
+  }, [fetchCurrencyAndBudget, userId]);
 
   // console.log(defaultCurrencySymbol);
 
   return (
     <div className="bg-gray-100 flex flex-col h-[40vh] justify-center items-center p-4 rounded-md border gap-5">
       <h1 className="text-lg font-bold text-gray-700">
-        {lable} Total Expenses
+        {lable} {activeTab}
       </h1>
       {loading ? (
         <Spin size="large" />
