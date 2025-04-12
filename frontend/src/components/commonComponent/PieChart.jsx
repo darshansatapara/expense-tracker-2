@@ -4,7 +4,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const PieChart = ({ labels = [], data = [], title = "", total = "" }) => {
+const PieChart = ({ labels = [], data = [], title = "", total = "", isSmallScreen = false }) => {
   // Extend background colors for more than 5 items
   const backgroundColors = [
     "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF",
@@ -24,13 +24,16 @@ const PieChart = ({ labels = [], data = [], title = "", total = "" }) => {
 
   const options = {
     responsive: true,
-    maintainAspectRatio: false,
+    maintainAspectRatio: false, // Allow custom sizing
     plugins: {
       legend: {
-        position: "bottom",
+        position: isSmallScreen ? "bottom" : "bottom", // Keep bottom, adjust size
         labels: {
-          boxWidth: 20,
-          padding: 15,
+          boxWidth: isSmallScreen ? 10 : 20,
+          padding: isSmallScreen ? 5 : 15,
+          font: {
+            size: isSmallScreen ? 8 : 12,
+          },
         },
       },
       tooltip: {
@@ -40,30 +43,44 @@ const PieChart = ({ labels = [], data = [], title = "", total = "" }) => {
             return `${context.label}: ${value.toFixed(2)}%`;
           },
         },
+        bodyFont: {
+          size: isSmallScreen ? 8 : 12,
+        },
       },
       title: {
-        display: true,
+        display: !isSmallScreen, // Hide title on small screens
         text: title,
         font: {
-          size: 18,
+          size: isSmallScreen ? 10 : 18,
         },
       },
     },
   };
 
-  return (
-  <div className="w-full max-w-md mx-auto px-4 sm:px-6 md:px-0">
-  <div className="relative aspect-[1/1]">
-    <Pie data={chartData} options={options} />
-  </div>
-  {total && (
-    <p className="text-center mt-4 text-sm text-gray-600 font-medium">
-      Total: {total}
-    </p>
-  )}
-</div>
+  // Determine size based on screen type
+  const chartSize = isSmallScreen
+    ? { width: "100%", height: "100px" } // Reduced height for small screens (fits within TinyChart's h-32)
+    : { width: "100%", height: "300px" }; // Default height for larger screens
 
-  
+  return (
+    <div className={`w-full mx-auto px-2 ${isSmallScreen ? "max-w-xs" : "max-w-md"}`}>
+      <div
+        className="relative"
+        style={{
+          aspectRatio: isSmallScreen ? "1/0.5" : "1/1", // Flatter aspect for small screens
+          ...chartSize,
+        }}
+      >
+        <Pie data={chartData} options={options} />
+      </div>
+      {total && (
+        <p
+          className={`text-center mt-1 ${isSmallScreen ? "text-xs" : "text-sm"} text-gray-600 font-medium`}
+        >
+          Total: {total}
+        </p>
+      )}
+    </div>
   );
 };
 
