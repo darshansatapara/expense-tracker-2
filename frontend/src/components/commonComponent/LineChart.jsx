@@ -52,7 +52,7 @@ const LineChart = ({ data, isSmallScreen = false }) => {
       },
       title: {
         display: !isSmallScreen, // Hide title on small screens
-        text: "Yearly Income and Expense Trend",
+        text: "",
         font: {
           size: isSmallScreen ? 10 : 14,
         },
