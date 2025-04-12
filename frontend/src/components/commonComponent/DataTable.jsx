@@ -4,7 +4,7 @@ const DataTable = ({ data, headers }) => {
   const safeData = Array.isArray(data) ? data : [];
 
   return (
-    <div className="h-48 overflow-y-auto">
+    <div className="w-full  h-auto">
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-gray-200">
@@ -19,7 +19,6 @@ const DataTable = ({ data, headers }) => {
           {safeData.map((item, rowIndex) => (
             <tr key={rowIndex} className={rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50"}>
               {headers.map((header, colIndex) => {
-                // Convert header to lowercase to match key (e.g., "Total" -> "total")
                 const key = header.toLowerCase();
                 return (
                   <td key={colIndex} className="border p-2 text-gray-600">
