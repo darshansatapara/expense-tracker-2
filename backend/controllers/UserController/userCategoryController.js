@@ -968,14 +968,14 @@ export const updateUserCurrencyAndBudget =
 export const deleteUserCurrencyCategory =
   (userDbConnection) => async (req, res) => {
     const { userId } = req.params;
-    const {  deleteCurrencyCategoryIds } = req.body;
+    const { deleteCurrencyCategoryIds } = req.body;
 
-    console.log(userId,"sdchavsdjch", deleteCurrencyCategoryIds);
+    console.log(userId, deleteCurrencyCategoryIds);
 
     // Validate input
     if (
-      !userId &&
-      !Array.isArray(deleteCurrencyCategoryIds) &&
+      !userId ||
+      !Array.isArray(deleteCurrencyCategoryIds) ||
       deleteCurrencyCategoryIds.length === 0
     ) {
       return res.status(400).json({

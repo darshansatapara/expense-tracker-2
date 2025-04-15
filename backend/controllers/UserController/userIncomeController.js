@@ -736,11 +736,10 @@ export const getIncomeAnalysis =
       const defaultCurrencyId = userCurrencyData.defaultCurrency?._id;
       const defaultCurrencySymbol = userCurrencyData.defaultCurrency?.symbol;
 
-      // Fetch profession category for subcategory mapping
+      // Fetch profession category
       const professionCategory = await AdminIncomeCategoryModel.findOne({
         _id: professionId,
       });
-
       if (!professionCategory) {
         return res.status(404).json({
           success: false,
@@ -748,7 +747,7 @@ export const getIncomeAnalysis =
         });
       }
 
-      // Fetch all incomes for the user
+      // Fetch all incomes
       const userIncomes = await UserIncomeModel.findOne({ userId })
         .populate({
           path: "incomes.online.currency",
@@ -781,10 +780,9 @@ export const getIncomeAnalysis =
         );
       });
 
-      // Process all incomes
+      // Process incomes
       for (const incomeGroup of filteredIncomes) {
         const allIncomes = [...incomeGroup.online, ...incomeGroup.offline];
-
         for (const income of allIncomes) {
           // Convert amount to default currency
           const convertedAmount = await userExpenseAmountCurrencyConverter(
@@ -795,7 +793,16 @@ export const getIncomeAnalysis =
             defaultCurrencyId
           );
 
-          totalIncomeInDefaultCurrency += parseFloat(convertedAmount);
+          // Skip if conversion failed
+          if (convertedAmount === "Unavailable") {
+            console.warn(
+              `Skipping income due to unavailable conversion: ${income._id}`
+            );
+            continue;
+          }
+
+          const amount = parseFloat(convertedAmount);
+          totalIncomeInDefaultCurrency += amount;
 
           // Currency breakdown
           const currencyKey = `${income.currency?.name} (${income.currency?.symbol})`;
@@ -806,22 +813,18 @@ export const getIncomeAnalysis =
               symbol: income.currency?.symbol,
             };
           }
-          currencyBreakdown[currencyKey].total += parseFloat(convertedAmount);
+          currencyBreakdown[currencyKey].total += amount;
           currencyBreakdown[currencyKey].count += 1;
 
-          // Category breakdown (using subcategories as categories)
+          // Category breakdown
           const category = subcategories.find(
             (sub) => sub._id.toString() === income.category?.toString()
           );
           const categoryName = category?.name || "Uncategorized";
-
           if (!categoryBreakdown[categoryName]) {
-            categoryBreakdown[categoryName] = {
-              total: 0,
-              count: 0,
-            };
+            categoryBreakdown[categoryName] = { total: 0, count: 0 };
           }
-          categoryBreakdown[categoryName].total += parseFloat(convertedAmount);
+          categoryBreakdown[categoryName].total += amount;
           categoryBreakdown[categoryName].count += 1;
         }
       }
@@ -861,10 +864,7 @@ export const getIncomeAnalysis =
         },
         currencyBreakdown: currencyAnalysis,
         categoryBreakdown: categoryAnalysis,
-        dateRange: {
-          startDate,
-          endDate,
-        },
+        dateRange: { startDate, endDate },
         professionId,
       };
 
@@ -889,7 +889,7 @@ export const getMonthlyIncomeTotals =
     const { userId, year } = req.params;
 
     try {
-      // Validate year parameter
+      // Validate year
       if (!year || isNaN(year)) {
         return res.status(400).json({
           success: false,
@@ -904,7 +904,7 @@ export const getMonthlyIncomeTotals =
       const AdminCurrencyCategoryModel =
         AdminCurrencyCategory(adminDbConnection);
 
-      // Fetch user's default currency (only populate necessary fields)
+      // Fetch user's default currency
       const userCurrencyData = await UserCurrencyAndBudget.findOne(
         { userId },
         "defaultCurrency"
@@ -924,9 +924,8 @@ export const getMonthlyIncomeTotals =
       const defaultCurrencyId = userCurrencyData.defaultCurrency?._id;
       const defaultCurrencySymbol = userCurrencyData.defaultCurrency?.symbol;
 
-      // Fetch incomes for the user (avoid unnecessary population since we only need totals)
+      // Fetch incomes
       const userIncomes = await UserIncomeModel.findOne({ userId }, "incomes");
-
       if (!userIncomes) {
         return res.status(404).json({
           success: false,
@@ -934,40 +933,48 @@ export const getMonthlyIncomeTotals =
         });
       }
 
-      // Use Map for efficient monthly total accumulation
+      // Initialize monthly totals
       const monthlyTotalsMap = new Map();
       for (let i = 1; i <= 12; i++) {
-        monthlyTotalsMap.set(i, 0); // Initialize totals for all 12 months
+        monthlyTotalsMap.set(i, 0);
       }
 
-      // Filter incomes by year and accumulate totals
+      // Process incomes
       await Promise.all(
         userIncomes.incomes.map(async (incomeGroup) => {
           const [day, month, incomeYear] = incomeGroup.date.split("-");
           if (parseInt(incomeYear) === parseInt(year)) {
-            const monthNum = parseInt(month); // Month as number (1-12)
-
+            const monthNum = parseInt(month);
             const allIncomes = [...incomeGroup.online, ...incomeGroup.offline];
             for (const income of allIncomes) {
-              // Convert amount to default currency
+              // Convert amount
               const convertedAmount = await userExpenseAmountCurrencyConverter(
                 adminDbConnection,
                 income.date,
                 income.amount,
-                income.currency,
+                income.currency?._id,
                 defaultCurrencyId
               );
-              // Add to existing total for this month
+
+              // Skip if conversion failed
+              if (convertedAmount === "Unavailable") {
+                console.warn(
+                  `Skipping income due to unavailable conversion: ${income._id}`
+                );
+                return;
+              }
+
+              const amount = parseFloat(convertedAmount);
               monthlyTotalsMap.set(
                 monthNum,
-                monthlyTotalsMap.get(monthNum) + parseFloat(convertedAmount)
+                monthlyTotalsMap.get(monthNum) + amount
               );
             }
           }
         })
       );
 
-      // Define month names for response
+      // Format response
       const monthNames = [
         "January",
         "February",
@@ -983,27 +990,20 @@ export const getMonthlyIncomeTotals =
         "December",
       ];
 
-      // Format the response with month number and name
       const monthlyIncomeTotals = Array.from(
         monthlyTotalsMap,
-        ([monthNum, total], index) => ({
-          monthNumber: monthNum, // 1-12
-          monthName: monthNames[monthNum - 1], // Corresponding name
-          total: total.toFixed(2), // Fixed to 2 decimal places
+        ([monthNum, total]) => ({
+          monthNumber: monthNum,
+          monthName: monthNames[monthNum - 1],
+          total: total.toFixed(2),
           currency: defaultCurrencySymbol,
         })
-      );
-
-      // Sort by month number to ensure consistent order
-      monthlyIncomeTotals.sort((a, b) => a.monthNumber - b.monthNumber);
+      ).sort((a, b) => a.monthNumber - b.monthNumber);
 
       res.status(200).json({
         success: true,
         message: `Monthly income totals for ${year} retrieved successfully`,
-        data: {
-          year,
-          monthlyTotals: monthlyIncomeTotals,
-        },
+        data: { year, monthlyTotals: monthlyIncomeTotals },
       });
     } catch (error) {
       console.error("Error fetching monthly income totals:", error);

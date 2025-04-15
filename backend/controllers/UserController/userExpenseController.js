@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { userExpenseAmountCurrencyConverter } from "../../middlewares/userExpenseAmountCurrencyConverter.js";
 import {
   AdminCurrencyCategory,
@@ -544,8 +545,6 @@ export const deleteUserExpense = (userDbConnection) => async (req, res) => {
   }
 };
 
-/// analysis of the expense
-
 export const getExpenseAnalysis =
   (userDbConnection, adminDbConnection) => async (req, res) => {
     const { userId, startDate, endDate } = req.params;
@@ -565,7 +564,7 @@ export const getExpenseAnalysis =
       );
       const formattedEndDate = new Date(endDate.split("-").reverse().join("-"));
 
-      // Get user's default currency
+      // Fetch user's default currency
       const userCurrencyData = await UserCurrencyAndBudget.findOne({
         userId,
       }).populate({
@@ -584,7 +583,7 @@ export const getExpenseAnalysis =
       const defaultCurrencyId = userCurrencyData.defaultCurrency?._id;
       const defaultCurrencySymbol = userCurrencyData.defaultCurrency?.symbol;
 
-      // Fetch all expenses for the user
+      // Fetch expenses
       const userExpenses = await UserExpenseModel.findOne({ userId })
         .populate({
           path: "expenses.online.currency",
@@ -614,11 +613,7 @@ export const getExpenseAnalysis =
         });
       }
 
-      // Filter expenses by date range and calculate totals
-      let totalExpenseInDefaultCurrency = 0;
-      const currencyBreakdown = {};
-      const categoryBreakdown = {};
-
+      // Filter expenses by date range
       const filteredExpenses = userExpenses.expenses.filter((exp) => {
         const expenseDate = new Date(exp.date.split("-").reverse().join("-"));
         return (
@@ -626,10 +621,13 @@ export const getExpenseAnalysis =
         );
       });
 
-      // Process all expenses
+      // Process expenses
+      let totalExpenseInDefaultCurrency = 0;
+      const currencyBreakdown = {};
+      const categoryBreakdown = {};
+
       for (const expenseGroup of filteredExpenses) {
         const allExpenses = [...expenseGroup.online, ...expenseGroup.offline];
-
         for (const expense of allExpenses) {
           // Convert amount to default currency
           const convertedAmount = await userExpenseAmountCurrencyConverter(
@@ -640,29 +638,37 @@ export const getExpenseAnalysis =
             defaultCurrencyId
           );
 
-          totalExpenseInDefaultCurrency += parseFloat(convertedAmount);
+          // Skip if conversion failed
+          if (convertedAmount === "Unavailable") {
+            console.warn(
+              `Skipping expense due to unavailable conversion: ${expense._id}`
+            );
+            continue;
+          }
+
+          const amount = parseFloat(convertedAmount);
+          totalExpenseInDefaultCurrency += amount;
 
           // Currency breakdown
-          const currencyKey = `${expense.currency?.name} (${expense.currency?.symbol})`;
+          const currencyKey = `${expense.currency?.name || "Unknown"} (${
+            expense.currency?.symbol || "N/A"
+          })`;
           if (!currencyBreakdown[currencyKey]) {
             currencyBreakdown[currencyKey] = {
               total: 0,
               count: 0,
-              symbol: expense.currency?.symbol,
+              symbol: expense.currency?.symbol || "N/A",
             };
           }
-          currencyBreakdown[currencyKey].total += parseFloat(convertedAmount);
+          currencyBreakdown[currencyKey].total += amount;
           currencyBreakdown[currencyKey].count += 1;
 
           // Category breakdown
           const categoryName = expense.category?.name || "Uncategorized";
           if (!categoryBreakdown[categoryName]) {
-            categoryBreakdown[categoryName] = {
-              total: 0,
-              count: 0,
-            };
+            categoryBreakdown[categoryName] = { total: 0, count: 0 };
           }
-          categoryBreakdown[categoryName].total += parseFloat(convertedAmount);
+          categoryBreakdown[categoryName].total += amount;
           categoryBreakdown[categoryName].count += 1;
         }
       }
@@ -702,10 +708,7 @@ export const getExpenseAnalysis =
         },
         currencyBreakdown: currencyAnalysis,
         categoryBreakdown: categoryAnalysis,
-        dateRange: {
-          startDate,
-          endDate,
-        },
+        dateRange: { startDate, endDate },
       };
 
       res.status(200).json({
@@ -723,13 +726,12 @@ export const getExpenseAnalysis =
     }
   };
 
-// monthly expense analysis by year
 export const getMonthlyExpenseTotals =
   (userDbConnection, adminDbConnection) => async (req, res) => {
     const { userId, year } = req.params;
 
     try {
-      // Validate year parameter
+      // Validate year
       if (!year || isNaN(year)) {
         return res.status(400).json({
           success: false,
@@ -744,7 +746,7 @@ export const getMonthlyExpenseTotals =
       const AdminCurrencyCategoryModel =
         AdminCurrencyCategory(adminDbConnection);
 
-      // Fetch user's default currency (only populate necessary fields)
+      // Fetch user's default currency
       const userCurrencyData = await UserCurrencyAndBudget.findOne(
         { userId },
         "defaultCurrency"
@@ -764,12 +766,11 @@ export const getMonthlyExpenseTotals =
       const defaultCurrencyId = userCurrencyData.defaultCurrency?._id;
       const defaultCurrencySymbol = userCurrencyData.defaultCurrency?.symbol;
 
-      // Fetch expenses for the user (avoid unnecessary population since we only need totals)
+      // Fetch expenses
       const userExpenses = await UserExpenseModel.findOne(
         { userId },
         "expenses"
       );
-
       if (!userExpenses) {
         return res.status(404).json({
           success: false,
@@ -777,43 +778,46 @@ export const getMonthlyExpenseTotals =
         });
       }
 
-      // Use Map for efficient monthly total accumulation
+      // Initialize monthly totals
       const monthlyTotalsMap = new Map();
       for (let i = 1; i <= 12; i++) {
-        monthlyTotalsMap.set(i, 0); // Initialize totals for all 12 months
+        monthlyTotalsMap.set(i, 0);
       }
 
-      // Filter expenses by year and accumulate totals
-      await Promise.all(
-        userExpenses.expenses.map(async (expenseGroup) => {
-          const [day, month, expenseYear] = expenseGroup.date.split("-");
-          if (parseInt(expenseYear) === parseInt(year)) {
-            const monthNum = parseInt(month); // Month as number (1-12)
+      // Process expenses
+      for (const expenseGroup of userExpenses.expenses) {
+        const [day, month, expenseYear] = expenseGroup.date.split("-");
+        if (parseInt(expenseYear) === parseInt(year)) {
+          const monthNum = parseInt(month);
+          const allExpenses = [...expenseGroup.online, ...expenseGroup.offline];
+          for (const expense of allExpenses) {
+            // Convert amount
+            const convertedAmount = await userExpenseAmountCurrencyConverter(
+              adminDbConnection,
+              expense.date,
+              expense.amount,
+              expense.currency?._id,
+              defaultCurrencyId
+            );
 
-            const allExpenses = [
-              ...expenseGroup.online,
-              ...expenseGroup.offline,
-            ];
-            for (const expense of allExpenses) {
-              // Convert amount to default currency
-              const convertedAmount = await userExpenseAmountCurrencyConverter(
-                adminDbConnection,
-                expense.date,
-                expense.amount,
-                expense.currency,
-                defaultCurrencyId
+            // Skip if conversion failed
+            if (convertedAmount === "Unavailable") {
+              console.warn(
+                `Skipping expense due to unavailable conversion: ${expense._id}`
               );
-              // Add to existing total for this month
-              monthlyTotalsMap.set(
-                monthNum,
-                monthlyTotalsMap.get(monthNum) + parseFloat(convertedAmount)
-              );
+              continue;
             }
-          }
-        })
-      );
 
-      // Define month names for response
+            const amount = parseFloat(convertedAmount);
+            monthlyTotalsMap.set(
+              monthNum,
+              monthlyTotalsMap.get(monthNum) + amount
+            );
+          }
+        }
+      }
+
+      // Format response
       const monthNames = [
         "January",
         "February",
@@ -829,27 +833,20 @@ export const getMonthlyExpenseTotals =
         "December",
       ];
 
-      // Format the response with month number and name
       const monthlyExpenseTotals = Array.from(
         monthlyTotalsMap,
-        ([monthNum, total], index) => ({
-          monthNumber: monthNum, // 1-12
-          monthName: monthNames[monthNum - 1], // Corresponding name
-          total: total.toFixed(2), // Fixed to 2 decimal places
+        ([monthNum, total]) => ({
+          monthNumber: monthNum,
+          monthName: monthNames[monthNum - 1],
+          total: total.toFixed(2),
           currency: defaultCurrencySymbol,
         })
-      );
-
-      // Sort by month number to ensure consistent order
-      monthlyExpenseTotals.sort((a, b) => a.monthNumber - b.monthNumber);
+      ).sort((a, b) => a.monthNumber - b.monthNumber);
 
       res.status(200).json({
         success: true,
         message: `Monthly expense totals for ${year} retrieved successfully`,
-        data: {
-          year,
-          monthlyTotals: monthlyExpenseTotals,
-        },
+        data: { year, monthlyTotals: monthlyExpenseTotals },
       });
     } catch (error) {
       console.error("Error fetching monthly expense totals:", error);
