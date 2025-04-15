@@ -1,82 +1,99 @@
+import NodeCache from "node-cache";
 import CurrencyDailyRateModel from "../models/CommonModel/CurrencyDailyRatesModel.js";
 
-export const getExchangeRate = async (dbConnection, date, currencyId) => {
-  console.log("script run ");
-  if (!currencyId) return null;
+const rateCache = new NodeCache({ stdTTL: 3600 }); // Cache for 1 hour
 
-  const CurrencyRateModel = CurrencyDailyRateModel(dbConnection);
-
-  // Step 1: Extract year from date and match it in the database
-  const [day, month, year] = date.split("-"); // Assuming date is "DD-MM-YYYY", e.g., "03-02-2025"
-  const rateData = await CurrencyRateModel.findOne({ year });
-
-  if (!rateData) {
-    console.log(`No data found for year: ${year}`);
-    return null;
+// Helper function to build a map for quick lookups
+const buildDayRateMap = (rateData) => {
+  const monthMap = new Map();
+  for (const month of rateData.months) {
+    const key = month.startMonth.split("-")[1]; // month number
+    const dayMap = new Map();
+    for (const day of month.days) {
+      dayMap.set(
+        day.date,
+        new Map(
+          day.rates.map((rate) => [
+            rate.currency.toString(),
+            parseFloat(rate.value),
+          ])
+        )
+      );
+    }
+    monthMap.set(key, dayMap);
   }
-
-  // Step 2: Match the month by comparing with startMonth and endMonth
-  const monthData = rateData.months.find((m) => {
-    const startMonthParts = m.startMonth.split("-"); // e.g., ["01", "02", "2025"]
-    const endMonthParts = m.endMonth.split("-"); // e.g., ["28", "02", "2025"]
-    const monthToFind = month; // e.g., "02"
-    return (
-      startMonthParts[1] === monthToFind && endMonthParts[1] === monthToFind
-    );
-  });
-
-  if (!monthData) {
-    console.log(`No month data found for month: ${month}`);
-    return null;
-  }
-
-  // Step 3: Match the exact date in the days array
-  const normalizedDate = `${day}-${month}-${year}`; // Ensure format is "DD-MM-YYYY", e.g., "03-02-2025"
-  const dayData = monthData.days.find((d) => d.date === normalizedDate);
-  if (!dayData || !dayData.rates.length) {
-    console.log(`No day data found for date: ${normalizedDate}`);
-    // Uncomment for debugging
-    // console.log("Available days in monthData:", monthData.days.map((d) => d.date));
-    return null;
-  }
-  // console.log("dayData:", dayData);
-
-  // Find the currency rate for the given currencyId
-  const currencyRate = dayData.rates.find(
-    (r) => r.currency.toString() === currencyId.toString()
-  );
-
-  return currencyRate ? parseFloat(currencyRate.value) : null;
+  return monthMap;
 };
 
+// Batch fetch exchange rates for multiple dates
+export const getExchangeRatesForDates = async (dbConnection, dates, year) => {
+  const cacheKey = `rates_${year}`;
+  let monthMap = rateCache.get(cacheKey);
+
+  if (!monthMap) {
+    const CurrencyRateModel = CurrencyDailyRateModel(dbConnection);
+    const rateData = await CurrencyRateModel.findOne({ year });
+    if (!rateData) return new Map();
+
+    monthMap = buildDayRateMap(rateData);
+    rateCache.set(cacheKey, monthMap);
+  }
+
+  const rateMap = new Map();
+  for (const date of dates) {
+    const [day, month] = date.split("-");
+    const dayMap = monthMap.get(month);
+    if (dayMap && dayMap.get(date)) {
+      rateMap.set(date, dayMap.get(date));
+    }
+  }
+  return rateMap;
+};
+
+// Optimized getExchangeRate (used as fallback or for single lookups)
+export const getExchangeRate = async (dbConnection, date, currencyId) => {
+  if (!currencyId) return null;
+
+  const [day, month, year] = date.split("-");
+  const rates = await getExchangeRatesForDates(dbConnection, [date], year);
+  const rateMap = rates.get(date);
+
+  return rateMap ? rateMap.get(currencyId.toString()) || null : null;
+};
+
+// Optimized currency converter
 export const userExpenseAmountCurrencyConverter = async (
   adminDbConnection,
   date,
   amount,
   expenseCurrencyId,
-  defaultCurrencyId
+  defaultCurrencyId,
+  exchangeRates // Pre-fetched rates
 ) => {
   if (!expenseCurrencyId || !defaultCurrencyId) return "Unavailable";
 
-  // If both currencies are the same, return the amount directly
   if (expenseCurrencyId.toString() === defaultCurrencyId.toString()) {
     return parseFloat(amount).toFixed(2);
   }
 
   try {
-    // Fetch exchange rates for the expense currency and default currency (both against USD)
-    const [expenseToUsdRate, defaultToUsdRate] = await Promise.all([
-      getExchangeRate(adminDbConnection, date, expenseCurrencyId), // Expense currency → USD
-      getExchangeRate(adminDbConnection, date, defaultCurrencyId), // Default currency → USD
-    ]);
+    let expenseToUsdRate, defaultToUsdRate;
 
-    // Ensure both rates exist before proceeding
+    if (exchangeRates && exchangeRates.get(date)) {
+      const rateMap = exchangeRates.get(date);
+      expenseToUsdRate = rateMap.get(expenseCurrencyId.toString());
+      defaultToUsdRate = rateMap.get(defaultCurrencyId.toString());
+    } else {
+      // Fallback to single query
+      [expenseToUsdRate, defaultToUsdRate] = await Promise.all([
+        getExchangeRate(adminDbConnection, date, expenseCurrencyId),
+        getExchangeRate(adminDbConnection, date, defaultCurrencyId),
+      ]);
+    }
+
     if (!expenseToUsdRate || !defaultToUsdRate) return "Unavailable";
 
-    // Step 1: Convert amount from expense currency to USD
     const amountInUsd = parseFloat(amount) / expenseToUsdRate;
-
-    // Step 2: Convert amount from USD to the default currency
     const convertedAmount = (amountInUsd * defaultToUsdRate).toFixed(2);
 
     return convertedAmount;

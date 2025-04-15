@@ -1,3 +1,187 @@
+// import {
+//   getExpenseAnalysis,
+//   getMonthlyExpenseTotals,
+// } from "../UserController/userExpenseController.js";
+// import {
+//   getIncomeAnalysis,
+//   getMonthlyIncomeTotals,
+// } from "../UserController/userIncomeController.js";
+
+// const mockResponse = () => {
+//   let capturedData = null;
+//   return {
+//     status: () => ({
+//       json: (data) => {
+//         capturedData = data;
+//       },
+//     }),
+//     getData: () => capturedData,
+//   };
+// };
+
+// const formatDate = (dateStr) => {
+//   const date = new Date(dateStr);
+//   if (isNaN(date)) return null;
+//   const [day, month, year] = [
+//     String(date.getDate()).padStart(2, "0"),
+//     String(date.getMonth() + 1).padStart(2, "0"),
+//     date.getFullYear(),
+//   ];
+//   return `${day}-${month}-${year}`;
+// };
+
+// const isValidDate = (dateStr) => {
+//   const isoDate = dateStr.split("-").reverse().join("-");
+//   return !isNaN(new Date(isoDate));
+// };
+
+// export const getFinancialReportData =
+//   (userDbConnection, adminDbConnection) => async (req, res) => {
+//     const { userId, year, professionId, startDate, endDate } = req.params;
+
+//     if (!userId || !year || isNaN(year)) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Missing or invalid userId or year",
+//       });
+//     }
+
+//     let effectiveStartDate = startDate || `01-01-${year}`;
+//     let effectiveEndDate = endDate || `31-12-${year}`;
+
+//     if (
+//       (startDate && !isValidDate(startDate)) ||
+//       (endDate && !isValidDate(endDate))
+//     ) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid startDate or endDate format. Expected DD-MM-YYYY",
+//       });
+//     }
+
+//     effectiveStartDate = formatDate(
+//       effectiveStartDate.split("-").reverse().join("-")
+//     );
+//     effectiveEndDate = formatDate(
+//       effectiveEndDate.split("-").reverse().join("-")
+//     );
+
+//     if (!effectiveStartDate || !effectiveEndDate) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Failed to parse dates",
+//       });
+//     }
+
+//     try {
+//       const mocks = {
+//         monthlyExpenses: mockResponse(),
+//         monthlyIncomes: mockResponse(),
+//         expenseAnalysis: mockResponse(),
+//         incomeAnalysis: mockResponse(),
+//       };
+
+//       const tasks = [
+//         getMonthlyExpenseTotals(userDbConnection, adminDbConnection)(
+//           { params: { userId, year } },
+//           mocks.monthlyExpenses
+//         ),
+//         getMonthlyIncomeTotals(userDbConnection, adminDbConnection)(
+//           { params: { userId, year } },
+//           mocks.monthlyIncomes
+//         ),
+//         getExpenseAnalysis(userDbConnection, adminDbConnection)(
+//           {
+//             params: {
+//               userId,
+//               startDate: effectiveStartDate,
+//               endDate: effectiveEndDate,
+//             },
+//           },
+//           mocks.expenseAnalysis
+//         ),
+//         getIncomeAnalysis(userDbConnection, adminDbConnection)(
+//           {
+//             params: {
+//               userId,
+//               startDate: effectiveStartDate,
+//               endDate: effectiveEndDate,
+//               professionId,
+//             },
+//           },
+//           mocks.incomeAnalysis
+//         ),
+//       ];
+
+//       await Promise.allSettled(tasks);
+
+//       const responseData = {
+//         monthlyExpenses:
+//           mocks.monthlyExpenses.getData()?.data?.monthlyTotals || [],
+//         monthlyIncomes:
+//           mocks.monthlyIncomes.getData()?.data?.monthlyTotals || [],
+//         expenseAnalysis: mocks.expenseAnalysis.getData()?.data || null,
+//         incomeAnalysis: mocks.incomeAnalysis.getData()?.data || null,
+//       };
+
+//       const warnings = [];
+
+//       const addWarningIfFail = (mock, label) => {
+//         const data = mock.getData();
+//         if (!data?.success) {
+//           warnings.push(
+//             `${label} unavailable: ${data?.message || "Unknown error"}`
+//           );
+//         }
+//       };
+
+//       addWarningIfFail(mocks.monthlyExpenses, "Monthly expense totals");
+//       addWarningIfFail(mocks.monthlyIncomes, "Monthly income totals");
+//       addWarningIfFail(mocks.expenseAnalysis, "Expense analysis");
+//       addWarningIfFail(mocks.incomeAnalysis, "Income analysis");
+
+//       const allZero =
+//         responseData.monthlyExpenses.every((m) => m.total === "0.00") &&
+//         responseData.monthlyIncomes.every((m) => m.total === "0.00") &&
+//         responseData.expenseAnalysis?.totalExpense?.amount === "0.00" &&
+//         responseData.incomeAnalysis?.totalIncome?.amount === "0.00";
+
+//       if (allZero) {
+//         warnings.push(
+//           "Some totals may be incomplete due to missing exchange rates for currency conversions"
+//         );
+//       }
+
+//       const noData =
+//         !responseData.monthlyExpenses.length &&
+//         !responseData.monthlyIncomes.length &&
+//         !responseData.expenseAnalysis &&
+//         !responseData.incomeAnalysis;
+
+//       if (noData) {
+//         return res.status(404).json({
+//           success: false,
+//           message: "No financial data available",
+//           warnings,
+//         });
+//       }
+
+//       return res.status(200).json({
+//         success: true,
+//         message: `Financial report data for ${year} from ${effectiveStartDate} to ${effectiveEndDate} retrieved successfully`,
+//         data: responseData,
+//         warnings: warnings.length ? warnings : undefined,
+//       });
+//     } catch (error) {
+//       console.error("Error fetching financial report data:", error);
+//       return res.status(500).json({
+//         success: false,
+//         message: "Error fetching financial report data",
+//         error: error.message,
+//       });
+//     }
+//   };
+
 import {
   getExpenseAnalysis,
   getMonthlyExpenseTotals,
@@ -6,40 +190,46 @@ import {
   getIncomeAnalysis,
   getMonthlyIncomeTotals,
 } from "../UserController/userIncomeController.js";
+import { getExchangeRatesForDates } from "../../middlewares/userExpenseAmountCurrencyConverter.js";
+import {
+  UserCurrencyAndBudgetModel,
+  UserExpenseCategoryModel,
+  UserIncomeCategoryModel,
+} from "../../models/UserModel/UserCategoryModels.js";
+import { AdminCurrencyCategory } from "../../models/AdminModel/AdminCategoryModels.js";
 
-// Helper function to mock res and capture data
 const mockResponse = () => {
   let capturedData = null;
   return {
-    status: (code) => ({
+    status: () => ({
       json: (data) => {
-        capturedData = data; // Capture the response data
+        capturedData = data;
       },
     }),
-    getData: () => capturedData, // Method to retrieve captured data
+    getData: () => capturedData,
   };
 };
 
-// Helper function to format date to DD-MM-YYYY
 const formatDate = (dateStr) => {
   const date = new Date(dateStr);
   if (isNaN(date)) return null;
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
+  const [day, month, year] = [
+    String(date.getDate()).padStart(2, "0"),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    date.getFullYear(),
+  ];
   return `${day}-${month}-${year}`;
 };
 
-// Helper function to validate date
 const isValidDate = (dateStr) => {
-  return !isNaN(new Date(dateStr.split("-").reverse().join("-")));
+  const isoDate = dateStr.split("-").reverse().join("-");
+  return !isNaN(new Date(isoDate));
 };
 
 export const getFinancialReportData =
   (userDbConnection, adminDbConnection) => async (req, res) => {
     const { userId, year, professionId, startDate, endDate } = req.params;
 
-    // Validate inputs
     if (!userId || !year || isNaN(year)) {
       return res.status(400).json({
         success: false,
@@ -47,31 +237,25 @@ export const getFinancialReportData =
       });
     }
 
-    // Default to full year if dates not provided, and format to DD-MM-YYYY
     let effectiveStartDate = startDate || `01-01-${year}`;
     let effectiveEndDate = endDate || `31-12-${year}`;
 
-    // Validate and format dates
-    if (startDate && !isValidDate(startDate)) {
+    if (
+      (startDate && !isValidDate(startDate)) ||
+      (endDate && !isValidDate(endDate))
+    ) {
       return res.status(400).json({
         success: false,
-        message: "Invalid startDate format. Expected DD-MM-YYYY",
-      });
-    }
-    if (endDate && !isValidDate(endDate)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid endDate format. Expected DD-MM-YYYY",
+        message: "Invalid startDate or endDate format. Expected DD-MM-YYYY",
       });
     }
 
-    // Ensure dates are in DD-MM-YYYY
-    effectiveStartDate = startDate
-      ? formatDate(startDate.split("-").reverse().join("-"))
-      : effectiveStartDate;
-    effectiveEndDate = endDate
-      ? formatDate(endDate.split("-").reverse().join("-"))
-      : effectiveEndDate;
+    effectiveStartDate = formatDate(
+      effectiveStartDate.split("-").reverse().join("-")
+    );
+    effectiveEndDate = formatDate(
+      effectiveEndDate.split("-").reverse().join("-")
+    );
 
     if (!effectiveStartDate || !effectiveEndDate) {
       return res.status(400).json({
@@ -81,21 +265,82 @@ export const getFinancialReportData =
     }
 
     try {
-      // Create mock responses
-      const monthlyExpensesMock = mockResponse();
-      const monthlyIncomesMock = mockResponse();
-      const expenseAnalysisMock = mockResponse();
-      const incomeAnalysisMock = mockResponse();
+      // Fetch common data
+      const UserCurrencyAndBudget =
+        UserCurrencyAndBudgetModel(userDbConnection);
+      const AdminCurrencyCategoryModel =
+        AdminCurrencyCategory(adminDbConnection);
+      const userCurrencyData = await UserCurrencyAndBudget.findOne({
+        userId,
+      }).populate({
+        path: "defaultCurrency",
+        model: AdminCurrencyCategoryModel,
+        select: "symbol name",
+      });
 
-      // Execute controller functions concurrently
-      await Promise.all([
+      if (!userCurrencyData) {
+        return res.status(404).json({
+          success: false,
+          message: "User currency data not found",
+        });
+      }
+
+      // Fetch incomes and expenses to get unique dates
+      const [incomesAgg, expensesAgg] = await Promise.all([
+        UserIncomeCategoryModel(userDbConnection).aggregate([
+          { $match: { userId } },
+          { $unwind: "$incomes" },
+          {
+            $match: {
+              "incomes.date": {
+                $regex: `^\\d{2}-\\d{2}-${year}`,
+              },
+            },
+          },
+          { $project: { date: "$incomes.date" } },
+        ]),
+        UserExpenseCategoryModel(userDbConnection).aggregate([
+          { $match: { userId } },
+          { $unwind: "$expenses" },
+          {
+            $match: {
+              "expenses.date": {
+                $regex: `^\\d{2}-\\d{2}-${year}`,
+              },
+            },
+          },
+          { $project: { date: "$expenses.date" } },
+        ]),
+      ]);
+
+      const uniqueDates = new Set([
+        ...incomesAgg.map((inc) => inc.date),
+        ...expensesAgg.map((exp) => exp.date),
+      ]);
+      const exchangeRates = await getExchangeRatesForDates(
+        adminDbConnection,
+        uniqueDates,
+        year
+      );
+
+      const mocks = {
+        monthlyExpenses: mockResponse(),
+        monthlyIncomes: mockResponse(),
+        expenseAnalysis: mockResponse(),
+        incomeAnalysis: mockResponse(),
+      };
+
+      // Pass shared context to APIs
+      const context = { userCurrencyData, exchangeRates };
+
+      const tasks = [
         getMonthlyExpenseTotals(userDbConnection, adminDbConnection)(
-          { params: { userId, year } },
-          monthlyExpensesMock
+          { params: { userId, year }, context },
+          mocks.monthlyExpenses
         ),
         getMonthlyIncomeTotals(userDbConnection, adminDbConnection)(
-          { params: { userId, year } },
-          monthlyIncomesMock
+          { params: { userId, year }, context },
+          mocks.monthlyIncomes
         ),
         getExpenseAnalysis(userDbConnection, adminDbConnection)(
           {
@@ -104,8 +349,9 @@ export const getFinancialReportData =
               startDate: effectiveStartDate,
               endDate: effectiveEndDate,
             },
+            context,
           },
-          expenseAnalysisMock
+          mocks.expenseAnalysis
         ),
         getIncomeAnalysis(userDbConnection, adminDbConnection)(
           {
@@ -115,79 +361,58 @@ export const getFinancialReportData =
               endDate: effectiveEndDate,
               professionId,
             },
+            context,
           },
-          incomeAnalysisMock
+          mocks.incomeAnalysis
         ),
-      ]);
+      ];
 
-      // Extract captured data
-      const monthlyExpensesData = monthlyExpensesMock.getData();
-      const monthlyIncomesData = monthlyIncomesMock.getData();
-      const expenseAnalysisData = expenseAnalysisMock.getData();
-      const incomeAnalysisData = incomeAnalysisMock.getData();
+      await Promise.allSettled(tasks);
 
-      // Initialize response data and warnings
       const responseData = {
-        monthlyExpenses: [],
-        monthlyIncomes: [],
-        expenseAnalysis: null,
-        incomeAnalysis: null,
+        monthlyExpenses:
+          mocks.monthlyExpenses.getData()?.data?.monthlyTotals || [],
+        monthlyIncomes:
+          mocks.monthlyIncomes.getData()?.data?.monthlyTotals || [],
+        expenseAnalysis: mocks.expenseAnalysis.getData()?.data || null,
+        incomeAnalysis: mocks.incomeAnalysis.getData()?.data || null,
       };
+
       const warnings = [];
 
-      // Process monthly expenses
-      if (monthlyExpensesData && monthlyExpensesData.success) {
-        responseData.monthlyExpenses =
-          monthlyExpensesData.data?.monthlyTotals || [];
-      } else {
+      const addWarningIfFail = (mock, label) => {
+        const data = mock.getData();
+        if (!data?.success) {
+          warnings.push(
+            `${label} unavailable: ${data?.message || "Unknown error"}`
+          );
+        }
+      };
+
+      addWarningIfFail(mocks.monthlyExpenses, "Monthly expense totals");
+      addWarningIfFail(mocks.monthlyIncomes, "Monthly income totals");
+      addWarningIfFail(mocks.expenseAnalysis, "Expense analysis");
+      addWarningIfFail(mocks.incomeAnalysis, "Income analysis");
+
+      const allZero =
+        responseData.monthlyExpenses.every((m) => m.total === "0.00") &&
+        responseData.monthlyIncomes.every((m) => m.total === "0.00") &&
+        responseData.expenseAnalysis?.totalExpense?.amount === "0.00" &&
+        responseData.incomeAnalysis?.totalIncome?.amount === "0.00";
+
+      if (allZero) {
         warnings.push(
-          `Monthly expense totals unavailable: ${
-            monthlyExpensesData?.message || "Unknown error"
-          }`
+          "Some totals may be incomplete due to missing exchange rates for currency conversions"
         );
       }
 
-      // Process monthly incomes
-      if (monthlyIncomesData && monthlyIncomesData.success) {
-        responseData.monthlyIncomes =
-          monthlyIncomesData.data?.monthlyTotals || [];
-      } else {
-        warnings.push(
-          `Monthly income totals unavailable: ${
-            monthlyIncomesData?.message || "Unknown error"
-          }`
-        );
-      }
-
-      // Process expense analysis
-      if (expenseAnalysisData && expenseAnalysisData.success) {
-        responseData.expenseAnalysis = expenseAnalysisData.data || null;
-      } else {
-        warnings.push(
-          `Expense analysis unavailable: ${
-            expenseAnalysisData?.message || "Unknown error"
-          }`
-        );
-      }
-
-      // Process income analysis
-      if (incomeAnalysisData && incomeAnalysisData.success) {
-        responseData.incomeAnalysis = incomeAnalysisData.data || null;
-      } else {
-        warnings.push(
-          `Income analysis unavailable: ${
-            incomeAnalysisData?.message || "Unknown error"
-          }`
-        );
-      }
-
-      // Check if any data was retrieved
-      if (
-        responseData.monthlyExpenses.length === 0 &&
-        responseData.monthlyIncomes.length === 0 &&
+      const noData =
+        !responseData.monthlyExpenses.length &&
+        !responseData.monthlyIncomes.length &&
         !responseData.expenseAnalysis &&
-        !responseData.incomeAnalysis
-      ) {
+        !responseData.incomeAnalysis;
+
+      if (noData) {
         return res.status(404).json({
           success: false,
           message: "No financial data available",
@@ -195,28 +420,15 @@ export const getFinancialReportData =
         });
       }
 
-      // Add warning about potential skipped conversions
-      if (
-        responseData.expenseAnalysis?.totalExpense?.amount === "0.00" ||
-        responseData.incomeAnalysis?.totalIncome?.amount === "0.00" ||
-        responseData.monthlyExpenses.every((m) => m.total === "0.00") ||
-        responseData.monthlyIncomes.every((m) => m.total === "0.00")
-      ) {
-        warnings.push(
-          "Some totals may be incomplete due to missing exchange rates for currency conversions"
-        );
-      }
-
-      // Send combined response
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: `Financial report data for ${year} from ${effectiveStartDate} to ${effectiveEndDate} retrieved successfully`,
         data: responseData,
-        warnings: warnings.length > 0 ? warnings : undefined,
+        warnings: warnings.length ? warnings : undefined,
       });
     } catch (error) {
       console.error("Error fetching financial report data:", error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: "Error fetching financial report data",
         error: error.message,
