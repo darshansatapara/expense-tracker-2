@@ -3,7 +3,7 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import "antd/dist/reset.css";
 import dayjs from "dayjs";
-import  { ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import useUserIncomeStore from "../store/UserStore/userIncomeStore.js";
 import useUserExpenseStore from "../store/UserStore/userExpenseStore.js";
 import PieChart from "../components/commonComponent/PieChart.jsx";
@@ -61,7 +61,8 @@ const CurrencySliderCard = React.memo(({ type, currencyTotals, isSmallScreen }) 
       <div className="flex items-center justify-between">
         <div>
           <p className="text-base md:text-3xl font-extrabold text-gray-900">
-            {currencyTotals[currentCurrencyIndex].total} ({currencyTotals[currentCurrencyIndex].currency})
+            ${parseFloat(currencyTotals[currentCurrencyIndex].total).toFixed(2)} (
+            {currencyTotals[currentCurrencyIndex].currency})
           </p>
           <p className="text-xs md:text-sm text-gray-500 mt-2">
             Each selected currency is shown, but the total is in Indian Rupees (₹).
@@ -121,10 +122,10 @@ const AnalysisSection = React.memo(
       () =>
         analysisData?.currencyBreakdown?.length > 0
           ? analysisData.currencyBreakdown.map((item) => ({
-              currency: item.currency || "INR (₹)",
-              total: item.total ? `${item.symbol}${parseFloat(item.total).toFixed(2)}` : "₹0.00",
+              currency: item.currency || "INR",
+              total: item.total ? parseFloat(item.total).toFixed(2) : "0.00",
             }))
-          : [{ currency: "INR (₹)", total: "₹0.00" }],
+          : [{ currency: "INR", total: "0.00" }],
       [analysisData?.currencyBreakdown]
     );
 
@@ -145,16 +146,16 @@ const AnalysisSection = React.memo(
         labels:
           analysisData?.currencyBreakdown?.length > 0
             ? analysisData.currencyBreakdown.map((item) => item.currency)
-            : ["INR (₹)"],
+            : ["INR"],
         data:
           analysisData?.currencyBreakdown?.length > 0
             ? analysisData.currencyBreakdown.map((item) => parseFloat(item.percentage || 0))
             : [0],
         total: analysisData?.[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.amount
-          ? `${analysisData[activeTab === "expense" ? "totalExpense" : "totalIncome"].currency}${parseFloat(
+          ? `$${parseFloat(
               analysisData[activeTab === "expense" ? "totalExpense" : "totalIncome"].amount
             ).toFixed(2)}`
-          : "₹0.00",
+          : "$0.00",
       }),
       [analysisData, activeTab]
     );
@@ -208,15 +209,18 @@ const AnalysisSection = React.memo(
                   <div className="flex items-center space-x-1 md:space-x-2">
                     <p className="text-base md:text-3xl font-extrabold text-gray-900">
                       {analysisData?.[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.amount
-                        ? `${analysisData[activeTab === "expense" ? "totalExpense" : "totalIncome"].currency}${parseFloat(
+                        ? `$${parseFloat(
                             analysisData[activeTab === "expense" ? "totalExpense" : "totalIncome"].amount
                           ).toFixed(2)}`
-                        : "₹0.00"}
+                        : "$0.00"}
                     </p>
                     <span className="text-xs md:text-sm text-gray-500">
-                      ({analysisData?.[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.currency || "INR (₹)"})
+                      ({analysisData?.[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.currency || "INR"})
                     </span>
                   </div>
+                  <p className="text-xs md:text-sm text-gray-500 mt-2">
+                    Total is in Indian Rupees (₹).
+                  </p>
                 </div>
                 <CurrencySliderCard
                   type={activeTab}

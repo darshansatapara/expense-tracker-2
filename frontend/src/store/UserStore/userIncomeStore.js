@@ -76,7 +76,7 @@ getIncomeAnalysis: async (userId, startDate, endDate, professionId) => {
     const response = await axiosInstance.get(
       `/income/getIncomesAnalysis/${userId}/${startDate}/${endDate}/${professionId}`
     );
-    console.log("income",response.data.data)
+    // console.log("income",response.data.data)
     if (response.data.success) {
       set({ userIncomes: response.data.data, loading: false });
     } else {

@@ -70,7 +70,7 @@ monthlyExpenseTotals: [],
         const response = await axiosInstance.get(
           `/expense/getExpensesAnalysis/${userId}/${startDate}/${endDate}`
         );
-        console.log(response.data)
+        // console.log("analysis",response.data)
   
         if (response.data.success) {
           set({
@@ -98,7 +98,7 @@ monthlyExpenseTotals: [],
       const response = await axiosInstance.get(
         `/expense/getMonthlyExpenseTotals/${userId}/${year}`
       );
-      console.log("API success:", response.data); // Second checkpoint
+      // console.log("API success:", response.data); // Second checkpoint
 
       if (response.data.success) {
         // You can optionally format the data here
