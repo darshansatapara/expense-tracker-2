@@ -4,11 +4,9 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
 
-const LineChart = ({ data, title, isSmallScreen = false }) => {
-  // Use the title prop if provided
-  const chartTitle = title || "";
-  
-  const options = {
+const LineChart = ({ data, options, isSmallScreen = false }) => {
+  // Use the provided options, merging with responsive defaults
+  const defaultOptions = {
     responsive: true,
     maintainAspectRatio: false, // Allow custom sizing
     scales: {
@@ -17,7 +15,7 @@ const LineChart = ({ data, title, isSmallScreen = false }) => {
           display: true,
           text: "Month",
           font: {
-            size: isSmallScreen ? 8 : 12, // Smaller font for small screens
+            size: isSmallScreen ? 8 : 12,
           },
         },
         ticks: {
@@ -29,19 +27,13 @@ const LineChart = ({ data, title, isSmallScreen = false }) => {
       y: {
         beginAtZero: true,
         title: {
-          display: !isSmallScreen, // Hide title on small screens
+          display: !isSmallScreen,
           text: "Value",
           font: {
             size: isSmallScreen ? 8 : 12,
           },
         },
         ticks: {
-          // Use the currency symbol from the dataset if available
-          callback: (value) => {
-            // Extract currency symbol from dataset label if possible
-            const currencySymbol = data.datasets && data.datasets[0]?.label?.includes("$") ? "$" : "₹";
-            return `${currencySymbol}${value.toLocaleString()}`;
-          },
           font: {
             size: isSmallScreen ? 8 : 12,
           },
@@ -50,7 +42,7 @@ const LineChart = ({ data, title, isSmallScreen = false }) => {
     },
     plugins: {
       legend: {
-        position: isSmallScreen ? "bottom" : "top", // Move to bottom on small screens
+        position: isSmallScreen ? "bottom" : "top",
         labels: {
           font: {
             size: isSmallScreen ? 8 : 12,
@@ -59,26 +51,56 @@ const LineChart = ({ data, title, isSmallScreen = false }) => {
         },
       },
       title: {
-        display: chartTitle && !isSmallScreen, // Show title only if provided and not on small screens
-        text: chartTitle,
+        display: false, // Title is set via options
         font: {
           size: isSmallScreen ? 10 : 14,
         },
       },
       tooltip: {
-        callbacks: {
-          label: (context) => {
-            // Extract currency symbol from dataset label if possible
-            const currencySymbol = context.dataset.label?.includes("$") ? "$" : "₹";
-            return `${context.dataset.label}: ${currencySymbol}${context.raw.toLocaleString()}`;
-          },
-        },
         bodyFont: {
           size: isSmallScreen ? 8 : 12,
         },
         titleFont: {
           size: isSmallScreen ? 8 : 12,
         },
+      },
+    },
+  };
+
+  // Merge provided options with defaults, prioritizing provided options
+  const mergedOptions = {
+    ...defaultOptions,
+    ...options,
+    scales: {
+      ...defaultOptions.scales,
+      ...options?.scales,
+      x: {
+        ...defaultOptions.scales.x,
+        ...options?.scales?.x,
+      },
+      y: {
+        ...defaultOptions.scales.y,
+        ...options?.scales?.y,
+        ticks: {
+          ...defaultOptions.scales.y.ticks,
+          ...options?.scales?.y?.ticks,
+        },
+      },
+    },
+    plugins: {
+      ...defaultOptions.plugins,
+      ...options?.plugins,
+      legend: {
+        ...defaultOptions.plugins.legend,
+        ...options?.plugins?.legend,
+      },
+      title: {
+        ...defaultOptions.plugins.title,
+        ...options?.plugins?.title,
+      },
+      tooltip: {
+        ...defaultOptions.plugins.tooltip,
+        ...options?.plugins?.tooltip,
       },
     },
   };
@@ -96,7 +118,7 @@ const LineChart = ({ data, title, isSmallScreen = false }) => {
           maxHeight: isSmallScreen ? "200px" : "400px",
         }}
       >
-        <Line data={data} options={options} />
+        <Line data={data} options={mergedOptions} />
       </div>
     </div>
   );

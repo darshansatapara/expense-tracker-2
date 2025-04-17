@@ -70,7 +70,7 @@ monthlyExpenseTotals: [],
         const response = await axiosInstance.get(
           `/expense/getExpensesAnalysis/${userId}/${startDate}/${endDate}`
         );
-        // console.log("analysis",response.data)
+        console.log("analysis",response.data)
   
         if (response.data.success) {
           set({
