@@ -22,27 +22,27 @@ const debounce = (func, delay) => {
 };
 
 // Currency Slider Card Component
-const CurrencySliderCard = React.memo(({ type, currencyTotals, isSmallScreen }) => {
+const CurrencySliderCard = React.memo(({ type, currencyBreakdown, defaultCurrency, isSmallScreen }) => {
   const [currentCurrencyIndex, setCurrentCurrencyIndex] = useState(0);
 
-  const isValidCurrencyTotals = Array.isArray(currencyTotals) && currencyTotals.length > 0;
+  const isValidCurrencyBreakdown = Array.isArray(currencyBreakdown) && currencyBreakdown.length > 0;
 
   useEffect(() => {
-    if (!isValidCurrencyTotals) return;
+    if (!isValidCurrencyBreakdown) return;
 
     const interval = setInterval(() => {
-      setCurrentCurrencyIndex((prevIndex) => (prevIndex + 1) % currencyTotals.length);
+      setCurrentCurrencyIndex((prevIndex) => (prevIndex + 1) % currencyBreakdown.length);
     }, 2000);
     return () => clearInterval(interval);
-  }, [isValidCurrencyTotals, currencyTotals?.length]);
+  }, [isValidCurrencyBreakdown, currencyBreakdown?.length]);
 
   const handleNextCurrency = () => {
     if (isValidCurrencyTotals) {
-      setCurrentCurrencyIndex((prevIndex) => (prevIndex + 1) % currencyTotals?.length);
+      setCurrentCurrencyIndex((prevIndex) => (prevIndex + 1) % currencyTotals.length);
     }
   };
 
-  if (!isValidCurrencyTotals) {
+  if (!isValidCurrencyBreakdown) {
     return (
       <div className="bg-white p-4 md:p-6 rounded-2xl border border-gray-100 hover:shadow-lg transition-all h-full">
         <h3 className="text-lg md:text-2xl font-bold mb-2 md:mb-4 text-gray-800">
@@ -61,11 +61,11 @@ const CurrencySliderCard = React.memo(({ type, currencyTotals, isSmallScreen }) 
       <div className="flex items-center justify-between">
         <div>
           <p className="text-base md:text-3xl font-extrabold text-gray-900">
-            ${parseFloat(currencyTotals[currentCurrencyIndex]?.total).toFixed(2)} (
-            {currencyTotals[currentCurrencyIndex]?.currency})
+            ${parseFloat(currencyTotals[currentCurrencyIndex].total).toFixed(2)} (
+            {currencyTotals[currentCurrencyIndex].currency})
           </p>
           <p className="text-xs md:text-sm text-gray-500 mt-2">
-            Each selected currency is shown, but the total is in "Your default currency".
+            Each selected currency is shown, but the total is in Indian Rupees (₹).
           </p>
         </div>
         <button
@@ -116,15 +116,30 @@ const AnalysisSection = React.memo(
   }) => {
     const title = activeTab === "expense" ? "Expense" : "Income";
     const textColor = activeTab === "expense" ? "text-red-600" : "text-green-600";
-    const iconColor = activeTab === "expense" ? "text-red-500" : "text-green-500";
 
-    const currencyTotals = useMemo(
+    // Utility to simplify currency name to code (e.g., "United States Dollar ($)" -> "USD")
+    const getCurrencyCode = (currencyName) => {
+      const currencyMap = {
+        "United States Dollar ($)": "USD",
+        "Indian Rupee (₹)": "INR",
+        // Add more mappings as needed
+      };
+      return currencyMap[currencyName] || currencyName.slice(0, 3).toUpperCase();
+    };
+
+    // Get the default currency symbol from totalIncome or totalExpense
+    const defaultCurrency = useMemo(() => {
+      return analysisData?.[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.currency || "₹";
+    }, [analysisData, activeTab]);
+
+    // Map currencyBreakdown to get totals and currency codes
+    const currencyBreakdown = useMemo(
       () =>
         analysisData?.currencyBreakdown?.length > 0
           ? analysisData.currencyBreakdown.map((item) => ({
-            currency: item.currency || "INR",
-            total: item.total ? parseFloat(item.total).toFixed(2) : "0.00",
-          }))
+              currency: item.currency || "INR",
+              total: item.total ? parseFloat(item.total).toFixed(2) : "0.00",
+            }))
           : [{ currency: "INR", total: "0.00" }],
       [analysisData?.currencyBreakdown]
     );
@@ -145,7 +160,7 @@ const AnalysisSection = React.memo(
       () => ({
         labels:
           analysisData?.currencyBreakdown?.length > 0
-            ? analysisData.currencyBreakdown.map((item) => item.currency)
+            ? analysisData.currencyBreakdown.map((item) => getCurrencyCode(item.currency || "INR"))
             : ["INR"],
         data:
           analysisData?.currencyBreakdown?.length > 0
@@ -153,8 +168,8 @@ const AnalysisSection = React.memo(
             : [0],
         total: analysisData?.[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.amount
           ? `$${parseFloat(
-            analysisData[activeTab === "expense" ? "totalExpense" : "totalIncome"].amount
-          ).toFixed(2)}`
+              analysisData[activeTab === "expense" ? "totalExpense" : "totalIncome"].amount
+            ).toFixed(2)}`
           : "$0.00",
       }),
       [analysisData, activeTab]
@@ -196,6 +211,40 @@ const AnalysisSection = React.memo(
       [activeTab, selectedYear, monthlyIncomeTotals, monthlyExpenseTotals]
     );
 
+    // Get the currency symbol from monthlyTotals
+    const monthlyDefaultCurrency = useMemo(() => {
+      const totals = activeTab === "income" ? monthlyIncomeTotals : monthlyExpenseTotals;
+      console.log(`${activeTab} monthlyTotals:`, totals);
+      const validEntry = totals?.find((item) => parseFloat(item.total) > 0) || totals?.[0];
+      const currency = validEntry?.currency || "₹";
+      console.log(`${activeTab} defaultCurrency:`, currency);
+      return currency;
+    }, [activeTab, monthlyIncomeTotals, monthlyExpenseTotals]);
+
+    // Line chart options to display Y-axis values with user's default currency symbol from monthlyTotals
+    const lineChartOptions = {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: "top",
+        },
+        title: {
+          display: true,
+          text: `${selectedYear} - ${title} Monthly Trend`,
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function (value) {
+              return `${monthlyDefaultCurrency}${value.toFixed(2)}`;
+            },
+          },
+        },
+      },
+    };
+
     return (
       <div className="p-4 md:p-6 border-gray-100">
         <div className="flex flex-col space-y-6">
@@ -210,21 +259,22 @@ const AnalysisSection = React.memo(
                     <p className="text-base md:text-3xl font-extrabold text-gray-900">
                       {analysisData?.[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.amount
                         ? `$${parseFloat(
-                          analysisData[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.amount
-                        ).toFixed(2)}`
+                            analysisData[activeTab === "expense" ? "totalExpense" : "totalIncome"].amount
+                          ).toFixed(2)}`
                         : "$0.00"}
                     </p>
                     <span className="text-xs md:text-sm text-gray-500">
-                      ({analysisData?.[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.currency || "Your default currency"})
+                      ({analysisData?.[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.currency || "INR"})
                     </span>
                   </div>
                   <p className="text-xs md:text-sm text-gray-500 mt-2">
-                    Total is in "Your default currency".
+                    Total is in Indian Rupees (₹).
                   </p>
                 </div>
                 <CurrencySliderCard
                   type={activeTab}
-                  currencyTotals={currencyTotals}
+                  currencyBreakdown={currencyBreakdown}
+                  defaultCurrency={defaultCurrency}
                   isSmallScreen={isSmallScreen}
                 />
               </div>
@@ -288,7 +338,7 @@ const AnalysisSection = React.memo(
             <h3 className="text-base md:text-xl font-semibold mb-2 md:mb-4 text-gray-800">
               {selectedYear} - Yearly {title} Trend
             </h3>
-            <LineChart data={lineChartData} title={`${selectedYear} - ${title} Monthly Trend`} />
+            <LineChart data={lineChartData} options={lineChartOptions} />
           </div>
         </div>
       </div>
