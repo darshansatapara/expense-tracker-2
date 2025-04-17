@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../../utils/axios.js";
 import { toast } from "react-toastify";
+import { message } from "antd";
 
 export const userStore = create((set) => ({
   currentUser: null,
@@ -138,14 +139,21 @@ export const userStore = create((set) => ({
   signout: async () => {
     set({ isSigningOut: true });
     try {
-      await axiosInstance.post("/auth/signout");
-      set({ currentUser: null });
-      toast.success("Signed out successfully!");
+      const response = await axiosInstance.post("/auth/signout");
+      console.log("signout response:", response.data);
+      set({ currentUser: null, isSigningOut: false });
+      message.success("Signed out successfully!");
+      // Navigate to signin page (must be called in component, see below)
+      return response.data;
     } catch (error) {
-      console.error("Signout error:", error);
-      toast.error(error.response?.data?.message || "Sign-out failed!");
-    } finally {
+      console.error("Signout error:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+      message.error(error.response?.data?.message || "Sign-out failed!");
       set({ isSigningOut: false });
+      throw error;
     }
   },
 
@@ -176,7 +184,7 @@ export const userStore = create((set) => ({
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/me");
-      console.log(res.data.user);
+      // console.log(res.data.user);
       set({ currentUser: res.data.user });
     } catch (error) {
       console.error("Check auth error:", error);

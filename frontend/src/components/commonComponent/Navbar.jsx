@@ -10,10 +10,11 @@ import {
 } from "@ant-design/icons";
 import { BellPlus, LogOut, ShieldQuestion } from "lucide-react";
 import NotificationModal from "../NotificationComponents/Notification"; // Import the new modal component
-
+import { userStore } from "../../store/UserStore/userAuthStore.js";
 const Navbar = ({ toggleSidebar }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { signout } = userStore();
   const pathMap = {
     "/": {
       name: "Home",
@@ -107,11 +108,12 @@ const Navbar = ({ toggleSidebar }) => {
           {/* Logout Button Hidden on Small Screens */}
           <div
             className="hidden lg:flex hover:cursor-pointer rounded-md h-8 w-8 items-center justify-center"
-            onClick={() => {
-              navigate("/signin");
-            }}
+
           >
-            <LogOut />
+            <LogOut onClick={async () => {
+              console.log("signing out");
+              await signout();
+            }} />
           </div>
           {/* Hamburger Menu for Small Screens */}
           <button

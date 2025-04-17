@@ -299,7 +299,10 @@ export const googlesignin = (userDbConnection) => async (req, res) => {
 
 // Sign-out controller
 export const signOut = () => (req, res) => {
-  res.clearCookie("token");
+  console.log("Clearing cookie: token"); // Debug log
+  res.clearCookie("token", {
+    httpOnly: true,
+  });
   res.status(200).json({ success: true, message: "Successfully signed out" });
 };
 

@@ -10,7 +10,7 @@ export const protect = (userDbConnection) => {
     try {
       let token;
 
-      console.log(req.cookies);
+      // console.log(req.cookies);
       // Check for token in cookies or Authorization header
       if (req.cookies && req.cookies?.token) {
         token = req.cookies.token;
@@ -19,7 +19,7 @@ export const protect = (userDbConnection) => {
         req.headers.authorization.startsWith("Bearer")
       ) {
         token = req.headers.authorization.split(" ")[1];
-        console.log(token);
+        // console.log(token);
       }
 
       if (!token) {
@@ -33,7 +33,7 @@ export const protect = (userDbConnection) => {
       let decoded;
       try {
         decoded = jwt.verify(token, process.env.JWT_SECRET);
-        console.log(decoded);
+        // console.log(decoded);
       } catch (error) {
         if (error.name === "TokenExpiredError") {
           return res
@@ -50,7 +50,7 @@ export const protect = (userDbConnection) => {
       const user = await UserProfileModel.findById(decoded.id).select(
         "-password"
       );
-      console.log(user);
+      // console.log(user);
 
       if (!user) {
         return res
