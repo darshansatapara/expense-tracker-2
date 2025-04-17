@@ -3,6 +3,7 @@ import { Table, Spin, Empty } from "antd";
 import "antd/dist/reset.css"; // Ensure Ant Design styles are applied
 import { TabButton } from "../commonComponent/TabButton.jsx";
 import { userCategoryStore } from "../../store/UserStore/userCategoryStore.js";
+import { userStore } from "../../store/UserStore/userAuthStore.js";
 const TableList = ({ today, yesterday, activeTab }) => {
   const [showData, setShowData] = useState([]);
   const [activeButton, setActiveButton] = useState("Today");
@@ -10,7 +11,8 @@ const TableList = ({ today, yesterday, activeTab }) => {
   const handleTodayClick = () => setActiveButton("Today");
   const handleYesterdayClick = () => setActiveButton("Yesterday");
   const [defaultCurrencySymbol, setDefaultCurrencySymbol] = useState("");
-  const userId = "677bc096bd8c6f677ef507d3";
+  const { currentUser } = userStore();
+  const userId = currentUser?._id;
 
   const { fetchCurrencyAndBudget } = userCategoryStore();
 

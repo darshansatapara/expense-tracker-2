@@ -5,17 +5,19 @@ import { adminCategoryStore } from "../../store/AdminStore/adminCategoryStore.js
 import useUserExpenseStore from "../../store/UserStore/userExpenseStore.js";
 import useUserIncomeStore from "../../store/UserStore/userIncomeStore.js";
 import dayjs from "dayjs";
-
+import { userStore } from "../../store/UserStore/userAuthStore.js";
 const { Option } = Select;
 
 export default function AddIncomeExpenseModel({ option, isVisible, onClose }) {
+
   const { fetchUserExpenseCategories, fetchCurrencyAndBudget } =
     userCategoryStore();
+  const { currentUser } = userStore();
   const { addUserIncome } = useUserIncomeStore();
   const { addUserExpense } = useUserExpenseStore();
   const { fetchIncomeCategoriesIsActive } = adminCategoryStore();
-  const userId = "677bc096bd8c6f677ef507d3";
-  const professionId = "6774e0884930e249cf39daa0";
+  const userId = currentUser?._id;
+  const professionId = currentUser?.profession;
 
   const [categoryData, setCategoryData] = useState([]);
   const [currency, setCurrency] = useState([]);
@@ -121,17 +123,17 @@ export default function AddIncomeExpenseModel({ option, isVisible, onClose }) {
           >
             {option === "Expense"
               ? categoryData.map((category) => (
-                  <Option key={category._id} value={category.categoryId._id}>
-                    {category.categoryId.name}
+                <Option key={category._id} value={category.categoryId._id}>
+                  {category.categoryId.name}
+                </Option>
+              ))
+              : categoryData.map((category) =>
+                category.subcategories?.map((subcategory) => (
+                  <Option key={subcategory._id} value={subcategory._id}>
+                    {subcategory.name}
                   </Option>
                 ))
-              : categoryData.map((category) =>
-                  category.subcategories?.map((subcategory) => (
-                    <Option key={subcategory._id} value={subcategory._id}>
-                      {subcategory.name}
-                    </Option>
-                  ))
-                )}
+              )}
           </Select>
         </div>
 

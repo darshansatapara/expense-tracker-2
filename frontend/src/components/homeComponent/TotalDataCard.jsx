@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Spin } from "antd";
 import { userCategoryStore } from "../../store/UserStore/userCategoryStore";
-
+import { userStore } from "../../store/UserStore/userAuthStore.js";
 const TotalDataCard = ({ cardData, lable, activeTab }) => {
   console.log(activeTab);
   const [loading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(null); // Error state
   const [defaultCurrencySymbol, setDefaultCurrencySymbol] = useState("");
-  const userId = "677bc096bd8c6f677ef507d3";
+  const { currentUser } = userStore();
+  const userId = currentUser?._id;
 
   const { fetchCurrencyAndBudget } = userCategoryStore();
   useEffect(() => {

@@ -6,7 +6,6 @@ const ProtectedRoute = () => {
   const { currentUser, checkAuth, isLoading } = userStore();
   const [isChecking, setIsChecking] = useState(true);
 
-  console.log(currentUser);
   useEffect(() => {
     const verifyAuth = async () => {
       if (!currentUser) {

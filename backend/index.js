@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-
+import cookieParser from "cookie-parser";
 // Database imports
 import {
   connectUserDatabase,
@@ -34,6 +34,7 @@ dotenv.config(); // Load environment variables
     const app = express();
 
     // Middleware
+    app.use(cookieParser());
     app.use(express.json({ limit: "10mb" }));
     app.use(express.urlencoded({ limit: "10mb", extended: true }));
     app.use(
