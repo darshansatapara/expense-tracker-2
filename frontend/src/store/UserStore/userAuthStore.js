@@ -37,6 +37,7 @@ export const userStore = create((set) => ({
    */
   markProfileAsCompleted: async (userId) => {
     set({ isUpdatingProfileStatus: true });
+    console.log("Marking profile as completed for userId:", userId);
     try {
       // Call the backend API to update the profile_complated field
       const res = await axiosInstance.put(`/auth/profilestatus`, {
@@ -70,6 +71,7 @@ export const userStore = create((set) => ({
    */
   markCategoryAsCompleted: async (userId) => {
     set({ isUpdatingCategoryStatus: true });
+    console.log("Marking category as completed for userId:", userId);
     try {
       // Call the backend API to update the profile_complated field
       const res = await axiosInstance.put(`/auth/categorystatus`, {
