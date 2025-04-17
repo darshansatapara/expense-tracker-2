@@ -11,6 +11,7 @@ export default function SubCategorySection() {
 
   // Extract data passed from the previous step
   const { payload, userId, categoriesObject } = location.state || {};
+  const { markCategoryAsCompleted } = userStore();
   console.log("Payload:", payload);
   console.log("Categories Object:", categoriesObject);
 
@@ -84,7 +85,9 @@ export default function SubCategorySection() {
           expenseCategories: categoryData,
         });
 
-        await userStore.getState().markCategoryAsCompleted(userId);
+        
+        console.log(userId);
+        await markCategoryAsCompleted(userId);
 
         await navigate("/category/currencyBudgetSelection", {
           state: { userId },

@@ -12,6 +12,7 @@ export default function CurrencyBudgetSelection() {
   const navigate = useNavigate();
 
   const { userId } = location.state || {};
+  const { markProfileAsCompleted } = userStore();
 
   // console.log(userId);
   const { addCurrencyAndBudget } = userCategoryStore();
@@ -70,7 +71,8 @@ export default function CurrencyBudgetSelection() {
 
       await addCurrencyAndBudget(budgetData);
 
-      await userStore.getState().markProfileAsCompleted(userId);
+      console.log(userId);
+      await markProfileAsCompleted(userId);
 
       navigate("/", { state: { budgetData } });
     } catch (error) {
