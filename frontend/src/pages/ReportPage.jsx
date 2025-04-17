@@ -14,7 +14,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import * as XLSX from "xlsx";
 import useFinancialReportStore from "../store/UserStore/useFinancialReportStore.js";
-
+import { userStore } from "../store/UserStore/userAuthStore";
 // Register ChartJS components
 ChartJS.register(
   CategoryScale,
@@ -36,10 +36,10 @@ const ReportPage = () => {
     error,
     fetchReportData,
   } = useFinancialReportStore();
-
-  const userId = "677bc096bd8c6f677ef507d3";
-  const professionId = "6774e0884930e249cf39daa0";
-  const userName = "Asmit Upala";
+  const { currentUser } = userStore();
+  const userId = currentUser?._id;
+  const professionId = currentUser?.profession;
+  const userName = currentUser?.name;
 
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from(

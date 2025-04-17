@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { userCategoryStore } from "../../store/UserStore/userCategoryStore.js";
 import { adminCategoryStore } from "../../store/AdminStore/adminCategoryStore.js";
 import { Button, Modal, Select, Table, InputNumber, message } from "antd";
-
+import { userStore } from "../../store/UserStore/userAuthStore";
 function CurrencyManagement() {
+  const { currentUser } = userStore();
   const [currency, setCurrency] = useState({});
   const [adminCurrencies, setAdminCurrencies] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,7 +20,7 @@ function CurrencyManagement() {
   } = userCategoryStore();
   const { fetchCurrencyCategories, allCurrencyCategories } = adminCategoryStore();
 
-  const userId = "677bc096bd8c6f677ef507d3";
+  const userId = currentUser?._id;
 
   useEffect(() => {
     const fetching = async () => {

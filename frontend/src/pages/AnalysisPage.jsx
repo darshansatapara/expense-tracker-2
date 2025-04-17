@@ -11,7 +11,7 @@ import LineChart from "../components/commonComponent/LineChart.jsx";
 import DataTable from "../components/commonComponent/DataTable.jsx";
 import { TabButton } from "../components/commonComponent/TabButton.jsx";
 import DateRangeSelector from "../components/InputComponents/DateRangeSelector.jsx";
-
+import { userStore } from "../store/UserStore/userAuthStore";
 // Utility to debounce a function
 const debounce = (func, delay) => {
   let timeoutId;
@@ -38,7 +38,7 @@ const CurrencySliderCard = React.memo(({ type, currencyTotals, isSmallScreen }) 
 
   const handleNextCurrency = () => {
     if (isValidCurrencyTotals) {
-      setCurrentCurrencyIndex((prevIndex) => (prevIndex + 1) % currencyTotals.length);
+      setCurrentCurrencyIndex((prevIndex) => (prevIndex + 1) % currencyTotals?.length);
     }
   };
 
@@ -61,11 +61,11 @@ const CurrencySliderCard = React.memo(({ type, currencyTotals, isSmallScreen }) 
       <div className="flex items-center justify-between">
         <div>
           <p className="text-base md:text-3xl font-extrabold text-gray-900">
-            ${parseFloat(currencyTotals[currentCurrencyIndex].total).toFixed(2)} (
-            {currencyTotals[currentCurrencyIndex].currency})
+            ${parseFloat(currencyTotals[currentCurrencyIndex]?.total).toFixed(2)} (
+            {currencyTotals[currentCurrencyIndex]?.currency})
           </p>
           <p className="text-xs md:text-sm text-gray-500 mt-2">
-            Each selected currency is shown, but the total is in Indian Rupees (₹).
+            Each selected currency is shown, but the total is in "Your default currency".
           </p>
         </div>
         <button
@@ -122,9 +122,9 @@ const AnalysisSection = React.memo(
       () =>
         analysisData?.currencyBreakdown?.length > 0
           ? analysisData.currencyBreakdown.map((item) => ({
-              currency: item.currency || "INR",
-              total: item.total ? parseFloat(item.total).toFixed(2) : "0.00",
-            }))
+            currency: item.currency || "INR",
+            total: item.total ? parseFloat(item.total).toFixed(2) : "0.00",
+          }))
           : [{ currency: "INR", total: "0.00" }],
       [analysisData?.currencyBreakdown]
     );
@@ -133,10 +133,10 @@ const AnalysisSection = React.memo(
       () =>
         analysisData?.categoryBreakdown?.length > 0
           ? analysisData.categoryBreakdown.map((item) => ({
-              index: item.index || 0,
-              category: item.category || "Uncategorized",
-              total: item.percentage ? `${parseFloat(item.percentage).toFixed(2)}%` : "0.00%",
-            }))
+            index: item.index || 0,
+            category: item.category || "Uncategorized",
+            total: item.percentage ? `${parseFloat(item.percentage).toFixed(2)}%` : "0.00%",
+          }))
           : [],
       [analysisData?.categoryBreakdown]
     );
@@ -153,8 +153,8 @@ const AnalysisSection = React.memo(
             : [0],
         total: analysisData?.[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.amount
           ? `$${parseFloat(
-              analysisData[activeTab === "expense" ? "totalExpense" : "totalIncome"].amount
-            ).toFixed(2)}`
+            analysisData[activeTab === "expense" ? "totalExpense" : "totalIncome"].amount
+          ).toFixed(2)}`
           : "$0.00",
       }),
       [analysisData, activeTab]
@@ -168,29 +168,29 @@ const AnalysisSection = React.memo(
         datasets: [
           activeTab === "income"
             ? {
-                label: `Income ${selectedYear}`,
-                data: Array(12)
-                  .fill(0)
-                  .map((_, index) => {
-                    const month = monthlyIncomeTotals?.find((item) => item.monthNumber === index + 1);
-                    return month ? parseFloat(month.total || 0) : 0;
-                  }),
-                borderColor: "rgba(34, 197, 94, 1)",
-                backgroundColor: "rgba(34, 197, 94, 0.2)",
-                fill: false,
-              }
+              label: `Income ${selectedYear}`,
+              data: Array(12)
+                .fill(0)
+                .map((_, index) => {
+                  const month = monthlyIncomeTotals?.find((item) => item.monthNumber === index + 1);
+                  return month ? parseFloat(month.total || 0) : 0;
+                }),
+              borderColor: "rgba(34, 197, 94, 1)",
+              backgroundColor: "rgba(34, 197, 94, 0.2)",
+              fill: false,
+            }
             : {
-                label: `Expense ${selectedYear}`,
-                data: Array(12)
-                  .fill(0)
-                  .map((_, index) => {
-                    const month = monthlyExpenseTotals?.find((item) => item.monthNumber === index + 1);
-                    return month ? parseFloat(month.total || 0) : 0;
-                  }),
-                borderColor: "rgba(239, 68, 68, 1)",
-                backgroundColor: "rgba(239, 68, 68, 0.2)",
-                fill: false,
-              },
+              label: `Expense ${selectedYear}`,
+              data: Array(12)
+                .fill(0)
+                .map((_, index) => {
+                  const month = monthlyExpenseTotals?.find((item) => item.monthNumber === index + 1);
+                  return month ? parseFloat(month.total || 0) : 0;
+                }),
+              borderColor: "rgba(239, 68, 68, 1)",
+              backgroundColor: "rgba(239, 68, 68, 0.2)",
+              fill: false,
+            },
         ],
       }),
       [activeTab, selectedYear, monthlyIncomeTotals, monthlyExpenseTotals]
@@ -210,16 +210,16 @@ const AnalysisSection = React.memo(
                     <p className="text-base md:text-3xl font-extrabold text-gray-900">
                       {analysisData?.[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.amount
                         ? `$${parseFloat(
-                            analysisData[activeTab === "expense" ? "totalExpense" : "totalIncome"].amount
-                          ).toFixed(2)}`
+                          analysisData[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.amount
+                        ).toFixed(2)}`
                         : "$0.00"}
                     </p>
                     <span className="text-xs md:text-sm text-gray-500">
-                      ({analysisData?.[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.currency || "INR"})
+                      ({analysisData?.[activeTab === "expense" ? "totalExpense" : "totalIncome"]?.currency || "Your default currency"})
                     </span>
                   </div>
                   <p className="text-xs md:text-sm text-gray-500 mt-2">
-                    Total is in Indian Rupees (₹).
+                    Total is in "Your default currency".
                   </p>
                 </div>
                 <CurrencySliderCard
@@ -308,6 +308,8 @@ const AnalysisSection = React.memo(
 
 // Main Analysis Page Component
 const AnalysisPage = () => {
+  const { currentUser } = userStore();
+
   const [filters, setFilters] = useState({
     startValue: dayjs().startOf("month"),
     endValue: dayjs().endOf("month"),
@@ -336,8 +338,8 @@ const AnalysisPage = () => {
     loading: expenseLoading,
   } = useUserExpenseStore();
 
-  const userId = "677bc096bd8c6f677ef507d3";
-  const professionId = "6774e0884930e249cf39daa0";
+  const userId = currentUser?._id;
+  const professionId = currentUser?.profession;
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);

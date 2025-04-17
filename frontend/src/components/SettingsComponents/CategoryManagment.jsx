@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { adminCategoryStore } from "../../store/AdminStore/adminCategoryStore.js";
 import { userCategoryStore } from "../../store/UserStore/userCategoryStore.js";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
-
+import { userStore } from "../../store/UserStore/userAuthStore";
 const CategoryManagement = () => {
-  const userId = "6793cd10fab0f3ca14e4fd41";
+  const { currentUser } = userStore();
+  const userId = currentUser?._id;
   const { fetchActiveCategories } = adminCategoryStore();
   const { fetchUserCategories, updateUserCategories } = userCategoryStore();
 
