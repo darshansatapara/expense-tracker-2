@@ -9,32 +9,33 @@ import HistoryPage from "./pages/HistoryPage";
 import MainLayout from "./Layouts/MainLayout";
 import AnalysisPage from "./pages/AnalysisPage";
 import ReportPage from "./pages/ReportPage";
+import { userStore } from "./store/UserStore/userAuthStore";
+import { useEffect } from "react";
 
 function App() {
+
   return (
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
+
         <Route path="/signup/*" element={<SignupPage />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/category/*" element={<CategoryPage />} />
 
         {/* Protected Routes inside MainLayout */}
-        <Route element={<MainLayout />}>
-          {/* Uncomment the ProtectedRoute wrapper to enable authentication */}
-          {/* <Route element={<ProtectedRoute />}> */}
-          {/* Main Application Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<HomePage />} />
 
-          <Route path="/" element={<HomePage />} />
+            <Route path="/settings/*" element={<SettingsPage />} />
+            <Route path="/history" element={<HistoryPage />} />
 
-          <Route path="/settings/*" element={<SettingsPage />} />
-          <Route path="/history" element={<HistoryPage />} />
+            <Route path="/analysis" element={<AnalysisPage />} />
 
-          <Route path="/analysis" element={<AnalysisPage />} />
-
-          <Route path="/reports" element={<ReportPage />} />
+            <Route path="/reports" element={<ReportPage />} />
+          </Route>
         </Route>
-        {/* </Route> */}
       </Routes>
     </BrowserRouter>
   );

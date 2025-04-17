@@ -5,8 +5,9 @@ import DateRangeSelector from "../components/InputComponents/DateRangeSelector";
 import { TabButton } from "../components/commonComponent/TabButton";
 import userExpenseStore from "../store/UserStore/userExpenseStore";
 import userIncomeStore from "../store/UserStore/userIncomeStore";
-
+import { userStore } from "../store/UserStore/userAuthStore";
 const HistoryPage = () => {
+  const { currentUser } = userStore();
   const { fetchUserExpenses } = userExpenseStore();
   const { fetchUserIncomes } = userIncomeStore();
   const [expandedIndexes, setExpandedIndexes] = useState([]);
@@ -19,8 +20,8 @@ const HistoryPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const userId = "677bc096bd8c6f677ef507d3";
-  const profession = "6774e0884930e249cf39daa0";
+  const userId = currentUser?._id;
+  const profession = currentUser?.profession;
 
   const fetchTransactions = async () => {
     setLoading(true);
@@ -117,22 +118,22 @@ const HistoryPage = () => {
 
           {loading
             ? [...Array(30)].map((_, index) => (
-                <HistoryEntry
-                  key={index}
-                  isExpanded={false} // Prevent expansion during loading
-                  loading={true} // Pass loading state
-                />
-              ))
+              <HistoryEntry
+                key={index}
+                isExpanded={false} // Prevent expansion during loading
+                loading={true} // Pass loading state
+              />
+            ))
             : transactions.map((entry, index) => (
-                <HistoryEntry
-                  key={index}
-                  entry={entry}
-                  isExpanded={expandedIndexes.includes(index)}
-                  toggleExpand={() => toggleExpand(index)}
-                  isExpense={activeTab === "Expense"}
-                  loading={false} // No loading state
-                />
-              ))}
+              <HistoryEntry
+                key={index}
+                entry={entry}
+                isExpanded={expandedIndexes.includes(index)}
+                toggleExpand={() => toggleExpand(index)}
+                isExpense={activeTab === "Expense"}
+                loading={false} // No loading state
+              />
+            ))}
         </div>
       </div>
     </div>

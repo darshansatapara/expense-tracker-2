@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { TransactionList } from "./TransactionList";
 import { userCategoryStore } from "../../store/UserStore/userCategoryStore";
-
+import { userStore } from "../../store/UserStore/userAuthStore";
 export const HistoryEntry = ({
   entry,
   isExpanded,
@@ -11,7 +11,8 @@ export const HistoryEntry = ({
   loading, // New loading prop
 }) => {
   const [defaultCurrencySymbol, setDefaultCurrencySymbol] = useState("");
-  const userId = "677bc096bd8c6f677ef507d3";
+  const { currentUser } = userStore();
+  const userId = currentUser?._id;
   const { fetchCurrencyAndBudget } = userCategoryStore();
   useEffect(() => {
     const fetchDefaultCurrency = async () => {

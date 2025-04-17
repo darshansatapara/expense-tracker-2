@@ -9,9 +9,10 @@ import {
   FileTextOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
+import { userStore } from "../../store/UserStore/userAuthStore.js";
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
- 
+
 
   const handleClickOutside = (e) => {
     if (e.target.id === "sidebar-overlay") toggleSidebar();
@@ -51,11 +52,12 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
 const SidebarContent = ({ toggleSidebar, isSmallScreen }) => {
   const { fetchUserProfile } = useUserProfileStore();
+  const { currentUser } = userStore();
   const [userProfile, setUserProfile] = useState(null);
 
-  const userId = "67932feef0d689eeeaddcf86"; // Your user ID
+  const userId = currentUser?._id; // Your user ID
+  console.log(userId);
 
-  
   useEffect(() => {
     const getUserProfile = async () => {
       try {
@@ -75,13 +77,13 @@ const SidebarContent = ({ toggleSidebar, isSmallScreen }) => {
       <div className="flex flex-col items-center py-6 bg-white mt-12 lg:mt-10 md:mt-10">
         <div className="flex rounded-full items-center justify-center border-2 border-indigo-400">
           <img
-            src={userProfile?.profilePic || "https://via.placeholder.com/100"}
+            src={userProfile?.profilePic}
             alt="User"
             className="rounded-full h-20 w-20"
           />
         </div>
         <span className="mt-4 text-lg font-semibold text-gray-700">
-        {userProfile?.username || "Username"}
+          {userProfile?.username || "Username"}
         </span>
       </div>
 
@@ -118,10 +120,9 @@ const SidebarContent = ({ toggleSidebar, isSmallScreen }) => {
             key={name}
             to={to}
             className={({ isActive }) =>
-              `w-[85%] flex items-center space-x-2 py-3 px-4 rounded-xl text-gray-600 text-md font-bold ${
-                isActive
-                  ? "bg-indigo-100 text-indigo-600 border-2 border-indigo-600"
-                  : "hover:bg-gray-200"
+              `w-[85%] flex items-center space-x-2 py-3 px-4 rounded-xl text-gray-600 text-md font-bold ${isActive
+                ? "bg-indigo-100 text-indigo-600 border-2 border-indigo-600"
+                : "hover:bg-gray-200"
               }`
             }
             onClick={() => {

@@ -84,7 +84,6 @@ export const signUp = (userDbConnection) => async (req, res, next) => {
     if (savedUser) {
       // Generate JWT Token
       generateToken(savedUser._id, res);
-      // console.log("generated toked", generateToken());
 
       // Send response
       res.status(201).json({
@@ -148,6 +147,8 @@ export const updateProfileStatus = (userDbConnection) => async (req, res) => {
 export const updateCategoryStatus = (userDbConnection) => async (req, res) => {
   const { userId } = req.body;
 
+  console.log("userId", userId);
+
   if (!userId) {
     return res.status(401).json({ success: false, error: "Invalid userId" });
   }
@@ -172,38 +173,57 @@ export const updateCategoryStatus = (userDbConnection) => async (req, res) => {
 };
 
 // Sign-in controller
+
 export const signIn = (userDbConnection) => async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Email and password are required" });
+    }
+
     const UserCredentialModel = UserCredential(userDbConnection);
     const UserProfileModel = UserProfile(userDbConnection);
 
-    const userCredential = await UserCredentialModel.findOne({ email });
-
+    const userCredential = await UserCredentialModel.findOne({
+      email: email.toLowerCase().trim(),
+    });
     if (!userCredential) {
+      console.log(`No user found for email: ${email}`);
       return res
         .status(401)
         .json({ success: false, error: "Invalid credentials" });
     }
 
-    console.log(password, userCredential.password);
+    console.log(
+      "Input password:",
+      password,
+      "Stored hash:",
+      userCredential.password
+    );
 
     const isPasswordCorrect = await bcrypt.compare(
       password,
       userCredential.password
     );
     if (!isPasswordCorrect) {
+      console.log("Password mismatch for email:", email);
       return res
         .status(401)
         .json({ success: false, error: "Invalid password" });
     }
 
-    // Fetch user profile using the UserProfile model
     const user = await UserProfileModel.findOne({
       email: userCredential.email,
     });
-
+    if (!user) {
+      console.log(`No user profile found for email: ${email}`);
+      return res
+        .status(404)
+        .json({ success: false, error: "User profile not found" });
+    }
     generateToken(user._id, res);
 
     res.status(200).json({
@@ -222,6 +242,7 @@ export const signIn = (userDbConnection) => async (req, res, next) => {
       },
     });
   } catch (error) {
+    console.error("Sign-in error:", error);
     next(error);
   }
 };
@@ -314,4 +335,31 @@ export const getUserById = (userDbConnection) => async (req, res) => {
     // Return generic server error
     res.status(500).json({ success: false, message: "Server error" });
   }
+};
+
+export const auth = (userDbConnection) => {
+  if (!userDbConnection) {
+    throw new Error("User database connection is undefined");
+  }
+
+  return async (req, res) => {
+    try {
+      // Validate req.user from protect middleware
+      if (!req.user || !req.user._id) {
+        return res
+          .status(401)
+          .json({ success: false, message: "No authenticated user found" });
+      }
+
+      const UserProfileModel = UserProfile(userDbConnection);
+      const userProfile = await UserProfileModel.findById(req.user?._id);
+
+      res.json({ success: true, user: userProfile });
+    } catch (error) {
+      console.error("Error in auth controller:", error.message);
+      res
+        .status(500)
+        .json({ success: false, message: "Server error fetching user data" });
+    }
+  };
 };

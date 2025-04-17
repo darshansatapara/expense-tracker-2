@@ -85,15 +85,42 @@ export function filterDataByDateRange(data) {
     );
   };
 
-  // Helper function to calculate totals for a given expense array
+  // // Helper function to calculate totals for a given expense array
+  // const calculateTotals = (expenses) => {
+  //   // console.log(expenses);
+  //   const offlineTotal = expenses
+  //     .flatMap((item) => item.offline || [])
+  //     .reduce((sum, exp) => sum + parseFloat(exp.convertedAmount || 0), 0);
+  //   const onlineTotal = expenses
+  //     .flatMap((item) => item.online || [])
+  //     .reduce((sum, exp) => sum + parseFloat(exp?.convertedAmount || 0), 0);
+
+  //   console.log(offlineTotal);
+  //   console.log(onlineTotal);
+  //   return {
+  //     offlineTotal,
+  //     onlineTotal,
+  //     bothTotal: offlineTotal + onlineTotal,
+  //   };
+  // };
+
   const calculateTotals = (expenses) => {
     const offlineTotal = expenses
       .flatMap((item) => item.offline || [])
-      .reduce((sum, exp) => sum + parseFloat(exp.convertedAmount || 0), 0);
+      .reduce((sum, exp) => {
+        const amount = parseFloat(exp.convertedAmount);
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
+
     const onlineTotal = expenses
       .flatMap((item) => item.online || [])
-      .reduce((sum, exp) => sum + parseFloat(exp.convertedAmount || 0), 0);
+      .reduce((sum, exp) => {
+        const amount = parseFloat(exp.convertedAmount);
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
 
+    console.log(offlineTotal);
+    console.log(onlineTotal);
     return {
       offlineTotal,
       onlineTotal,

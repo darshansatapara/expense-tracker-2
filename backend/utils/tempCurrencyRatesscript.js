@@ -12,7 +12,7 @@ const CURRENCYBEACON_API_KEY = process.env.CURRENCYBEACON_API_KEY; // Replace wi
 const API_URL = "https://api.currencybeacon.com/v1/historical";
 
 // Define dynamic start and end dates using environment variables or defaults (format: "YYYY-MM-DD")
-const DYNAMIC_START_DATE = process.env.DYNAMIC_START_DATE || "2025-01-01";
+const DYNAMIC_START_DATE = process.env.DYNAMIC_START_DATE || "2025-04-15";
 const DYNAMIC_END_DATE = process.env.DYNAMIC_END_DATE || formatDate(new Date());
 
 console.log("Date Range:", DYNAMIC_START_DATE, DYNAMIC_END_DATE);

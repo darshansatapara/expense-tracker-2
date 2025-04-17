@@ -5,7 +5,7 @@ import { adminCategoryStore } from "../../store/AdminStore/adminCategoryStore.js
 import useUserExpenseStore from "../../store/UserStore/userExpenseStore.js";
 import useUserIncomeStore from "../../store/UserStore/userIncomeStore.js";
 import dayjs from "dayjs";
-
+import { userStore } from "../../store/UserStore/userAuthStore.js";
 const { Option } = Select;
 
 export default function ViewAndEditExpense({
@@ -16,12 +16,13 @@ export default function ViewAndEditExpense({
 }) {
   const { fetchUserExpenseCategories, fetchCurrencyAndBudget } =
     userCategoryStore();
+  const { currentUser } = userStore();
   const { updateUserExpense } = useUserExpenseStore();
   const { updateUserIncome } = useUserIncomeStore();
   const { fetchIncomeCategoriesIsActive } = adminCategoryStore();
 
-  const userId = "677bc096bd8c6f677ef507d3";
-  const professionId = "6774e0884930e249cf39daa0";
+  const userId = currentUser?._id;
+  const professionId = currentUser?.profession;
 
   const [categoryData, setCategoryData] = useState([]);
   const [currencyData, setCurrencyData] = useState([]);

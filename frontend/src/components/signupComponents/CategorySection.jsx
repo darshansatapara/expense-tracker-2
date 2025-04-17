@@ -7,11 +7,12 @@ import { userStore } from "../../store/UserStore/userAuthStore.js";
 
 export default function CategorySection() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentUser } = userStore();
 
   console.log(currentUser);
 
-  const userId = "67da8c9a65e7ceb648882c2d";
+  const { userId } = location?.state || {};
   // console.log(userData);
 
   const [selectedCategories, setSelectedCategories] = useState([]); // Store selected categories with empty subcategories
