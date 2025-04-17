@@ -11,7 +11,7 @@ export default function CurrencyBudgetSelection() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { userId } = location.state || {};
+  const { userId } = location?.state || {};
   const { markProfileAsCompleted } = userStore();
 
   // console.log(userId);

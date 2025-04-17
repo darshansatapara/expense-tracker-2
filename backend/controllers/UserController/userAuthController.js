@@ -147,6 +147,8 @@ export const updateProfileStatus = (userDbConnection) => async (req, res) => {
 export const updateCategoryStatus = (userDbConnection) => async (req, res) => {
   const { userId } = req.body;
 
+  console.log("userId", userId);
+
   if (!userId) {
     return res.status(401).json({ success: false, error: "Invalid userId" });
   }
