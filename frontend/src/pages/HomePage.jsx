@@ -1,28 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
 import { CirclePlus } from "lucide-react";
 import { TabButton } from "../components/commonComponent/TabButton";
-import ExpenseHome from "../components/homeComponent/IncomeAndExpenseHome";
 import dayjs from "dayjs";
 import useUserExpenseStore from "../store/UserStore/userExpenseStore";
 import { filterDataByDateRange } from "../components/commonComponent/formatEAndIData.js";
 import useUserIncomeStore from "../store/UserStore/userIncomeStore";
 import IncomeAndExpenseHome from "../components/homeComponent/IncomeAndExpenseHome";
 import AddIncomeExpenseModel from "../components/commonComponent/AddIncomeExpenseModel";
+import { userStore } from "../store/UserStore/userAuthStore.js";
 
 function HomePage() {
   const { userExpenses, fetchUserExpenses } = useUserExpenseStore();
   const { fetchUserIncomes, userIncomes } = useUserIncomeStore();
+  const { currentUser } = userStore();
 
-  const userId = "677bc096bd8c6f677ef507d3";
-  const profession = "6774e0884930e249cf39daa0";
-
+  const userId = currentUser?._id;
+  const profession = currentUser?.profession;
   const [option, setOption] = useState("");
-  const [isModalVisible, setIsModalVisible]  = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [filteredExpense, setFilteredExpense] = useState(null);
   const [filteredIncome, setfilteredIncome] = useState(null);
   const [activeTab, setActiveTab] = useState("Expense");
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+
 
   // get current month of ghe user expense
   const getCurrentMonthDates = () => {

@@ -12,14 +12,6 @@ export const userStore = create((set) => ({
   isUpdatingCategoryStatus: false,
 
   /**
-   * Check if the user is authenticated.
-   * @returns {boolean} True if authenticated, false otherwise.
-   */
-  checkAuth: () => {
-    const state = userStore.getState();
-    return state.currentUser !== null;
-  },
-  /**
    * Signup method to create a new user account.
    * @param {Object} data - User data for signup.
    */
@@ -28,9 +20,7 @@ export const userStore = create((set) => ({
     try {
       const res = await axiosInstance.post("/auth/signup", data);
       set({ currentUser: res.data.user }); // Save the user data locally
-
       toast.success("Account created successfully!");
-      console.log("user signup successful!");
       return res.data.user; // Return the user data to the caller
     } catch (error) {
       console.error("Signup error:", error);
@@ -115,10 +105,9 @@ export const userStore = create((set) => ({
     set({ isSigningIn: true });
     try {
       const res = await axiosInstance.post("/auth/signin", data);
-      console.log(res);
       set({ currentUser: res.data });
-      console.log(currentUser);
       toast.success("Signed in successfully!");
+      return res.data;
     } catch (error) {
       console.error("Signin error:", error);
       toast.error(error.response?.data?.message || "Sign-in failed!");
@@ -131,10 +120,9 @@ export const userStore = create((set) => ({
     set({ isSigningIn: true });
     try {
       const res = await axiosInstance.post("/auth/googlesignin", data);
-      console.log(res.data);
       set({ currentUser: res.data });
-
       toast.success("Signed in successfully!");
+      return res.data;
     } catch (error) {
       console.error("Signin error:", error);
       toast.error(error.response?.data?.message || "Sign-in failed!");
@@ -180,6 +168,16 @@ export const userStore = create((set) => ({
       throw error; // Ensure the error propagates
     } finally {
       set({ isUpdatingProfile: false });
+    }
+  },
+
+  checkAuth: async () => {
+    try {
+      const res = await axiosInstance.get("/auth/me");
+      console.log(res.data.user);
+      set({ currentUser: res.data.user });
+    } catch (error) {
+      console.error("Check auth error:", error);
     }
   },
 }));
