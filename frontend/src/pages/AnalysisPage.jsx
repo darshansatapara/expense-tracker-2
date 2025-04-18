@@ -1,11 +1,17 @@
-
-
 import React, { useState, useEffect } from "react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import "antd/dist/reset.css";
 import dayjs from "dayjs";
-import { ChevronRight } from "lucide-react";
+import {
+  ChevronRight,
+  TrendingUp,
+  ArrowRightCircle,
+  DollarSign,
+  PieChart as PieChartIcon,
+  BarChart2,
+  Calendar,
+} from "lucide-react";
 import useUserIncomeStore from "../store/UserStore/userIncomeStore.js";
 import useUserExpenseStore from "../store/UserStore/userExpenseStore.js";
 import PieChart from "../components/commonComponent/PieChart.jsx";
@@ -24,7 +30,17 @@ const debounce = (func, delay) => {
   };
 };
 
-// Currency Slider Card Component
+// Card Component with Animation
+const AnimatedCard = ({ children, className = "", delay = 0 }) => (
+  <div
+    className={`bg-white p-5 rounded-xl border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:scale-102 ${className}`}
+    style={{ animationDelay: `${delay}ms` }}
+  >
+    {children}
+  </div>
+);
+
+// Improved Currency Slider Card Component
 const CurrencySliderCard = ({
   type,
   currencyBreakdown,
@@ -57,71 +73,135 @@ const CurrencySliderCard = ({
 
   if (!isValidCurrencyBreakdown) {
     return (
-      <div className="bg-white p-4 md:p-6 rounded-2xl border border-gray-100 hover:shadow-lg transition-all h-full">
-        <h3 className="text-lg md:text-2xl font-bold mb-2 md:mb-4 text-gray-800">
-          {type === "income" ? "Income" : "Expense"} Currency Breakdown
-        </h3>
+      <AnimatedCard delay={200}>
+        <div className="flex items-center gap-3 mb-3">
+          <DollarSign className="w-5 h-5 text-purple-500" />
+          <h3 className="text-lg md:text-xl font-bold text-gray-800">
+            {type === "income" ? "Income" : "Expense"} Currency Breakdown
+          </h3>
+        </div>
         <Skeleton height={40} width={100} />
-      </div>
+      </AnimatedCard>
     );
   }
 
   return (
-    <div className="bg-white p-4 md:p-6 rounded-2xl border border-gray-100 hover:shadow-lg transition-all h-full">
-      <h3 className="text-lg md:text-2xl font-bold mb-2 md:mb-4 text-gray-800">
-        {type === "income" ? "Income" : "Expense"} Currency Breakdown
-      </h3>
+    <AnimatedCard
+      delay={200}
+      className={`${
+        type === "income"
+          ? "bg-gradient-to-br from-green-50 to-white"
+          : "bg-gradient-to-br from-red-50 to-white"
+      }`}
+    >
+      <div className="flex items-center gap-3 mb-3">
+        <DollarSign
+          className={`w-5 h-5 ${
+            type === "income" ? "text-green-500" : "text-red-500"
+          }`}
+        />
+        <h3 className="text-lg md:text-xl font-bold text-gray-800">
+          {type === "income" ? "Income" : "Expense"} Currency Breakdown
+        </h3>
+      </div>
       <div className="flex items-center justify-between">
-        <div>
+        <div className="flex flex-col items-baseline">
           <p className="text-base md:text-3xl font-extrabold text-gray-900">
             {defaultCurrency}
             {parseFloat(currencyBreakdown[currentCurrencyIndex]?.total).toFixed(
               2
-            )}{" "}
-            ({currencyBreakdown[currentCurrencyIndex]?.currency})
+            )}
           </p>
-          <p className="text-xs md:text-sm text-gray-500 mt-2">
-            Each selected currency is shown, but the total is in Indian Rupees
-            (₹).
-          </p>
+          <span className="inline-block px-2 py-1 text-sm font-semibold rounded-full bg-gray-100 text-gray-700  text-center">
+            {currencyBreakdown[currentCurrencyIndex]?.currency}
+          </span>
         </div>
         <button
           onClick={handleNextCurrency}
-          className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors"
+          className={`p-3 rounded-full transition-all duration-300 transform hover:scale-110 ${
+            type === "income"
+              ? "bg-green-100 hover:bg-green-200"
+              : "bg-red-100 hover:bg-red-200"
+          }`}
         >
-          <ChevronRight className="w-4 h-4 text-blue-600" />
+          <ChevronRight
+            className={`w-4 h-4 ${
+              type === "income" ? "text-green-600" : "text-red-600"
+            }`}
+          />
         </button>
       </div>
-    </div>
+      <p className="text-xs md:text-sm text-gray-500 mt-2">
+        Each selected currency is shown, but the total is in you selected
+        default currency.
+      </p>
+    </AnimatedCard>
   );
 };
 
 // Skeleton Component for Analysis Section
 const AnalysisSectionSkeleton = ({ isSmallScreen }) => (
-  <div className="p-4 md:p-6 border-gray-100">
+  <div className=" md:p-6 border-gray-100">
     <div className="flex flex-col space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
         <div className="lg:col-span-2 flex flex-col space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <Skeleton height={100} />
-            <Skeleton height={100} />
+            <Skeleton height={120} borderRadius={16} />
+            <Skeleton height={120} borderRadius={16} />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <Skeleton height={200} />
-            <Skeleton height={200} />
+            <Skeleton height={220} borderRadius={16} />
+            <Skeleton height={220} borderRadius={16} />
           </div>
         </div>
         <div className="lg:self-start lg:h-full">
-          <Skeleton height={300} />
+          <Skeleton height={360} borderRadius={16} />
         </div>
       </div>
-      <Skeleton height={300} />
+      <Skeleton height={350} borderRadius={16} />
     </div>
   </div>
 );
 
+// Improved PieChart Component with Hover Effects
+const EnhancedPieChart = ({ labels, data, title, total, isSmallScreen }) => {
+  return (
+    <div className="relative h-40 md:h-52">
+      <PieChart
+        labels={labels}
+        data={data}
+        title={title}
+        // total={total}
+        isSmallScreen={isSmallScreen}
+        options={{
+          plugins: {
+            tooltip: {
+              enabled: true,
+              callbacks: {
+                label: function (tooltipItem) {
+                  return `${tooltipItem.label}: ${tooltipItem.raw}%`;
+                },
+              },
+              backgroundColor: "rgba(0, 0, 0, 0.8)",
+              padding: 10,
+              titleFont: {
+                size: 14,
+                weight: "bold",
+              },
+              bodyFont: {
+                size: 12,
+              },
+              displayColors: true,
+              boxPadding: 3,
+            },
+          },
+        }}
+      />
+    </div>
+  );
+};
 
-// Analysis Section Component
+// Analysis Section Component with improved responsiveness
 const AnalysisSection = ({
   activeTab,
   analysisData,
@@ -133,6 +213,14 @@ const AnalysisSection = ({
 }) => {
   const title = activeTab === "expense" ? "Expense" : "Income";
   const textColor = activeTab === "expense" ? "text-red-600" : "text-green-600";
+  const bgGradient =
+    activeTab === "expense"
+      ? "bg-gradient-to-br from-red-50 to-white"
+      : "bg-gradient-to-br from-green-50 to-white";
+  const iconColor = activeTab === "expense" ? "text-red-500" : "text-green-500";
+  const accentColor = activeTab === "expense" ? "bg-red-100" : "bg-green-100";
+  const hoverColor =
+    activeTab === "expense" ? "hover:bg-red-200" : "hover:bg-green-200";
 
   // Utility to simplify currency name to code
   const getCurrencyCode = (currencyName) => {
@@ -164,9 +252,6 @@ const AnalysisSection = ({
       })
     : [{ currency: "INR", total: "0.00", percentage: 0 }];
 
-  // Log currencyBreakdown for debugging
-  console.log("currencyBreakdown:", currencyBreakdown);
-
   // Category breakdown
   const categoryData = Array.isArray(analysisData?.categoryBreakdown)
     ? analysisData.categoryBreakdown.map((item) => ({
@@ -191,9 +276,6 @@ const AnalysisSection = ({
         ).toFixed(2)}`
       : `${defaultCurrency}0.00`,
   };
-
-  // Log currencyUsageData for debugging
-  console.log("currencyUsageData:", currencyUsageData);
 
   // Available years for selection
   const years = Array.from(
@@ -231,7 +313,8 @@ const AnalysisSection = ({
               }),
             borderColor: "rgba(34, 197, 94, 1)",
             backgroundColor: "rgba(34, 197, 94, 0.2)",
-            fill: false,
+            fill: true,
+            tension: 0.4,
           }
         : {
             label: `Expense ${selectedYear}`,
@@ -245,7 +328,8 @@ const AnalysisSection = ({
               }),
             borderColor: "rgba(239, 68, 68, 1)",
             backgroundColor: "rgba(239, 68, 68, 0.2)",
-            fill: false,
+            fill: true,
+            tension: 0.4,
           },
     ],
   };
@@ -259,43 +343,111 @@ const AnalysisSection = ({
     return validEntry?.currency || "₹";
   })();
 
-  // Line chart options
+  // Improved line chart options with better responsiveness
   const lineChartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "top",
+        labels: {
+          boxWidth: 15,
+          usePointStyle: true,
+          font: {
+            size: 12,
+            weight: "bold",
+          },
+        },
+      },
+      tooltip: {
+        backgroundColor:
+          activeTab === "expense"
+            ? "rgba(239, 68, 68, 0.9)"
+            : "rgba(34, 197, 94, 0.9)",
+        titleFont: {
+          size: 14,
+          weight: "bold",
+        },
+        bodyFont: {
+          size: 13,
+        },
+        padding: 12,
+        displayColors: false,
+        callbacks: {
+          label: function (context) {
+            let label = context.dataset.label || "";
+            if (label) {
+              label += ": ";
+            }
+            if (context.parsed.y !== null) {
+              label += `${monthlyDefaultCurrency}${context.parsed.y.toFixed(
+                2
+              )}`;
+            }
+            return label;
+          },
+        },
       },
       title: {
-        display: true,
-        text: `${selectedYear} - ${title} Monthly Trend`,
+        display: false,
       },
     },
     scales: {
       y: {
         beginAtZero: true,
+        grid: {
+          color: "rgba(0, 0, 0, 0.05)",
+          drawBorder: false,
+        },
         ticks: {
+          font: {
+            size: 11,
+          },
           callback: function (value) {
-            return `${monthlyDefaultCurrency}${value.toFixed(2)}`;
+            return `${monthlyDefaultCurrency}${value.toFixed(0)}`;
+          },
+        },
+      },
+      x: {
+        grid: {
+          display: false,
+        },
+        ticks: {
+          font: {
+            size: isSmallScreen ? 9 : 11,
           },
         },
       },
     },
+    elements: {
+      point: {
+        radius: 4,
+        hoverRadius: 6,
+      },
+      line: {
+        borderWidth: 3,
+      },
+    },
+    animation: {
+      duration: 1500,
+      easing: "easeOutQuart",
+    },
   };
 
   return (
-    <div className="p-4 md:p-6 border-gray-100">
+    <div className=" md:p-6 border-gray-100">
       <div className="flex flex-col space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           <div className="lg:col-span-2 flex flex-col space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              <div className="bg-white p-4 md:p-6 rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
-                <h3
-                  className={`text-lg md:text-2xl font-bold mb-2 md:mb-4 ${textColor}`}
-                >
-                  Total {title}
-                </h3>
-                <div className="flex items-center space-x-1 md:space-x-2">
+              <AnimatedCard delay={100} className={bgGradient}>
+                <div className="flex items-center gap-3 mb-3">
+                  <TrendingUp className={`w-5 h-5 ${iconColor}`} />
+                  <h3 className={`text-lg md:text-xl font-bold ${textColor}`}>
+                    Total {title}
+                  </h3>
+                </div>
+                <div className="flex items-center flex-wrap gap-2">
                   <p className="text-base md:text-3xl font-extrabold text-gray-900">
                     {analysisData?.[
                       activeTab === "expense" ? "totalExpense" : "totalIncome"
@@ -309,18 +461,11 @@ const AnalysisSection = ({
                         ).toFixed(2)}`
                       : `${defaultCurrency}0.00`}
                   </p>
-                  <span className="text-xs md:text-sm text-gray-500">
-                    (
-                    {analysisData?.[
-                      activeTab === "expense" ? "totalExpense" : "totalIncome"
-                    ]?.currency || "INR"}
-                    )
-                  </span>
                 </div>
-                <p className="text-xs md:text-sm text-gray-500 mt-2">
-                  Total is in {defaultCurrency}.
+                <p className="text-xs md:text-sm text-gray-500 ">
+                  Total is in your default currency .
                 </p>
-              </div>
+              </AnimatedCard>
               <CurrencySliderCard
                 type={activeTab}
                 currencyBreakdown={currencyBreakdown}
@@ -329,12 +474,15 @@ const AnalysisSection = ({
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              <div className="bg-white p-4 md:p-6 rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
-                <h3 className="text-base md:text-xl font-semibold mb-2 md:mb-4 text-gray-800">
-                  Currency Usage ({selectedYear})
-                </h3>
+              <AnimatedCard delay={300}>
+                <div className="flex items-center gap-3 mb-3">
+                  <PieChartIcon className={`w-5 h-5 ${iconColor}`} />
+                  <h3 className="text-base md:text-xl font-semibold text-gray-800">
+                    Currency Usage ({selectedYear})
+                  </h3>
+                </div>
                 {currencyUsageData.labels.length > 0 ? (
-                  <PieChart
+                  <EnhancedPieChart
                     labels={currencyUsageData.labels}
                     data={currencyUsageData.data}
                     title={`Currency Usage (${selectedYear})`}
@@ -342,17 +490,24 @@ const AnalysisSection = ({
                     isSmallScreen={isSmallScreen}
                   />
                 ) : (
-                  <p className="text-sm text-gray-500">
-                    No currency usage data available
-                  </p>
+                  <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-500 mb-2">
+                      No currency usage data available
+                    </p>
+                    <ArrowRightCircle className="w-6 h-6 text-gray-400" />
+                  </div>
                 )}
-              </div>
-              <div className="bg-white p-4 md:p-6 rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
-                <h3 className="text-base md:text-xl font-semibold mb-2 md:mb-4 text-gray-800">
-                  Category Usage ({selectedYear})
-                </h3>
+              </AnimatedCard>
+
+              <AnimatedCard delay={400}>
+                <div className="flex items-center gap-3 mb-3">
+                  <PieChartIcon className={`w-5 h-5 ${iconColor}`} />
+                  <h3 className="text-base md:text-xl font-semibold text-gray-800">
+                    Category Usage ({selectedYear})
+                  </h3>
+                </div>
                 {categoryData.length > 0 ? (
-                  <PieChart
+                  <EnhancedPieChart
                     labels={categoryData.map((item) => item.category)}
                     data={categoryData.map((item) =>
                       parseFloat(item.total.replace("%", ""))
@@ -362,63 +517,89 @@ const AnalysisSection = ({
                     isSmallScreen={isSmallScreen}
                   />
                 ) : (
-                  <p className="text-sm text-gray-500">
-                    No category usage data available
-                  </p>
+                  <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-500 mb-2">
+                      No category usage data available
+                    </p>
+                    <ArrowRightCircle className="w-6 h-6 text-gray-400" />
+                  </div>
                 )}
-              </div>
+              </AnimatedCard>
             </div>
           </div>
-          <div className="bg-white p-4 md:p-6 rounded-2xl border border-gray-100 hover:shadow-lg transition-all lg:self-start lg:h-full">
-            <h3 className="text-base md:text-xl font-semibold mb-2 md:mb-4 text-gray-800">
-              Category Breakdown
-            </h3>
-            <DataTable
-              data={categoryData}
-              headers={["Index", "Category", "Total"]}
-              defaultPageSize={15}
-            />
-          </div>
+
+          <AnimatedCard delay={500} className="lg:self-start lg:h-full">
+            <div className="flex items-center gap-3 mb-4">
+              <BarChart2 className={`w-5 h-5 ${iconColor}`} />
+              <h3 className="text-base md:text-xl font-semibold text-gray-800">
+                Category Breakdown
+              </h3>
+            </div>
+            <div className="overflow-hidden rounded-lg border border-gray-100">
+              <DataTable
+                data={categoryData}
+                headers={["Index", "Category", "Total"]}
+                defaultPageSize={15}
+              />
+            </div>
+          </AnimatedCard>
         </div>
-        <div className="bg-white p-4 md:p-6 rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
-          <div className="flex items-center gap-2 mb-4">
-            <label
-              htmlFor="year-select"
-              className="text-sm md:text-base font-medium text-gray-800"
-            >
-              Select Year:
-            </label>
-            <div className="relative w-[150px] md:w-[180px]">
-              <select
-                id="year-select"
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                className="appearance-none w-full border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+
+        <AnimatedCard delay={600} className="overflow-hidden">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div className="flex items-center gap-3">
+              <Calendar className={`w-5 h-5 ${iconColor}`} />
+              <h3 className="text-lg md:text-xl font-semibold text-gray-800">
+                {selectedYear} - Yearly {title} Trend
+              </h3>
+            </div>
+            <div className="flex items-center gap-3">
+              <label
+                htmlFor="year-select"
+                className="text-sm font-medium text-gray-700"
               >
-                {years.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
-                <svg
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
+                Select Year:
+              </label>
+              <div className="relative">
+                <select
+                  id="year-select"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                  className={`appearance-none w-32 border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-700 bg-white shadow-sm focus:outline-none focus:ring-2 ${
+                    activeTab === "expense"
+                      ? "focus:ring-red-500"
+                      : "focus:ring-green-500"
+                  } focus:border-transparent transition duration-200`}
                 >
-                  <path d="M19 9l-7 7-7-7" />
-                </svg>
+                  {years.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
-          <h3 className="text-base md:text-xl font-semibold mb-2 md:mb-4 text-gray-800">
-            {selectedYear} - Yearly {title} Trend
-          </h3>
-          <LineChart data={lineChartData} options={lineChartOptions} />
-        </div>
+          <div className="overflow-x-auto">
+            <div
+              className="h-80 md:h-96 min-w-full"
+              style={{ minWidth: isSmallScreen ? "600px" : "100%" }}
+            >
+              <LineChart data={lineChartData} options={lineChartOptions} />
+            </div>
+          </div>
+        </AnimatedCard>
       </div>
     </div>
   );
@@ -458,9 +639,9 @@ const AnalysisPage = () => {
   const userId = currentUser?._id;
   const professionId = currentUser?.profession;
 
-  // Handle window resize
+  // Handle window resize with improved debounce
   useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
+    const handleResize = debounce(() => setWindowWidth(window.innerWidth), 100);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -514,8 +695,6 @@ const AnalysisPage = () => {
     fetchMonthlyTotals(filters.selectedYear);
   }, [activeTab, filters.startValue, filters.endValue, userId, professionId]);
 
-  console.log(expenseAnalysis);
-
   // Handle date range change
   const handleDateRangeChange = ([start, end]) => {
     setFilters((prev) => ({
@@ -544,25 +723,40 @@ const AnalysisPage = () => {
     (activeTab === "expense" && expenseLoading && !expenseAnalysis);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-6 text-gray-800">
+    <div className="min-h-screen bg-gray-50 md:p-6 text-gray-800">
       <div className="w-full px-2 md:px-4 mb-6">
-        <div className="p-4 md:p-6 border border-gray-100 rounded-2xl bg-white shadow-sm">
+        <div className="p-5 border border-gray-100 rounded-xl bg-white shadow-sm transition-all duration-300 hover:shadow-md">
           <div className="flex flex-col md:flex-row justify-between items-center mb-4 md:mb-6 gap-4">
-            <div
-              className={`flex ${
-                isSmallScreen ? "flex-col space-y-2" : "flex-row space-x-4"
-              } border-b border-gray-200 pb-2`}
-            >
-              <TabButton
-                label="Expense"
-                isActive={activeTab === "expense"}
-                onClick={() => setActiveTab("expense")}
-              />
-              <TabButton
-                label="Income"
-                isActive={activeTab === "income"}
-                onClick={() => setActiveTab("income")}
-              />
+            <div className="flex items-center">
+              {/* Tab Buttons with Animated Underline */}
+              <div className="relative flex">
+                <button
+                  onClick={() => setActiveTab("expense")}
+                  className={`px-5 py-2 text-base font-medium transition-colors duration-200 relative ${
+                    activeTab === "expense"
+                      ? "text-red-600"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  Expense
+                  {activeTab === "expense" && (
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 animate-slideIn"></span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveTab("income")}
+                  className={`px-5 py-2 text-base font-medium transition-colors duration-200 relative ${
+                    activeTab === "income"
+                      ? "text-green-600"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  Income
+                  {activeTab === "income" && (
+                    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-green-500 animate-slideIn"></span>
+                  )}
+                </button>
+              </div>
             </div>
             <DateRangeSelector
               startValue={filters.startValue}
@@ -598,7 +792,7 @@ const AnalysisPage = () => {
               setSelectedYear={handleYearChange}
             />
           ) : (
-            <div className="text-center text-gray-600 py-4">
+            <div className="text-center text-gray-600 py-8">
               No {activeTab} data available
             </div>
           )}

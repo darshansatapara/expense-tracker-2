@@ -91,7 +91,7 @@ const TableList = ({ today, yesterday, activeTab }) => {
     <>
       <div className="flex items-center justify-between gap-5 mb-3">
         {/* Tab Buttons */}
-        <div className="flex items-center gap-5 mb-3">
+        <div className="flex text-sm md:text-lg items-center gap-5 mb-3">
           <TabButton
             label="Today"
             isActive={activeButton === "Today"}
@@ -124,7 +124,7 @@ const TableList = ({ today, yesterday, activeTab }) => {
             </div>
           </div>
           <div className="block sm:block md:hidden lg:block">
-            <h3 className="text-md font-bold text-gray-700">
+            <h3 className="text-sm md:text-md font-bold text-gray-700">
               Total:{" "}
               <span className="text-green-500 font-semibold">
                 {defaultCurrencySymbol}

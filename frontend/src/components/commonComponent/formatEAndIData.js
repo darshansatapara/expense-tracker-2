@@ -129,7 +129,7 @@ export function filterDataByDateRange(data) {
   };
 
   // Filter data for each case
-  const todayData = data.filter((item) =>
+  const todayData = data?.filter((item) =>
     filterByDateRange(item.date, today, today)
   );
   const yesterdayData = data.filter((item) =>

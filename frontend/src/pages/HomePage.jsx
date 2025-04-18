@@ -24,7 +24,6 @@ function HomePage() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-
   // get current month of ghe user expense
   const getCurrentMonthDates = () => {
     const startDate = dayjs().startOf("month").format("DD-MM-YYYY"); // Start of the month
@@ -107,7 +106,7 @@ function HomePage() {
       <div className="flex flex-col items-center p-4 shadow-lg">
         <div className="w-full border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
-            <div className="flex flex-wrap text-lg font-semibold text-center text-gray-500 dark:text-gray-400 mb-4">
+            <div className="flex md:text-lg  font-semibold text-center text-gray-500 dark:text-gray-400 mb-4">
               <div className="me-2">
                 <TabButton
                   label="Expense"
