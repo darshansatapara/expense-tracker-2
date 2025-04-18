@@ -22,7 +22,7 @@ const userAuthRoute = (userDbConnection) => {
   router.post("/signup", signUp(userDbConnection));
   router.post("/signin", signIn(userDbConnection));
   router.post("/googlesignin", googlesignin(userDbConnection));
-  router.post("/signout", signOut); // Assuming signOut doesn't require the database connection
+  router.post("/signout", signOut(userDbConnection)); // Assuming signOut doesn't require the database connection
   router.get("/user/:userId", getUserById(userDbConnection));
 
   // Update the profile status when the profile is completed

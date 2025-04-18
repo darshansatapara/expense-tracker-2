@@ -37,6 +37,21 @@ const Navbar = ({ toggleSidebar }) => {
       icon: <FileTextOutlined className="text-lg text-gray-700" />,
     },
   };
+  
+  const handleSignOut = async () => {
+    console.log("Signout button clicked, calling signout...");
+    try {
+      const result = await signout();
+      console.log("Signout successful:", result);
+      navigate("/signin");
+    } catch (error) {
+      console.error("Signout error in handleSignOut:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+    }
+  };
 
   const mainPath = location.pathname.split("/")[1];
   const { name, icon } = pathMap[`/${mainPath}`] || {
@@ -108,12 +123,9 @@ const Navbar = ({ toggleSidebar }) => {
           {/* Logout Button Hidden on Small Screens */}
           <div
             className="hidden lg:flex hover:cursor-pointer rounded-md h-8 w-8 items-center justify-center"
-
+            onClick={handleSignOut}
           >
-            <LogOut onClick={async () => {
-              console.log("signing out");
-              await signout();
-            }} />
+            <LogOut />
           </div>
           {/* Hamburger Menu for Small Screens */}
           <button
