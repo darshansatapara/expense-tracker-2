@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import useUserProfileStore from "../../store/UserStore/userProfileStore.js";
 import {
   HomeOutlined,
@@ -9,11 +9,10 @@ import {
   FileTextOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
+import { LogOut } from "lucide-react";
 import { userStore } from "../../store/UserStore/userAuthStore.js";
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
-
-
   const handleClickOutside = (e) => {
     if (e.target.id === "sidebar-overlay") toggleSidebar();
   };
@@ -52,17 +51,33 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
 const SidebarContent = ({ toggleSidebar, isSmallScreen }) => {
   const { fetchUserProfile } = useUserProfileStore();
-  const { currentUser } = userStore();
+  const { currentUser, signout } = userStore();
   const [userProfile, setUserProfile] = useState(null);
 
-  const userId = currentUser?._id; // Your user ID
-  console.log(userId);
+  const userId = currentUser?._id;
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    console.log("Signout button clicked, calling signout...");
+    try {
+      await signout(); // Call the signout function from the store
+      console.log("Signout successful");
+      if (isSmallScreen) toggleSidebar(); // Close sidebar on small screens
+      navigate("/signin"); // Redirect to signin page
+    } catch (error) {
+      console.error("Signout error in handleSignOut:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+    }
+  };
 
   useEffect(() => {
     const getUserProfile = async () => {
+      if (!userId) return; // Skip if no userId
       try {
         const response = await fetchUserProfile(userId);
-        // console.log(response)
         setUserProfile(response.data);
       } catch (err) {
         console.error("Failed to fetch user profile:", err);
@@ -71,13 +86,14 @@ const SidebarContent = ({ toggleSidebar, isSmallScreen }) => {
 
     getUserProfile();
   }, [userId, fetchUserProfile]);
+
   return (
     <div className="grid h-screen">
       {/* Top Section */}
-      <div className="flex flex-col items-center py-6 bg-white mt-12 lg:mt-10 md:mt-10">
+      <div className="flex flex-col items-center py-6 bg-white">
         <div className="flex rounded-full items-center justify-center border-2 border-indigo-400">
           <img
-            src={userProfile?.profilePic}
+            src={userProfile?.profilePic || "/images/default-profile.jpg"} // Fallback image
             alt="User"
             className="rounded-full h-20 w-20"
           />
@@ -120,18 +136,27 @@ const SidebarContent = ({ toggleSidebar, isSmallScreen }) => {
             key={name}
             to={to}
             className={({ isActive }) =>
-              `w-[85%] flex items-center space-x-2 py-3 px-4 rounded-xl text-gray-600 text-md font-bold ${isActive
-                ? "bg-indigo-100 text-indigo-600 border-2 border-indigo-600"
-                : "hover:bg-gray-200"
+              `w-[85%] flex items-center gap-2 py-2 px-2 font-bold rounded-xl text-gray-600 text-md ${
+                isActive
+                  ? "bg-indigo-100 text-indigo-600 border-2 border-indigo-600"
+                  : "hover:bg-gray-200"
               }`
             }
             onClick={() => {
-              if (isSmallScreen) toggleSidebar(); // Only close sidebar on small screens
+              if (isSmallScreen) toggleSidebar();
             }}
           >
             {icon} <span>{name}</span>
           </NavLink>
         ))}
+        {/* Logout Button */}
+        <button
+          onClick={handleSignOut}
+          className="w-[85%] flex items-center space-x-2 py-2 px-2  lg:hidden rounded-xl text-gray-600 text-md font-bold hover:bg-gray-200"
+        >
+          <LogOut className="text-lg text-gray-700" />
+          <span>Logout</span>
+        </button>
       </div>
 
       {/* Bottom Section */}

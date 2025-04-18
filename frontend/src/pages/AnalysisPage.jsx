@@ -723,7 +723,7 @@ const AnalysisPage = () => {
     (activeTab === "expense" && expenseLoading && !expenseAnalysis);
 
   return (
-    <div className="min-h-screen bg-gray-50 md:p-6 text-gray-800">
+    <div className="min-h-screen bg-gray-50 text-gray-800">
       <div className="w-full px-2 md:px-4 mb-6">
         <div className="p-5 border border-gray-100 rounded-xl bg-white shadow-sm transition-all duration-300 hover:shadow-md">
           <div className="flex flex-col md:flex-row justify-between items-center mb-4 md:mb-6 gap-4">
@@ -770,7 +770,7 @@ const AnalysisPage = () => {
       {isInitialLoading ? (
         <AnalysisSectionSkeleton isSmallScreen={isSmallScreen} />
       ) : (
-        <div className="w-full px-2 md:px-4">
+        <div className="w-full px-2 ">
           {activeTab === "income" && userIncomes ? (
             <AnalysisSection
               activeTab={activeTab}
