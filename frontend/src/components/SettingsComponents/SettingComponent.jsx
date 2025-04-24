@@ -149,13 +149,13 @@ const Settings = () => {
       description: "Edit your personal information",
       color: "bg-blue-100",
     },
-    {
-      label: "Theme Settings",
-      path: "/settings/theme-settings",
-      icon: <FaPalette />,
-      description: "Customize the look of the app",
-      color: "bg-purple-100",
-    },
+    // {
+    //   label: "Theme Settings",
+    //   path: "/settings/theme-settings",
+    //   icon: <FaPalette />,
+    //   description: "Customize the look of the app",
+    //   color: "bg-purple-100",
+    // },
     {
       label: "Category Management",
       path: "/settings/category-management",
