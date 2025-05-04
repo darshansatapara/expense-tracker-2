@@ -1,36 +1,94 @@
 import express from "express";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+// Database imports
+import {
+  connectUserDatabase,
+  connectAdminDatabase,
+} from "./config/database.js";
+
 import cors from "cors";
-import connectDatabase from "../backend/config/database.js";
-import userRoute from "./routes/userRoutes.js";
-import categoryRoute from "./routes/categoryRoutes.js";
-import expenseRoute from "./routes/expenseRoutes.js";
-import incomeRoute from "./routes/incomeRoutes.js";
-import otpRoute from "./routes/otpRoutes.js";
+// Routes
+import userAuthRoute from "./routes/UserRoutes/userAuthRoutes.js";
+import userExpenseRoute from "./routes/UserRoutes/userExpenseRoutes.js";
+import userIncomeRoute from "./routes/UserRoutes/userIncomeRoutes.js";
+import otpRoute from "./routes/CommonRoute/otpRoutes.js";
+import adminCategoryRoutes from "./routes/AdminRoutes/adminCategoryRoutes.js";
+import userCategoryRoute from "./routes/UserRoutes/userCategoryRoutes.js";
+import userProfileRoute from "./routes/UserRoutes/userProfileRoutes.js";
+import { CurrencyDailyRateJob } from "./jobs/currencyDailyRateJob.js";
+import currencyRateRoute from "./routes/CommonRoute/currencyDailyRateRoute.js";
+import reportRoute from "./routes/CommonRoute/reportRoutes.js";
 
 dotenv.config(); // Load environment variables
 
-// Connect to the database
-connectDatabase();
+(async () => {
+  try {
+    const userDbConnection = await connectUserDatabase();
+    const adminDbConnection = await connectAdminDatabase();
 
-const app = express();
+    if (!userDbConnection || !adminDbConnection) {
+      console.error("Error connecting to the databases.");
+      process.exit(1);
+    }
+    const app = express();
 
-// Middleware
-// Increase payload size limit
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ limit: "10mb", extended: true }));
+    // Middleware
+    app.use(cookieParser());
+    app.use(express.json({ limit: "10mb" }));
+    app.use(express.urlencoded({ limit: "10mb", extended: true }));
+    app.use(
+      cors({
+        origin: "http://localhost:5173",
+        credentials: true,
+      })
+    );
 
-app.use(cors());
+    // User Routes*********************************************************
+    app.use("/api/otp", otpRoute);
+    app.use("/api/auth", userAuthRoute(userDbConnection)); // Pass the user database connection to routes
+    app.use(
+      "/api/expense",
+      // protect,
+      userExpenseRoute(userDbConnection, adminDbConnection)
+    );
+    app.use(
+      "/api/income",
+      // protect,
+      userIncomeRoute(userDbConnection, adminDbConnection)
+    );
+    app.use(
+      "/api/usercategories",
+      // protect,
+      userCategoryRoute(userDbConnection, adminDbConnection)
+    );
+    app.use(
+      "/api/userprofile",
+      // protect,
+      userProfileRoute(userDbConnection, adminDbConnection)
+    );
 
-// routes
-app.use("/api/auth", userRoute);
-app.use("/api/categories", categoryRoute);
-app.use("/api/expenses", expenseRoute);
-app.use("/api/income", incomeRoute);
-app.use("/api/otp", otpRoute);
+    // Admin-specific routes (if any)****************************************************************
+    app.use(
+      "/api/admincategories",
+      adminCategoryRoutes(adminDbConnection, userDbConnection)
+    );
 
-// Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+    //currency rate routes (if any)****************************************************************
+    // Register currencyRateRoute with the app
+    app.use("/api/currencyrate", currencyRateRoute(adminDbConnection));
+    // Schedule the currency update job
+    CurrencyDailyRateJob(adminDbConnection);
+
+    //report routes (if any)****************************************************************
+    app.use("/api/report", reportRoute(userDbConnection, adminDbConnection));
+
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Error initializing server:", error);
+    process.exit(1);
+  }
+})();

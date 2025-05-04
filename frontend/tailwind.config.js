@@ -14,7 +14,23 @@ export default {
       animation: {
         bounce: "bounce 2.5s ease-in-out infinite", // Set your preferred duration here
       },
+      colors: {
+        "light-bg": "#fff",
+        "light-tranferant": "fff",
+        "light-text": "#696d75",
+
+        "dark-bg": "#0d1117",
+        "dark-tranferant": "0d1117",
+        "dark-text": "#fff",
+      },
+      screens:{
+        'sm-plus': {'max': '1139px'}, // Custom max-width breakpoint for 'sm-plus'
+        'xs':  {'max': '201px'}, // Custom breakpoint for 'xs' at 168px
+      },
+      backdropBlur: {
+        md: '12px', // or another value for the blur effect
+      },
     },
   },
-  plugins: [],
+  plugins: [require("tailwind-scrollbar")],
 };

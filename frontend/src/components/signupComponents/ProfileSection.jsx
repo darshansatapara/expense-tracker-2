@@ -1,26 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Form, Input, Button, DatePicker, Select, Upload, message } from "antd";
-import {
-  Mail,
-  User,
-  Phone,
-  CalendarFold,
-  ClipboardPen,
-  Lock,
-} from "lucide-react";
-import { userStore } from "../../store/userStore.js";
+import { Mail, User, Phone, CalendarFold, ClipboardPen } from "lucide-react";
+import { adminCategoryStore } from "../../store/AdminStore/adminCategoryStore.js";
+import { userStore } from "../../store/UserStore/userAuthStore.js";
 
 const { Option } = Select;
 
 export default function ProfileSection() {
+  const { fetchIncomeCategoriesIsActive } = adminCategoryStore();
   const location = useLocation();
   const navigate = useNavigate();
-  const signup = userStore((state) => state.signup);
+  const { signup } = userStore();
 
   const userData = location.state?.userCredentials || {};
-  console.log(userData);
+  // console.log(userData);
   const [form] = Form.useForm();
+  const [profession, setProfession] = useState();
   const [profilePic, setProfilePic] = useState("");
   const [loading, setLoading] = useState(false);
   const handleFileUpload = (file) => {
@@ -47,19 +43,38 @@ export default function ProfileSection() {
     return false; // Prevent the default upload behavior
   };
 
+  useEffect(() => {
+    const professionData = async () => {
+      const resData = await fetchIncomeCategoriesIsActive();
+      // console.log(resData.categories);
+
+      setProfession(resData.categories);
+    };
+
+    professionData();
+  }, [fetchIncomeCategoriesIsActive]);
+
+  // console.log(profession);
+
   const handleFinish = async (values) => {
     setLoading(true);
-
     const payload = {
       ...values,
       password: userData.password,
       profilePic,
+      // profession: profession,
     };
-
+    // console.log("payload", payload);
     try {
-      await signup(payload);
-      message.success("Profile saved successfully!");
-      navigate("/cetegory");
+      const res = await signup(payload); // Call the signup API from userstore
+      if (res) {
+        message.success("Profile saved successfully!");
+        const { _id } = res;
+        // Navigate to the CategoryPage with the data
+        navigate("/category", {
+          state: { userId: _id },
+        });
+      }
     } catch (error) {
       console.error("Signup failed:", error);
     } finally {
@@ -175,45 +190,18 @@ export default function ProfileSection() {
           >
             <Select
               className="rounded-md"
-              defaultValue="" // Default to the placeholder option
               prefix={<ClipboardPen className="text-pink-700" />}
             >
-              <Option value="" disabled hidden>
+              <Option value="" disabled hidden virtual>
                 Select an option
               </Option>
-              <Option value="student">Student</Option>
-              <Option value="employee">Employee</Option>
-              <Option value="householder">House Holder</Option>
-              <Option value="elder">Elder</Option>
-              <Option value="other">Other</Option>
+              {profession?.map((item) => (
+                <Option key={item._id} value={item._id}>
+                  {item?.name}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
-
-          {/* Password
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[
-              { required: true, message: "Please enter your password!" },
-              {
-                min: 6,
-                message: "Password must be at least 6 characters long!",
-              },
-              {
-                pattern:
-                  /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-                message:
-                  "Password must contain letters, numbers, and a special character!",
-              },
-            ]}
-          >
-            <Input.Password
-              prefix={<Lock className="text-blue-500" />}
-              placeholder="Enter your password"
-              className="rounded"
-              visibilityToggle
-            />
-          </Form.Item> */}
 
           {/* Submit Button */}
           <Form.Item>

@@ -10,8 +10,8 @@ export default function SignupPage() {
   return (
     <>
       {!subpath && <EmailAndOtpverification />}
-      {subpath === "profileSection" && <ProfileSection />}
       {subpath === "passwordSection" && <PasswordSection />}
+      {subpath === "profileSection" && <ProfileSection />}
     </>
   );
 }
