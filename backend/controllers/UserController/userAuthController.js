@@ -143,6 +143,51 @@ export const updateProfileStatus = (userDbConnection) => async (req, res) => {
   }
 };
 
+// update the password
+export const resetPassword = (userDbConnection) => async (req, res, next) => {
+  const { email, password } = req.body;
+
+  // Validate required fields
+  if (!email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide email and password.",
+    });
+  }
+
+  try {
+    // Get the UserCredential model for this connection
+    const UserCredentialModel = UserCredential(userDbConnection);
+
+    // Find the user by email
+    const userCredential = await UserCredentialModel.findOne({ email });
+    if (!userCredential) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Update the password
+    userCredential.password = hashedPassword;
+    await userCredential.save();
+
+    // Send response
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully.",
+    });
+  } catch (err) {
+    console.error("Password reset error:", err);
+    next(err); // Pass errors to error-handling middleware
+  }
+};
+
+
 // update the profilestatus when complete the signup process
 export const updateCategoryStatus = (userDbConnection) => async (req, res) => {
   const { userId } = req.body;

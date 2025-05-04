@@ -9,6 +9,8 @@ import HistoryPage from "./pages/HistoryPage";
 import MainLayout from "./Layouts/MainLayout";
 import AnalysisPage from "./pages/AnalysisPage";
 import ReportPage from "./pages/ReportPage";
+import ForgotPassword from "./components/signupComponents/ForgotPassword.jsx";
+import ResetPassword from "./components/signupComponents/ResetPassword.jsx";
 import { userStore } from "./store/UserStore/userAuthStore";
 import { useEffect } from "react";
 
@@ -22,7 +24,8 @@ function App() {
         <Route path="/signup/*" element={<SignupPage />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/category/*" element={<CategoryPage />} />
-
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/forgot-password/reset" element={<ResetPassword />} />
         {/* Protected Routes inside MainLayout */}
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
