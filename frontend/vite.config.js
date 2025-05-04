@@ -1,13 +1,16 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import dotenv from "dotenv";
 
-// https://vite.dev/config/
+// Load environment variables from .env file
+dotenv.config();
+
 export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
       "/api": {
-        target: import.meta.env.VITE_API_URL || "http://localhost:5000",
+        target: process.env.VITE_API_URL || "http://localhost:5000",
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api/, "/api"),
@@ -22,10 +25,10 @@ export default defineConfig({
         /backend\/.*/, // Exclude backend files
       ],
     },
-    sourcemap: true, // Enable sourcemaps for debugging
+    sourcemap: true,
   },
-  base: "/", // Ensure assets are served from root
+  base: "/",
   define: {
-    "process.env": {}, // Prevent process.env usage
+    "process.env": {},
   },
 });
