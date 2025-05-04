@@ -92,7 +92,9 @@ dotenv.config(); // Load environment variables
     app.use("/api/report", reportRoute(userDbConnection, adminDbConnection));
 
     app.get("/", (req, res) => {
-      res.status(200).json({ status: "OK", message: "Server is running" });
+      res
+        .status(200)
+        .json({ status: "OK", message: "Server is running properly" });
     });
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
