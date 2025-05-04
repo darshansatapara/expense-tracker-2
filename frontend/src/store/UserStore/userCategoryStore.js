@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { axiosInstance } from "../../utils/axios.js";
-import { updateExpenseCategoriesAndSubcategories } from "../../../../backend/controllers/AdminController/adminCategoryController.js";
 
 export const userCategoryStore = create((set, get) => ({
   userCategories: [],
@@ -126,13 +125,10 @@ export const userCategoryStore = create((set, get) => ({
   updateCurrencyAndBudget: async (userId, payload) => {
     set({ isPostingCategory: true });
     try {
-    
       const res = await axiosInstance.put(
         `/usercategories/currencyAndBudget/updateCurrency/${userId}`,
         payload
       );
-
-    
     } catch (error) {
       console.error("Error adding currency and budget:", error);
     } finally {
@@ -143,13 +139,10 @@ export const userCategoryStore = create((set, get) => ({
   //delete currency and budget
   deleteCurrencyAndBudget: async (userId, payload) => {
     try {
-     
       const res = await axiosInstance.delete(
         `/usercategories/currencyCategory/deleteCurrencyCategory/${userId}`,
         { data: payload } // Wrap payload in a config object under 'data'
       );
-
-
     } catch (error) {
       console.error("Error deleting currency and budget:", error);
     }
