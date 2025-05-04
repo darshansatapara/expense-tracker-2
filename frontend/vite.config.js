@@ -7,6 +7,7 @@ dotenv.config();
 
 export default defineConfig({
   plugins: [react()],
+  base: '/',
   server: {
     proxy: {
       "/api": {
@@ -27,7 +28,6 @@ export default defineConfig({
     },
     sourcemap: true,
   },
-  base: "/",
   define: {
     "process.env": {},
   },
