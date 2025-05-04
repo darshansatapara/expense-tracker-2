@@ -39,10 +39,18 @@ dotenv.config(); // Load environment variables
     app.use(express.urlencoded({ limit: "10mb", extended: true }));
     app.use(
       cors({
-        origin: "http://localhost:5173",
+        origin: [
+          "http://localhost:5173",
+          "https://expense-tracker-frontend.vercel.app", // Add your frontend's production URL
+        ],
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
       })
     );
+
+    // Add explicit OPTIONS handling for preflight requests
+    app.options("*", cors());
 
     // User Routes*********************************************************
     app.use("/api/otp", otpRoute);
