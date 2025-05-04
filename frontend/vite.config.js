@@ -27,7 +27,7 @@ export default defineConfig({
     },
     sourcemap: true,
   },
-  base: "./",
+  base: "/",
   define: {
     "process.env": {},
   },
