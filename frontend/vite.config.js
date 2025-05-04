@@ -7,10 +7,10 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: import.meta.env.LIVE_URL || "http://localhost:5000",
+        target: import.meta.env.VITE_API_URL || "http://localhost:5000",
         changeOrigin: true,
         secure: true,
-        rewrite: (path) => path.replace(/^\/api/, "/api"), // Ensure /api prefix is preserved
+        rewrite: (path) => path.replace(/^\/api/, "/api"),
       },
     },
   },
@@ -19,13 +19,13 @@ export default defineConfig({
     rollupOptions: {
       external: [
         "mongoose", // Exclude mongoose
-        /backend\/.*/, // Exclude all backend files
+        /backend\/.*/, // Exclude backend files
       ],
     },
-    sourcemap: true, // Enable sourcemaps for debugging (disable in production if not needed)
+    sourcemap: true, // Enable sourcemaps for debugging
   },
   base: "/", // Ensure assets are served from root
   define: {
-    "process.env": {}, // Prevent accidental process.env usage
+    "process.env": {}, // Prevent process.env usage
   },
 });
