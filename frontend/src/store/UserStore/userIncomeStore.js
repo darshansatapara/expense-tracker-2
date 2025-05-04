@@ -76,7 +76,7 @@ getIncomeAnalysis: async (userId, startDate, endDate, professionId) => {
     const response = await axiosInstance.get(
       `/income/getIncomesAnalysis/${userId}/${startDate}/${endDate}/${professionId}`
     );
-    console.log("income",response.data.data)
+    // console.log("income",response.data.data)
     if (response.data.success) {
       set({ userIncomes: response.data.data, loading: false });
     } else {
@@ -100,7 +100,7 @@ getMonthlyIncome: async (userId, year) => {
     const response = await axiosInstance.get(
       `/income/getMonthlyIncomeTotals/${userId}/${year}`
     );
-    console.log("monthly income",response.data.data)
+    // console.log("monthly income",response.data.data)
     if (response.data.success) {
       set({ monthlyIncomeTotals: response.data.data.monthlyTotals, loading: false });
     } 

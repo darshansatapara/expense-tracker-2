@@ -119,8 +119,6 @@ export function filterDataByDateRange(data) {
         return sum + (isNaN(amount) ? 0 : amount);
       }, 0);
 
-    console.log(offlineTotal);
-    console.log(onlineTotal);
     return {
       offlineTotal,
       onlineTotal,
@@ -139,12 +137,11 @@ export function filterDataByDateRange(data) {
     filterByDateRange(item.date, startOfWeek, endOfWeek)
   );
 
-  // console.log("currentweekdata", currentWeekData);
+
   const currentMonthData = data.filter((item) =>
     filterByDateRange(item.date, startOfMonth, endOfMonth)
   );
 
-  // console.log("Filtering today data", todayData, yesterdayData);
   return {
     today: {
       data: todayData,

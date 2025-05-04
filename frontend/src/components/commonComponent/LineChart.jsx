@@ -20,7 +20,6 @@ ChartJS.register(
 );
 
 const LineChart = ({ data, options, isSmallScreen = false }) => {
-  console.log("LineChart Data:", data);
   // Use the provided options, merging with responsive defaults
   const defaultOptions = {
     responsive: true,

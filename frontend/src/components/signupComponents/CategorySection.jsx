@@ -10,10 +10,10 @@ export default function CategorySection() {
   const location = useLocation();
   const { currentUser } = userStore();
 
-  console.log(currentUser);
+  
 
   const { userId } = location?.state || {};
-  // console.log(userData);
+  
 
   const [selectedCategories, setSelectedCategories] = useState([]); // Store selected categories with empty subcategories
   const [fetchError, setFetchError] = useState(false);
@@ -48,7 +48,7 @@ export default function CategorySection() {
       }, {})
     : {};
 
-  console.log("Transformed Categories Object:", categoriesObject);
+  
 
   // Handle Next button click
   const handleNext = () => {
@@ -62,7 +62,7 @@ export default function CategorySection() {
         })),
       };
 
-      console.log(payload);
+  
       navigate("/category/subCategorySection", {
         state: { userId, payload, categoriesObject },
       });

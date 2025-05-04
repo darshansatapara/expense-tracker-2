@@ -18,7 +18,6 @@ const CategoryManagement = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       const fetchedCategories = await fetchActiveCategories();
-      console.log("Active Categories:", fetchedCategories);
       setActiveCategories(fetchedCategories?.data?.categories || []);
     };
     fetchCategories();
@@ -29,7 +28,6 @@ const CategoryManagement = () => {
     const fetchUserData = async () => {
       if (userId) {
         const fetchedUserCategories = await fetchUserCategories(userId);
-        console.log("User Categories:", fetchedUserCategories);
         setUserCategories(fetchedUserCategories?.data?.data?.expenseCategories || []);
       }
     };
@@ -143,11 +141,11 @@ const CategoryManagement = () => {
         .map((subCat) => subCat._id),
     }));
 
-    console.log("Final Updated Categories:", updatedCategories);
+    
 
     try {
       const response = await updateUserCategories(userId, updatedCategories);
-      console.log("Categories updated successfully:", response);
+      
 
       // Update state to reflect the saved changes
       setCategoriesToDisplay((prevCategories) =>

@@ -12,8 +12,6 @@ export default function SubCategorySection() {
   // Extract data passed from the previous step
   const { payload, userId, categoriesObject } = location.state || {};
   const { markCategoryAsCompleted } = userStore();
-  console.log("Payload:", payload);
-  console.log("Categories Object:", categoriesObject);
 
   // Extract expenseCategories from the payload
   const expenseCategories = payload?.expenseCategories || [];
@@ -36,15 +34,6 @@ export default function SubCategorySection() {
     }
   );
 
-  console.log(
-    "Selected Categories with Subcategories:",
-    selectedCategoriesWithSubcategories
-  );
-
-  // Log the final category state for debugging
-  useEffect(() => {
-    console.log("Final Category State:", finalCategory);
-  }, [finalCategory]);
 
   // Transform the finalCategory object into the required format for backend
   const transformCategoryData = () =>
@@ -85,7 +74,7 @@ export default function SubCategorySection() {
           expenseCategories: categoryData,
         });
 
-        
+
         console.log(userId);
         await markCategoryAsCompleted(userId);
 
@@ -149,11 +138,10 @@ export default function SubCategorySection() {
             <button
               onClick={handleNext}
               disabled={!validateSubCategorySelection()}
-              className={`w-full py-2 rounded-md font-semibold transition-colors ${
-                validateSubCategorySelection()
+              className={`w-full py-2 rounded-md font-semibold transition-colors ${validateSubCategorySelection()
                   ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
                   : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
+                }`}
             >
               Next
             </button>

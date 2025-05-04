@@ -3,7 +3,7 @@ import { Table, Button, Select } from "antd";
 import ViewAndEditExpense from "./ViewAndEditExpense";
 
 export const TransactionList = ({ transactions, isExpense }) => {
-  console.log("Transaction", transactions);
+ 
   const [selectedMode, setSelectedMode] = useState("All");
 
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -12,12 +12,12 @@ export const TransactionList = ({ transactions, isExpense }) => {
   // Modify the handleViewAndEdit function to accept a record (transaction)
 
   const handleViewAndEdit = (record) => {
-    console.log(record);
+ 
     setSelectedTransaction(record); // Store the selected transaction
     setIsModalVisible(true); // Open the modal
   };
 
-  console.log("Transaction", selectedTransaction);
+ 
 
   // Filter transactions based on the selected mode
   const filteredTransactions =

@@ -39,10 +39,9 @@ const Navbar = ({ toggleSidebar }) => {
   };
   
   const handleSignOut = async () => {
-    console.log("Signout button clicked, calling signout...");
     try {
       const result = await signout();
-      console.log("Signout successful:", result);
+    
       navigate("/signin");
     } catch (error) {
       console.error("Signout error in handleSignOut:", {

@@ -53,7 +53,6 @@ const TableList = ({ today, yesterday, activeTab }) => {
     }))
   );
 
-  // console.log(formattedTransactions);
   // Define columns
   const columns = [
     {

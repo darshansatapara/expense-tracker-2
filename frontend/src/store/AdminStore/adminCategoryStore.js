@@ -20,7 +20,7 @@ export const adminCategoryStore = create((set, get) => ({
         "/admincategories/allcurrencyCategoryIsActive"
       );
       set({ allCurrencyCategories: res.data });
-      console.log(res.data);
+      // console.log(res.data);
     } catch (error) {
       console.error("Error fetching currency categories:", error);
       toast.error("Failed to fetch currency categories!");
@@ -35,7 +35,7 @@ export const adminCategoryStore = create((set, get) => ({
       const res = await axiosInstance.get(
         "/admincategories/allexpenseCategoryIsActive"
       );
-      console.log(res.data);
+      // console.log(res.data);
       set({
         expenseCategories: res.data,
       });
@@ -53,7 +53,7 @@ export const adminCategoryStore = create((set, get) => ({
       const res = await axiosInstance.get(
         "/admincategories/allincomeCategoryIsActive"
       );
-      console.log(res.data);
+      // console.log(res.data);
       return res.data;
     } catch (error) {
       console.error("Error fetching income categories:", error);
@@ -70,7 +70,7 @@ export const adminCategoryStore = create((set, get) => ({
     set({ isLoadingCategories: true, error: null });
     try {
       const response = await axiosInstance.get("/admincategories/allexpenseCategoryIsActive");
-      console.log("Active categories response:", response.data);
+      // console.log("Active categories response:", response.data);
       return response;
     } catch (error) {
       console.error("Error fetching active categories:", error);
@@ -86,7 +86,7 @@ updateCategoriesAndSubcategories: async (updatedCategories) => {
       "/admincategories/updateExpenseCategoriesAndSubcategories",
       { updatedcategories: updatedCategories }
     );
-    console.log("Update response:", response.data);
+    // console.log("Update response:", response.data);
 
     if (response.data.success) {
       // Update the store state with new categories

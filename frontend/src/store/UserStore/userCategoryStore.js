@@ -12,7 +12,7 @@ export const userCategoryStore = create((set, get) => ({
       const userRes = await axiosInstance.get(
         `/usercategories/expenseCategories/get/${userId}`
       );
-      console.log("User categories response:", userRes.data);
+      // console.log("User categories response:", userRes.data);
       return userRes;
     } catch (error) {
       console.error("Error fetching user categories:", error);
@@ -53,8 +53,8 @@ export const userCategoryStore = create((set, get) => ({
       return false;
     }
 
-    console.log("Updating categories for user:", userId);
-    console.log("New categories:", updatedCategories);
+    // console.log("Updating categories for user:", userId);
+    // console.log("New categories:", updatedCategories);
 
     try {
       const response = await axiosInstance.put(
@@ -62,7 +62,7 @@ export const userCategoryStore = create((set, get) => ({
         { newExpenseCategory: updatedCategories }
       );
 
-      console.log("Categories updated successfully:", response.data);
+      // console.log("Categories updated successfully:", response.data);
       return response.data;
     } catch (error) {
       console.error("Error updating category:", error);
@@ -126,15 +126,13 @@ export const userCategoryStore = create((set, get) => ({
   updateCurrencyAndBudget: async (userId, payload) => {
     set({ isPostingCategory: true });
     try {
-      console.log("Adding currency and budget", userId);
+    
       const res = await axiosInstance.put(
         `/usercategories/currencyAndBudget/updateCurrency/${userId}`,
         payload
       );
 
-      if (res.success) {
-        console.log(res.data);
-      }
+    
     } catch (error) {
       console.error("Error adding currency and budget:", error);
     } finally {
@@ -145,15 +143,13 @@ export const userCategoryStore = create((set, get) => ({
   //delete currency and budget
   deleteCurrencyAndBudget: async (userId, payload) => {
     try {
-      console.log(payload, userId);
+     
       const res = await axiosInstance.delete(
         `/usercategories/currencyCategory/deleteCurrencyCategory/${userId}`,
         { data: payload } // Wrap payload in a config object under 'data'
       );
 
-      if (res.success) {
-        console.log(res.data);
-      }
+
     } catch (error) {
       console.error("Error deleting currency and budget:", error);
     }

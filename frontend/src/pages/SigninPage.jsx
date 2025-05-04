@@ -27,13 +27,13 @@ export default function SignInPage() {
 
       if (!user.profile_complated) {
         if (!user.category_completed) {
-          console.log("Navigating to /category with user ID:", user._id);
+          // console.log("Navigating to /category with user ID:", user._id);
           navigate("/category", { state: { userId: user._id } });
         } else {
-          console.log(
-            "Navigating to /category/currencyBudgetSelection with user ID:",
-            user._id
-          );
+          // console.log(
+          //   "Navigating to /category/currencyBudgetSelection with user ID:",
+          //   user._id
+          // );
           navigate("/category/currencyBudgetSelection", {
             state: { userId: user._id },
           });

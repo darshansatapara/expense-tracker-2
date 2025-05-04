@@ -53,16 +53,13 @@ export default function OAuth2() {
 
         if (!user.profile_complated) {
           if (!user.category_completed) {
-            console.log("Navigating to /category with user ID:", user._id);
+            
             navigate("/category", { state: { userId: user._id } });
           } else {
             navigate("/category/currencyBudgetSelection", {
               state: { userId: userId },
             });
-            console.log(
-              "Navigating to /category/currencyBudgetSelection with user ID:",
-              user._id
-            );
+            
           }
         } else {
           message.success("Signed in successfully!");

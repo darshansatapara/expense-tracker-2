@@ -89,9 +89,7 @@ export default function ViewAndEditExpense({
     });
   }, [transaction, categoryData, currencyData, isExpense]);
 
-  // console.log("income category", categoryData);
-  console.log("currency category", transaction.date);
-  // console.log("form data", formData.category);
+
 
   // Handle form input changes
   const handleInputChange = (field, value) => {

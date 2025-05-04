@@ -58,10 +58,9 @@ const SidebarContent = ({ toggleSidebar, isSmallScreen }) => {
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
-    console.log("Signout button clicked, calling signout...");
     try {
       await signout(); // Call the signout function from the store
-      console.log("Signout successful");
+   
       if (isSmallScreen) toggleSidebar(); // Close sidebar on small screens
       navigate("/signin"); // Redirect to signin page
     } catch (error) {

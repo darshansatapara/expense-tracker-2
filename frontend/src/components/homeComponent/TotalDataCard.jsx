@@ -3,7 +3,6 @@ import { Spin } from "antd";
 import { userCategoryStore } from "../../store/UserStore/userCategoryStore";
 import { userStore } from "../../store/UserStore/userAuthStore.js";
 const TotalDataCard = ({ cardData, lable, activeTab }) => {
-  console.log(activeTab);
   const [loading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(null); // Error state
   const [defaultCurrencySymbol, setDefaultCurrencySymbol] = useState("");
@@ -20,7 +19,6 @@ const TotalDataCard = ({ cardData, lable, activeTab }) => {
     fetchDefaultCurrency();
   }, [fetchCurrencyAndBudget, userId]);
 
-  // console.log(defaultCurrencySymbol);
 
   return (
     <div className="bg-gray-100 flex flex-col h-[40vh] justify-center items-center p-4 rounded-md border gap-5">

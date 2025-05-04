@@ -16,7 +16,7 @@ monthlyExpenseTotals: [],
       const response = await axiosInstance.get(
         `/expense/getExpenses/${userId}/${startDate}/${endDate}` // Adjust the endpoint as needed
       );
-      console.log(response.data.expenses);
+      // console.log(response.data.expenses);
       if (response.data.success) {
         // Format the data using the utility function
         const formattedData = formatData(
@@ -70,7 +70,7 @@ monthlyExpenseTotals: [],
         const response = await axiosInstance.get(
           `/expense/getExpensesAnalysis/${userId}/${startDate}/${endDate}`
         );
-        console.log("analysis",response.data)
+        // console.log("analysis",response.data)
   
         if (response.data.success) {
           set({

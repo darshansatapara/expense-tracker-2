@@ -40,7 +40,7 @@ export const userStore = create((set) => ({
    */
   markProfileAsCompleted: async (userId) => {
     set({ isUpdatingProfileStatus: true });
-    console.log("Marking profile as completed for userId:", userId);
+    // console.log("Marking profile as completed for userId:", userId);
     try {
       // Call the backend API to update the profile_complated field
       const res = await axiosInstance.put(`/auth/profilestatus`, {
@@ -74,7 +74,7 @@ export const userStore = create((set) => ({
    */
   markCategoryAsCompleted: async (userId) => {
     set({ isUpdatingCategoryStatus: true });
-    console.log("Marking category as completed for userId:", userId);
+    // console.log("Marking category as completed for userId:", userId);
     try {
       // Call the backend API to update the profile_complated field
       const res = await axiosInstance.put(`/auth/categorystatus`, {
@@ -142,7 +142,7 @@ export const userStore = create((set) => ({
     set({ isSigningOut: true });
     try {
       const response = await axiosInstance.post("/auth/signout");
-      console.log("signout response:", response.data);
+      // console.log("signout response:", response.data);
       set({ currentUser: null, isSigningOut: false });
       message.success("Signed out successfully!");
       // Navigate to signin page (must be called in component, see below)
@@ -190,12 +190,12 @@ export const userStore = create((set) => ({
   updatePassword: async (email, password) => {
     set({ isUpdatingPassword: true });
     try {
-      console.log("Sending password update request:", { email, password });
+      // console.log("Sending password update request:", { email, password });
       const res = await axiosInstance.post("/auth/reset-password", {
         email,
         password,
       });
-      console.log("Password update response:", res.data);
+      // console.log("Password update response:", res.data);
       toast.success("Password updated successfully!");
       return res.data;
     } catch (error) {

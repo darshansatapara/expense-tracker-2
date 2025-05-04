@@ -7,7 +7,7 @@ export const CategorySelectorButton = ({
 }) => {
   const [selectedCategories, setSelectedCategories] = useState([]); // Track selected IDs locally
 
-  console.log(categories);
+  // console.log(categories);
   // Toggle category selection
   const toggleCategory = (categoryId) => {
     const isSelected = selectedCategories.includes(categoryId);

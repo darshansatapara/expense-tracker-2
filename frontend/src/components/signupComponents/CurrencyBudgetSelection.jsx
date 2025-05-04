@@ -14,7 +14,7 @@ export default function CurrencyBudgetSelection() {
   const { userId } = location?.state || {};
   const { markProfileAsCompleted } = userStore();
 
-  // console.log(userId);
+
   const { addCurrencyAndBudget } = userCategoryStore();
   const { fetchCurrencyCategories, allCurrencyCategories } =
     adminCategoryStore();
@@ -71,7 +71,7 @@ export default function CurrencyBudgetSelection() {
 
       await addCurrencyAndBudget(budgetData);
 
-      console.log(userId);
+    
       await markProfileAsCompleted(userId);
 
       navigate("/", { state: { budgetData } });
