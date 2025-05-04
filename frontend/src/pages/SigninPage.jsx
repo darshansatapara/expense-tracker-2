@@ -30,15 +30,21 @@ export default function SignInPage() {
           console.log("Navigating to /category with user ID:", user._id);
           navigate("/category", { state: { userId: user._id } });
         } else {
-          console.log("Navigating to /category/currencyBudgetSelection with user ID:", user._id);
-          navigate("/category/currencyBudgetSelection", { state: { userId: user._id } });
+          console.log(
+            "Navigating to /category/currencyBudgetSelection with user ID:",
+            user._id
+          );
+          navigate("/category/currencyBudgetSelection", {
+            state: { userId: user._id },
+          });
         }
       } else {
         message.success("Signed in successfully!");
         navigate("/");
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.error || "Failed to sign in. Please try again.";
+      const errorMessage =
+        error.response?.data?.error || "Failed to sign in. Please try again.";
       setError(errorMessage);
       console.error("Sign-in error:", error);
     }
@@ -51,7 +57,9 @@ export default function SignInPage() {
       </div>
       <div className="flex flex-1 items-center justify-center font-nunito px-4 lg:px-0">
         <div className="p-8 w-full max-w-md">
-          <h2 className="text-2xl font-bold text-gray-800 text-center mb-5">Sign In</h2>
+          <h2 className="text-2xl font-bold text-gray-800 text-center mb-5">
+            Sign In
+          </h2>
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}
           <form onSubmit={handleSignIn}>
             <div className="mb-7">
@@ -89,8 +97,19 @@ export default function SignInPage() {
           </form>
           <div className="text-center mt-7">
             <p className="text-gray-600">
+              Forgot your password?{" "}
+              <a
+                href="/forgot-password"
+                className="text-blue-500 hover:underline"
+              >
+                Reset it here
+              </a>
+            </p>
+            <p className="text-gray-600">
               Don’t have an account?{" "}
-              <a href="/signup" className="text-blue-500 hover:underline">Sign up</a>
+              <a href="/signup" className="text-blue-500 hover:underline">
+                Sign up
+              </a>
             </p>
           </div>
         </div>

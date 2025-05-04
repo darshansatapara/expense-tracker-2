@@ -7,6 +7,7 @@ import {
   signOut,
   updateProfileStatus,
   updateCategoryStatus,
+  resetPassword,
   auth,
 } from "../../controllers/UserController/userAuthController.js";
 import { protect } from "../../middlewares/userMiddlewares/authMiddleware.js";
@@ -20,6 +21,7 @@ const userAuthRoute = (userDbConnection) => {
 
   // Pass the controller functions with userDbConnection pre-applied
   router.post("/signup", signUp(userDbConnection));
+  router.post("/reset-password", resetPassword(userDbConnection));
   router.post("/signin", signIn(userDbConnection));
   router.post("/googlesignin", googlesignin(userDbConnection));
   router.post("/signout", signOut(userDbConnection)); // Assuming signOut doesn't require the database connection

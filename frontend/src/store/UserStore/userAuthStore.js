@@ -11,6 +11,8 @@ export const userStore = create((set) => ({
   isUpdatingProfile: false,
   isUpdatingProfileStatus: false,
   isUpdatingCategoryStatus: false,
+  isUpdatingPassword: false, // New state for password update
+
 
   /**
    * Signup method to create a new user account.
@@ -180,7 +182,43 @@ export const userStore = create((set) => ({
       set({ isUpdatingProfile: false });
     }
   },
+  /**
+   * Update user password.
+   * @param {String} email - Email of the user.
+   * @param {String} password - New password.
+   */
+  updatePassword: async (email, password) => {
+    set({ isUpdatingPassword: true });
+    try {
+      console.log("Sending password update request:", { email, password });
+      const res = await axiosInstance.post("/auth/reset-password", {
+        email,
+        password,
+      });
+      console.log("Password update response:", res.data);
+      toast.success("Password updated successfully!");
+      return res.data;
+    } catch (error) {
+      console.error("Password update error:", {
+        message: error.message,
+        code: error.code,
+        response: error.response?.data,
+        status: error.response?.status,
+        request: {
+          url: error.config?.url,
+          data: error.config?.data,
+        },
+      });
+      toast.error(
+        error.response?.data?.message || "Failed to update password!"
+      );
+      throw error;
+    } finally {
+      set({ isUpdatingPassword: false });
+    }
+  },
 
+  
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/me");
