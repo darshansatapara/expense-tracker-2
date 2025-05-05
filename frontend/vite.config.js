@@ -18,16 +18,32 @@ export default defineConfig({
   //     },
   //   },
   // },
-  // build: {
-  //   outDir: "dist",
-  //   rollupOptions: {
-  //     external: [
-  //       "mongoose", // Exclude mongoose
-  //       /backend\/.*/, // Exclude backend files
-  //     ],
-  //   },
-  //   sourcemap: true,
-  // },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom", "react-router-dom", "zustand"],
+          antd: ["antd"],
+          charts: ["chart.js", "react-chartjs-2"],
+          documents: ["exceljs", "jspdf", "html2canvas"],
+          // firebase: ['firebase'],
+          animations: ["framer-motion", "motion"],
+          datepicker: ["react-datepicker", "dayjs"],
+          utilities: [
+            "react-hot-toast",
+            "react-toastify",
+            "lucide-react",
+            "react-icons",
+            "react-loading-skeleton",
+            "react-otp-input",
+          ],
+          axios: ["axios"],
+          app: ["./src/main.jsx", "./src/App.jsx"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 10000,
+  },
   // define: {
   //   "process.env": {},
   // },
