@@ -41,7 +41,7 @@ dotenv.config(); // Load environment variables
       cors({
         origin: [
           "http://localhost:5173",
-          "https://expense-tracker-frontend.vercel.app", // Add your frontend's production URL
+          "https://expense-tracker-2-ml3k.vercel.app/", // Add your frontend's production URL
         ],
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
