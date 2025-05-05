@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { axiosInstance } from "../../utils/axios.js";
+import { axiosInstance } from "../../utils/axios.jsx";
 
 export const userCategoryStore = create((set, get) => ({
   userCategories: [],
