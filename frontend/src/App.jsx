@@ -11,13 +11,13 @@ import AnalysisPage from "./pages/AnalysisPage";
 import ReportPage from "./pages/ReportPage";
 import ForgotPassword from "./components/signupComponents/ForgotPassword.jsx";
 import ResetPassword from "./components/signupComponents/ResetPassword.jsx";
-import { userStore } from "./store/UserStore/userAuthStore";
-import { useEffect } from "react";
 
 function App() {
 
   return (
     <BrowserRouter>
+
+
       <Routes>
         {/* Public Routes */}
 

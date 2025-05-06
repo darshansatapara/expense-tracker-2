@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { axiosInstance } from "../../utils/axios"; // Assuming you have axiosInstance set up
+import { axiosInstance } from "../../utils/axios.jsx"; // Assuming you have axiosInstance set up
 
 const useUserProfileStore = create((set) => ({
   userProfile: {},

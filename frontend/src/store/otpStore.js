@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { axiosInstance } from "../utils/axios.js";
+import { axiosInstance } from "../utils/axios.jsx";
 import toast from "react-hot-toast";
 
 export const useOtpStore = create((set) => ({

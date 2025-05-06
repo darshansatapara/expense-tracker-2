@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { axiosInstance } from "../../utils/axios.js";
+import { axiosInstance } from "../../utils/axios.jsx";
 
 const useFinancialReportStore = create((set) => ({
   monthlyExpenses: [],

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { axiosInstance } from "../../utils/axios.js";
+import { axiosInstance } from "../../utils/axios.jsx";
 import { formatData } from "../../components/commonComponent/formatEAndIData.js";
 
 const useUserExpenseStore = create((set) => ({

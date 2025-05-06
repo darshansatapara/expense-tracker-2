@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { axiosInstance } from "../../utils/axios.js";
+import { axiosInstance } from "../../utils/axios.jsx";
 import { toast } from "react-toastify";
 import { message } from "antd";
 
@@ -12,7 +12,6 @@ export const userStore = create((set) => ({
   isUpdatingProfileStatus: false,
   isUpdatingCategoryStatus: false,
   isUpdatingPassword: false, // New state for password update
-
 
   /**
    * Signup method to create a new user account.
@@ -218,7 +217,6 @@ export const userStore = create((set) => ({
     }
   },
 
-  
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/me");

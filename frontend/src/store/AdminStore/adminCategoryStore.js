@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { axiosInstance } from "../../utils/axios.js";
+import { axiosInstance } from "../../utils/axios.jsx";
 import { toast } from "react-toastify";
 
 export const adminCategoryStore = create((set, get) => ({
@@ -7,7 +7,7 @@ export const adminCategoryStore = create((set, get) => ({
   // categories: [],
   // adminCategories:[],
   incomeCategories: [],
-  expenseCategories:[],
+  expenseCategories: [],
   isLoadingCategories: false,
 
   /**
@@ -69,7 +69,9 @@ export const adminCategoryStore = create((set, get) => ({
   fetchActiveCategories: async () => {
     set({ isLoadingCategories: true, error: null });
     try {
-      const response = await axiosInstance.get("/admincategories/allexpenseCategoryIsActive");
+      const response = await axiosInstance.get(
+        "/admincategories/allexpenseCategoryIsActive"
+      );
       // console.log("Active categories response:", response.data);
       return response;
     } catch (error) {
@@ -78,45 +80,45 @@ export const adminCategoryStore = create((set, get) => ({
       set({ isLoadingCategories: false });
     }
   },
- // Update categories after selection toggle
-// ✅ Update categories and subcategories
-updateCategoriesAndSubcategories: async (updatedCategories) => {
-  try {
-    const response = await axiosInstance.put(
-      "/admincategories/updateExpenseCategoriesAndSubcategories",
-      { updatedcategories: updatedCategories }
-    );
-    // console.log("Update response:", response.data);
+  // Update categories after selection toggle
+  // ✅ Update categories and subcategories
+  updateCategoriesAndSubcategories: async (updatedCategories) => {
+    try {
+      const response = await axiosInstance.put(
+        "/admincategories/updateExpenseCategoriesAndSubcategories",
+        { updatedcategories: updatedCategories }
+      );
+      // console.log("Update response:", response.data);
 
-    if (response.data.success) {
-      // Update the store state with new categories
-      set((state) => ({
-        categories: state.categories.map((category) => {
-          const updatedCategory = updatedCategories.find(
-            (c) => c.categoryId === category._id
-          );
-          if (updatedCategory) {
-            return {
-              ...category,
-              name: updatedCategory.categoryNewName || category.name,
-              subcategories: category.subcategories.map((sub) => {
-                const updatedSub = updatedCategory.subcategories?.find(
-                  (s) => s.subcategoryId === sub._id
-                );
-                return updatedSub ? { ...sub, name: updatedSub.subCategorynewName } : sub;
-              }),
-            };
-          }
-          return category;
-        }),
-      }));
+      if (response.data.success) {
+        // Update the store state with new categories
+        set((state) => ({
+          categories: state.categories.map((category) => {
+            const updatedCategory = updatedCategories.find(
+              (c) => c.categoryId === category._id
+            );
+            if (updatedCategory) {
+              return {
+                ...category,
+                name: updatedCategory.categoryNewName || category.name,
+                subcategories: category.subcategories.map((sub) => {
+                  const updatedSub = updatedCategory.subcategories?.find(
+                    (s) => s.subcategoryId === sub._id
+                  );
+                  return updatedSub
+                    ? { ...sub, name: updatedSub.subCategorynewName }
+                    : sub;
+                }),
+              };
+            }
+            return category;
+          }),
+        }));
+      }
+    } catch (error) {
+      console.error("Error updating categories:", error);
     }
-  } catch (error) {
-    console.error("Error updating categories:", error);
-  }
-},
+  },
 
-// Other functions (fetch categories, etc.) remain unchanged...
-
-
+  // Other functions (fetch categories, etc.) remain unchanged...
 }));

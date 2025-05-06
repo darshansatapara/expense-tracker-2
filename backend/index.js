@@ -42,10 +42,18 @@ dotenv.config(); // Load environment variables
     app.use(express.urlencoded({ limit: "10mb", extended: true }));
     app.use(
       cors({
-        origin: "http://localhost:5173",
+        origin: [
+          "http://localhost:5173",
+          "https://expense-tracker-2-ml3k.vercel.app/", // Add your frontend's production URL
+        ],
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
       })
     );
+
+    // Add explicit OPTIONS handling for preflight requests
+    app.options("*", cors());
 
     // User Routes*********************************************************
     app.use("/api/otp", otpRoute);
@@ -89,6 +97,11 @@ dotenv.config(); // Load environment variables
     // Serve static files with correct MIME types
     app.use(express.static(path.join(__dirname, "public")));
 
+    app.get("/", (req, res) => {
+      res
+        .status(200)
+        .json({ status: "OK", message: "Server is running properly" });
+    });
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
