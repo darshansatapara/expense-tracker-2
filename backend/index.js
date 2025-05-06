@@ -55,6 +55,8 @@ dotenv.config(); // Load environment variables
     // Add explicit OPTIONS handling for preflight requests
     app.options("*", cors());
 
+    // Serve static files with correct MIME types
+    app.use(express.static(path.join(__dirname, "public")));
     // User Routes*********************************************************
     app.use("/api/otp", otpRoute);
     app.use("/api/auth", userAuthRoute(userDbConnection)); // Pass the user database connection to routes
@@ -93,9 +95,6 @@ dotenv.config(); // Load environment variables
 
     //report routes (if any)****************************************************************
     app.use("/api/report", reportRoute(userDbConnection, adminDbConnection));
-
-    // Serve static files with correct MIME types
-    app.use(express.static(path.join(__dirname, "public")));
 
     app.get("/", (req, res) => {
       res
