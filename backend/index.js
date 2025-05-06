@@ -8,6 +8,9 @@ import {
 } from "./config/database.js";
 
 import cors from "cors";
+
+// import path from "path";
+
 // Routes
 import userAuthRoute from "./routes/UserRoutes/userAuthRoutes.js";
 import userExpenseRoute from "./routes/UserRoutes/userExpenseRoutes.js";
@@ -36,6 +39,7 @@ dotenv.config(); // Load environment variables
     // Middleware
     app.use(cookieParser());
     app.use(express.json({ limit: "10mb" }));
+    // const __dirname = path.resolve();
     app.use(express.urlencoded({ limit: "10mb", extended: true }));
     app.use(
       cors({
@@ -52,6 +56,8 @@ dotenv.config(); // Load environment variables
     // Add explicit OPTIONS handling for preflight requests
     app.options("*", cors());
 
+    // Serve static files with correct MIME types
+    // app.use(express.static(path.join(__dirname, "public")));
     // User Routes*********************************************************
     app.use("/api/otp", otpRoute);
     app.use("/api/auth", userAuthRoute(userDbConnection)); // Pass the user database connection to routes
