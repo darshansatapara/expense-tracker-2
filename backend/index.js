@@ -39,6 +39,7 @@ dotenv.config(); // Load environment variables
     // Middleware
     app.use(cookieParser());
     app.use(express.json({ limit: "10mb" }));
+    // const __dirname = path.resolve();
     app.use(express.urlencoded({ limit: "10mb", extended: true }));
     app.use(
       cors({
