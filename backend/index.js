@@ -8,6 +8,9 @@ import {
 } from "./config/database.js";
 
 import cors from "cors";
+
+import path from "path";
+
 // Routes
 import userAuthRoute from "./routes/UserRoutes/userAuthRoutes.js";
 import userExpenseRoute from "./routes/UserRoutes/userExpenseRoutes.js";
@@ -82,6 +85,9 @@ dotenv.config(); // Load environment variables
 
     //report routes (if any)****************************************************************
     app.use("/api/report", reportRoute(userDbConnection, adminDbConnection));
+
+    // Serve static files with correct MIME types
+    app.use(express.static(path.join(__dirname, "public")));
 
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
