@@ -44,8 +44,8 @@ dotenv.config(); // Load environment variables
     app.use(
       cors({
         origin: [
+          "https://expense-tracker-frontend-phi-one.vercel.app", // Add your frontend's production URL
           "http://localhost:5173",
-          "https://expense-tracker-2-ml3k.vercel.app/", // Add your frontend's production URL
         ],
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
@@ -54,7 +54,6 @@ dotenv.config(); // Load environment variables
     );
 
     // Add explicit OPTIONS handling for preflight requests
-    app.options("*", cors());
 
     // Serve static files with correct MIME types
     // app.use(express.static(path.join(__dirname, "public")));
