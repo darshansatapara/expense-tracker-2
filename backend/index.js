@@ -36,11 +36,6 @@ dotenv.config(); // Load environment variables
     }
     const app = express();
 
-    // Middleware
-    app.use(cookieParser());
-    app.use(express.json({ limit: "10mb" }));
-    // const __dirname = path.resolve();
-    app.use(express.urlencoded({ limit: "10mb", extended: true }));
     app.use(
       cors({
         origin: [
@@ -53,10 +48,18 @@ dotenv.config(); // Load environment variables
       })
     );
 
+    // Handle preflight requests
+    app.options("*", cors());
+
+    // Middleware
+    app.use(cookieParser());
+    app.use(express.json({ limit: "10mb" }));
+    // const __dirname = path.resolve();
+    app.use(express.urlencoded({ limit: "10mb", extended: true }));
+   
+
     // Add explicit OPTIONS handling for preflight requests
 
-    // Serve static files with correct MIME types
-    // app.use(express.static(path.join(__dirname, "public")));
     // User Routes*********************************************************
     app.use("/api/otp", otpRoute);
     app.use("/api/auth", userAuthRoute(userDbConnection)); // Pass the user database connection to routes
