@@ -8,7 +8,10 @@ export const connectUserDatabase = async () => {
   try {
     const userDbConnection = mongoose.createConnection(
       process.env.USER_MONGO_URI,
-      { serverSelectionTimeoutMS: 30000 }
+      {
+        serverSelectionTimeoutMS: 30000, // Increase to 30 seconds
+        socketTimeoutMS: 45000, // Optional: max time a query can run
+      }
     );
     console.log("Connected to user database");
     return userDbConnection; // Return the connection instance
