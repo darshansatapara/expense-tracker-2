@@ -9,8 +9,6 @@ import {
 
 import cors from "cors";
 
-// import path from "path";
-
 // Routes
 import userAuthRoute from "./routes/UserRoutes/userAuthRoutes.js";
 import userExpenseRoute from "./routes/UserRoutes/userExpenseRoutes.js";
@@ -54,9 +52,7 @@ dotenv.config(); // Load environment variables
     // Middleware
     app.use(cookieParser());
     app.use(express.json({ limit: "10mb" }));
-    // const __dirname = path.resolve();
     app.use(express.urlencoded({ limit: "10mb", extended: true }));
-   
 
     // Add explicit OPTIONS handling for preflight requests
 
@@ -94,10 +90,12 @@ dotenv.config(); // Load environment variables
     // Register currencyRateRoute with the app
     app.use("/api/currencyrate", currencyRateRoute(adminDbConnection));
     // Schedule the currency update job
-    CurrencyDailyRateJob(adminDbConnection);
 
     //report routes (if any)****************************************************************
     app.use("/api/report", reportRoute(userDbConnection, adminDbConnection));
+
+    /////// job sheduler
+    CurrencyDailyRateJob(adminDbConnection);
 
     app.get("/", (req, res) => {
       res

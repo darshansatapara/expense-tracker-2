@@ -28,14 +28,15 @@ const fetchCurrencyRates = async (date) => {
     return null;
   }
 };
+// Function to store currency rates in the database
+// This function is called by the cron job to update the rates daily
 
-// Function to store currency rates into the admin database
 const storeRates = async (adminDbConnection, date) => {
   const CurrencyRateModel = CurrencyDailyRateModel(adminDbConnection);
 
   const today = new Date(date.split("-").reverse().join("-"));
   const year = today.getFullYear();
-  const month = today.getMonth() + 1; // 1-12
+  const month = today.getMonth() + 1;
   const day = today.getDate();
 
   const formattedDate = date;
@@ -54,34 +55,25 @@ const storeRates = async (adminDbConnection, date) => {
         {
           startMonth,
           endMonth,
-          days: [{ date: formattedDate, rates: [] }],
+          days: [],
         },
       ],
     });
-  } else {
-    let monthData = currencyRate.months.find(
-      (m) => m.startMonth === startMonth
-    );
-
-    if (!monthData) {
-      currencyRate.months.push({
-        startMonth,
-        endMonth,
-        days: [{ date: formattedDate, rates: [] }],
-      });
-    } else {
-      let dayData = monthData.days.find((d) => d.date === formattedDate);
-      if (dayData) {
-        console.log(
-          `✅ Rates for ${formattedDate} already exist. Skipping update.`
-        );
-        return;
-      } else {
-        monthData.days.push({ date: formattedDate, rates: [] });
-      }
-    }
   }
 
+  let monthData = currencyRate.months.find((m) => m.startMonth === startMonth);
+  if (!monthData) {
+    monthData = {
+      startMonth,
+      endMonth,
+      days: [],
+    };
+    currencyRate.months.push(monthData);
+  }
+
+  let dayData = monthData.days.find((d) => d.date === formattedDate);
+
+  // Fetch latest currency rates
   const rates = await fetchCurrencyRates(formattedDate);
   if (!rates) return;
 
@@ -94,16 +86,29 @@ const storeRates = async (adminDbConnection, date) => {
     value: rates[currency.currency].toString(),
   }));
 
-  currencyRate.months.forEach((month) => {
-    month.days.forEach((day) => {
-      if (day.date === formattedDate) {
-        day.rates = mappedRates;
-      }
-    });
-  });
+  if (dayData) {
+    // Compare and update only if the rates are different
+    const existingRatesString = JSON.stringify(dayData.rates);
+    const newRatesString = JSON.stringify(mappedRates);
+
+    if (existingRatesString !== newRatesString) {
+      dayData.rates = mappedRates;
+      console.log(
+        `🔁 Rates for ${formattedDate} changed. Updated successfully.`
+      );
+    } else {
+      console.log(
+        `✅ Rates for ${formattedDate} already up-to-date. No changes needed.`
+      );
+      return;
+    }
+  } else {
+    // If no record for today, add a new one
+    monthData.days.push({ date: formattedDate, rates: mappedRates });
+    console.log(`✅ Currency rates for ${formattedDate} stored successfully.`);
+  }
 
   await currencyRate.save();
-  console.log(`✅ Currency rates for ${formattedDate} stored successfully.`);
 };
 
 export const getCurrencyRatesByDate =
@@ -219,6 +224,5 @@ export const getCurrencyRatesByMonthRange =
         .json({ success: false, message: "Internal server error." });
     }
   };
-
 
 export default storeRates;

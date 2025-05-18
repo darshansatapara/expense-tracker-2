@@ -14,45 +14,45 @@ import incomeSources from "./income.js";
 import mongoose from "mongoose";
 import categories from "./category.js";
 
-// **********************************Function to add currencies to the database
-const saveCurrency = async (currencyData, CurrencyModel) => {
-  try {
-    const newCurrency = new CurrencyModel({
-      ...currencyData,
-      isCurrencyActive: true, // Default to active
-    });
+// // **********************************Function to add currencies to the database
+// const saveCurrency = async (currencyData, CurrencyModel) => {
+//   try {
+//     const newCurrency = new CurrencyModel({
+//       ...currencyData,
+//       isCurrencyActive: true, // Default to active
+//     });
 
-    await newCurrency.save();
-    console.log(`Added currency: ${currencyData.currency}`);
-  } catch (error) {
-    console.error(
-      `Error adding currency "${currencyData.currency}":`,
-      error.message
-    );
-  }
-};
+//     await newCurrency.save();
+//     console.log(`Added currency: ${currencyData.currency}`);
+//   } catch (error) {
+//     console.error(
+//       `Error adding currency "${currencyData.currency}":`,
+//       error.message
+//     );
+//   }
+// };
 
-const addCurrencies = async () => {
-  try {
-    const adminDbConnection = await connectAdminDatabase(); // Ensure this function is defined
-    const CurrencyModel = AdminCurrencyCategory(adminDbConnection);
+// const addCurrencies = async () => {
+//   try {
+//     const adminDbConnection = await connectAdminDatabase(); // Ensure this function is defined
+//     const CurrencyModel = AdminCurrencyCategory(adminDbConnection);
 
-    // Add each currency from the array
-    for (const currencyData of currencies) {
-      await saveCurrency(currencyData, CurrencyModel);
-    }
+//     // Add each currency from the array
+//     for (const currencyData of currencies) {
+//       await saveCurrency(currencyData, CurrencyModel);
+//     }
 
-    console.log("All currencies have been added successfully.");
-  } catch (error) {
-    console.error("Error adding currencies:", error.message);
-  } finally {
-    // Disconnect from MongoDB
-    mongoose.connection.close();
-  }
-};
+//     console.log("All currencies have been added successfully.");
+//   } catch (error) {
+//     console.error("Error adding currencies:", error.message);
+//   } finally {
+//     // Disconnect from MongoDB
+//     mongoose.connection.close();
+//   }
+// };
 
-// Run the script
-addCurrencies();
+// // Run the script
+// addCurrencies();
 
 // Function to save a income category with its subcategories****************
 // Save category with its subcategories
@@ -116,66 +116,64 @@ addCurrencies();
 
 // Function to save expense a category and its subcategories***********************************
 // Save category with its subcategories
-// const saveCategoryWithSubcategories = async (
-//   categoryName,
-//   subcategories,
-//   AdminExpenseCategoryModel
-// ) => {
-//   try {
-//     // Map the subcategories to objects with _id, name, and isSubCategoryActive
-//     const subcategoryObjects = subcategories.map((subcategoryName) => ({
-//       _id: new mongoose.Types.ObjectId(),
-//       name: subcategoryName,
-//       isSubCategoryActive: true, // Default to active
-//     }));
+const saveCategoryWithSubcategories = async (
+  categoryName,
+  subcategories,
+  AdminExpenseCategoryModel
+) => {
+  try {
+    const subcategoryObjects = subcategories.map((subcategoryName) => ({
+      _id: new mongoose.Types.ObjectId(),
+      name: subcategoryName,
+      isSubCategoryActive: true,
+    }));
 
-//     // Create a new category document
-//     const category = new AdminExpenseCategoryModel({
-//       name: categoryName,
-//       isCategoryActive: true, // Default to active
-//       subcategories: subcategoryObjects,
-//     });
+    const category = new AdminExpenseCategoryModel({
+      name: categoryName,
+      isCategoryActive: true,
+      subcategories: subcategoryObjects,
+    });
 
-//     // Save to the database
-//     await category.save();
-//     console.log(
-//       `Category "${categoryName}" with subcategories added successfully.`
-//     );
-//   } catch (error) {
-//     console.error(`Error adding category "${categoryName}":`, error.message);
-//   }
-// };
+    await category.save();
+    console.log(
+      `Category "${categoryName}" with subcategories added successfully.`
+    );
+  } catch (error) {
+    console.error(`Error adding category "${categoryName}":`, error.message);
+    throw error; // Rethrow to handle in caller
+  }
+};
 
-// // Add categories and subcategories to the database
-// const addCategories = async () => {
-//   try {
-//     // Connect to MongoDB
-//     const adminDbConnection = await connectAdminDatabase();
-//     console.log("Connected to MongoDB");
+const addCategories = async () => {
+  let adminDbConnection;
+  try {
+    adminDbConnection = await connectAdminDatabase();
+    console.log("Connected to MongoDB");
 
-//     // Get the AdminExpenseCategory model
-//     const AdminExpenseCategoryModel = AdminExpenseCategory(adminDbConnection);
+    const AdminExpenseCategoryModel = AdminExpenseCategory(adminDbConnection);
 
-//     // Iterate through the categories object and add each category
-//     for (const [categoryName, subcategories] of Object.entries(categories)) {
-//       await saveCategoryWithSubcategories(
-//         categoryName,
-//         subcategories,
-//         AdminExpenseCategoryModel
-//       );
-//     }
+    for (const [categoryName, subcategories] of Object.entries(categories)) {
+      await saveCategoryWithSubcategories(
+        categoryName,
+        subcategories,
+        AdminExpenseCategoryModel
+      );
+    }
 
-//     console.log("All categories and subcategories added successfully.");
-//   } catch (error) {
-//     console.error("Error adding categories:", error.message);
-//   } finally {
-//     // Disconnect from MongoDB
-//     mongoose.connection.close();
-//   }
-// };
+    console.log("All categories and subcategories added successfully.");
+  } catch (error) {
+    console.error("Error adding categories:", error.message);
+    process.exit(1); // Exit with failure
+  } finally {
+    if (adminDbConnection && adminDbConnection.readyState === 1) {
+      await adminDbConnection.close();
+      console.log("MongoDB connection closed");
+    }
+  }
+};
 
-// // Run the script
-// addCategories();
+// Run the script
+addCategories();
 
 // *************************************************Copy data function
 
